@@ -1,7 +1,10 @@
 api_platform:
-    title: Hello API Platform
-    version: 1.0.0
-    defaults:
-        stateless: true
-        cache_headers:
-            vary: ['Content-Type', 'Authorization', 'Origin']
+  title: Système de réservation de vols d'avion # titre de la documentation de l’API
+  version: 1.0.0
+  formats:
+    json: ["application/json"] # format par défaut de retour des ressources API
+    jsonld: ["application/ld+json"] #format optionnel pour les tests
+  defaults:
+    stateless: true
+    cache_headers:
+      vary: ["Content-Type", "Authorization", "Origin"]
