@@ -2,11 +2,14 @@
 
 namespace App\Entity;
 
-use App\Repository\AirplaneRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use ApiPlatform\Metadata\ApiResource;
+use App\Repository\AirplaneRepository;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: AirplaneRepository::class)]
+#[ApiResource]
 class Airplane
 {
     #[ORM\Id]
@@ -15,12 +18,20 @@ class Airplane
     private ?int $id = null;
 
     #[ORM\Column(length: 12)]
+    #[Assert\NotBlank(message: 'Le modèle de l\'avion doit être renseigné')]
+    #[Assert\Length(
+        max: 12,
+        maxMessage: 'Le modèle de l\'avion ne doit pas dépasser 12 caractères'
+    )]
     private ?string $model = null;
 
     #[ORM\Column]
+    #[Assert\Positive(message: 'La capacité doit être un nombre supérieur à zéro')]
     private ?int $capacity = null;
 
     #[ORM\Column]
+    #[Assert\NotBlank(message: 'La date de création de la donnée doit être renseignée')]
+    #[Assert\DateTime('L\'information doit être au format date Y-m-d H:i:s')]
     private ?\DateTimeImmutable $created_at = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
