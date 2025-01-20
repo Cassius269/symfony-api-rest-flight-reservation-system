@@ -11,6 +11,7 @@ use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Metadata\ApiResource;
 use App\Repository\AirplaneRepository;
 use ApiPlatform\Metadata\GetCollection;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
@@ -20,12 +21,19 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
     message: 'Un modèle similaire d\'avion est déjà présente dans le serveur'
 )]
 #[ApiResource(
+    // Exposition des champs en phase de sérialisation et déserialisation
+    normalizationContext: ['groups' => ['airplane.read']], // convertir un objet Airplane au format json, utile en lecture
     operations: [
         new Get(), // obtenir une ressource Avion à l'aide de son ID
-        new GetCollection(), // obtenir toutes les ressources de type avion se trouvant dans le serveur
+        new GetCollection( // obtenir toutes les ressources de type avion se trouvant dans le serveur
+            paginationEnabled: true, // activer la pagination des ressources Avions
+            paginationItemsPerPage: 10 // 10 ressources avions affichées par page
+        ),
         new Post(), // créer une nouvelle ressource de type Avion à l'aide de son ID
         new Delete(), // supprimer une ressource du serveur à l'aide son ID
-        new Patch(), // mettre à jour partiellement une ressource à l'aide de son ID
+        new Patch( // convertir une donnée JSON en objet, utile en écriture
+            normalizationContext: ['groups' => ['airplane.write']],
+        ), // mettre à jour partiellement une ressource à l'aide de son ID
     ]
 )]
 class Airplane
@@ -33,6 +41,7 @@ class Airplane
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['airplane.read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 12)]
@@ -41,17 +50,21 @@ class Airplane
         max: 12,
         maxMessage: 'Le modèle de l\'avion ne doit pas dépasser 12 caractères'
     )]
+    #[Groups(['airplane.read', 'airplane.write'])]
     private ?string $model = null;
 
     #[ORM\Column]
     #[Assert\Positive(message: 'La capacité de l\'avion doit être un nombre supérieur à zéro')]
+    #[Groups(['airplane.read', 'airplane.write'])]
     private ?int $capacity = null;
 
     #[ORM\Column]
     #[Assert\NotBlank(message: 'La date de création de la donnée doit être renseignée')]
+    #[Groups(['airplane.read', 'airplane.write'])]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+    #[Groups(['airplane.read', 'airplane.write'])]
     private ?\DateTimeInterface $updatedAt = null;
 
     public function getId(): ?int
