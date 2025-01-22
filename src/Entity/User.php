@@ -2,49 +2,61 @@
 
 namespace App\Entity;
 
-use App\Repository\UserRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
-use Symfony\Component\Security\Core\User\UserInterface;
+use App\Repository\UserRepository;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
+#[UniqueEntity(fields: ['email'], message: 'Cet email est déjà utilisé.')] // Message d'erreur personnalisé pour éviter les emails en doublons
 #[ORM\InheritanceType('JOINED')]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['passenger.read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 180)]
     #[Assert\Email(message: 'veuillez entrer un email valide')]
+    #[Groups(['passenger.read', 'passenger.write'])]
     private ?string $email = null;
 
     /**
      * @var list<string> The user roles
      */
     #[ORM\Column]
+    #[Groups(['passenger.write'])]
+    #[Assert\NotBlank(message: 'chaque utilisateur doit avoir un rôle prédéfini')]
     private array $roles = [];
 
     /**
      * @var string The hashed password
      */
     #[ORM\Column]
+    #[Groups(['passenger.write'])]
     private ?string $password = null;
 
     #[ORM\Column(length: 30)]
+    #[Groups(['passenger.read', 'passenger.write'])]
     private ?string $firstname = null;
 
     #[ORM\Column(length: 30)]
+    #[Groups(['passenger.read', 'passenger.write'])]
     private ?string $lastname = null;
 
     #[ORM\Column]
+    #[Groups(['passenger.read'])]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+    #[Groups(['passenger.read', 'passenger.write'])]
     private ?\DateTimeInterface $updatedAt = null;
 
     public function getId(): ?int
