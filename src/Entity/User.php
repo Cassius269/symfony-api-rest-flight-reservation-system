@@ -20,19 +20,19 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['passenger.read'])]
+    // #[Groups(['passenger.read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 180)]
     #[Assert\Email(message: 'veuillez entrer un email valide')]
-    #[Groups(['passenger.read', 'passenger.write'])]
+    // #[Groups(['passenger.read', 'passenger.write'])]
     private ?string $email = null;
 
     /**
      * @var list<string> The user roles
      */
     #[ORM\Column]
-    #[Groups(['passenger.write'])]
+    // #[Groups(['passenger.write'])]
     #[Assert\NotBlank(message: 'chaque utilisateur doit avoir un rôle prédéfini')]
     private array $roles = [];
 
@@ -40,23 +40,23 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @var string The hashed password
      */
     #[ORM\Column]
-    #[Groups(['passenger.write'])]
+    // #[Groups(['passenger.write'])]
     private ?string $password = null;
 
     #[ORM\Column(length: 30)]
-    #[Groups(['passenger.read', 'passenger.write'])]
+    // #[Groups(['passenger.read', 'passenger.write'])]
     private ?string $firstname = null;
 
     #[ORM\Column(length: 30)]
-    #[Groups(['passenger.read', 'passenger.write'])]
+    // #[Groups(['passenger.read', 'passenger.write'])]
     private ?string $lastname = null;
 
     #[ORM\Column]
-    #[Groups(['passenger.read'])]
+    // #[Groups(['passenger.read'])]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
-    #[Groups(['passenger.read', 'passenger.write'])]
+    // #[Groups(['passenger.read', 'passenger.write'])]
     private ?\DateTimeInterface $updatedAt = null;
 
     public function getId(): ?int
