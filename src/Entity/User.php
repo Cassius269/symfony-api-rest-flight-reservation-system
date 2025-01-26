@@ -44,15 +44,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $password = null;
 
     #[ORM\Column(length: 30)]
-    // #[Groups(['passenger.read', 'passenger.write'])]
+    #[Groups(['passenger.read', 'passenger.write'])]
     private ?string $firstname = null;
 
     #[ORM\Column(length: 30)]
-    // #[Groups(['passenger.read', 'passenger.write'])]
+    #[Groups(['passenger.read', 'passenger.write'])]
     private ?string $lastname = null;
 
     #[ORM\Column]
-    // #[Groups(['passenger.read'])]
+    #[Groups(['passenger.read'])]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]

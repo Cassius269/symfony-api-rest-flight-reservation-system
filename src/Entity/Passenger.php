@@ -7,24 +7,24 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Delete;
 use Doctrine\ORM\Mapping as ORM;
+use App\Dto\PassengerResponseDto;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
-use App\Dto\PassengerResponseDto;
 use App\Repository\PassengerRepository;
-use App\State\PassengerStateProcessor;
+use App\State\InsertPassengerProcessor;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
 
 #[ORM\Entity(repositoryClass: PassengerRepository::class)]
 #[ApiResource(
-    // normalizationContext: ['groups' => ['passenger.read']],
+    normalizationContext: ['groups' => ['passenger.read']],
     // denormalizationContext: ['groups' => ['passenger.write']],
     operations: [
         new GetCollection(), // récupérer toutes les ressources passagers
         new Get(), // récuperer une ressource passager à l'aide de son ID
         new Post( // envoyer une nouvelle ressource passager
-            processor: PassengerStateProcessor::class, // liaison du processeur à la route de création de ressource passagers, 
-            input: PassengerResponseDto::class
+            processor: InsertPassengerProcessor::class, // liaison du processeur à la route de création de ressource passagers, 
+            // input: PassengerResponseDto::class
         ),
         new Patch(), // modifier une ressource passager présente dans le serveur à l'aide de son ID,
         new Delete() // supprimer une ressource passager présent dans le serveur à l'aide de son ID
