@@ -10,6 +10,7 @@ use ApiPlatform\State\ProcessorInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
+// Ce processor n'utilise pas de DTO, il utilise directement l'entité, ensuite les groupes de sérialisation pour choisir les champs exposés à l'affichage du résultat
 class InsertPassengerProcessor implements ProcessorInterface
 {
     public function __construct(

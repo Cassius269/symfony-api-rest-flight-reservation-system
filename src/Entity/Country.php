@@ -2,13 +2,26 @@
 
 namespace App\Entity;
 
-use App\Repository\CountryRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
-use Doctrine\ORM\Mapping as ORM;
+
 use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\Mapping as ORM;
+use ApiPlatform\Metadata\ApiResource;
+use App\Repository\CountryRepository;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 #[ORM\Entity(repositoryClass: CountryRepository::class)]
+#[UniqueEntity(
+    fields: 'name',
+    message: 'Le nom de pays {{ value }} existe déjà'
+)]
+#[UniqueEntity(
+    fields: 'isoCode',
+    message: 'Le code ISO {{ value }} existe déjà'
+)]
+#[ApiResource] // Transformer l'entité Country en une ressource API, avec toutes les opérations CRUD
 class Country
 {
     #[ORM\Id]
@@ -17,15 +30,27 @@ class Country
     private ?int $id = null;
 
     #[ORM\Column(length: 50)]
+    #[Assert\NotBlank(message: 'Le nom du pays est obligatoire')]
     private ?string $name = null;
 
     #[ORM\Column(length: 3, nullable: true)]
+    #[Assert\NotBlank(message: 'Le code ISO du pays est obligatoire')]
+    #[Assert\Length(
+        max: 3,
+        maxMessage: 'Le code ISO du pays doit contenir {{ limit }} caractères'
+    )]
     private ?string $isoCode = null;
 
     #[ORM\Column(length: 50)]
+    #[Assert\NotBlank(message: 'La timezone du pays est obligatoire')]
+    #[Assert\Length(
+        max: 15,
+        maxMessage: 'La timezone est trop longue'
+    )]
     private ?string $timezone = null;
-
+    #[Assert\NotBlank(message: 'La date de création de la donnée est obligatoire')]
     #[ORM\Column(type: Types::DATE_IMMUTABLE)]
+    #[Assert\NotBlank(message: 'La date de création de la data d\'un pays est obligatoire')]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]

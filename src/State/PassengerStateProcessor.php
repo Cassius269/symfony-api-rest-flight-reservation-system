@@ -10,6 +10,7 @@ use App\Dto\PassengerResponseDto;
 use App\Entity\Passenger;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
+// Ce processor utilise le principe de Data Transfert Object (pas besoin de groupe de sérialisation avec les DTO)
 class PassengerStateProcessor implements ProcessorInterface
 {
     public function __construct(private EntityManagerInterface $entityManager, private PassengerRepository $passengerRepository, private UserPasswordHasherInterface $passwordHasher) {}
