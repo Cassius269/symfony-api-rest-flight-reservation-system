@@ -48,7 +48,6 @@ class Country
         maxMessage: 'La timezone est trop longue'
     )]
     private ?string $timezone = null;
-    #[Assert\NotBlank(message: 'La date de création de la donnée est obligatoire')]
     #[ORM\Column(type: Types::DATE_IMMUTABLE)]
     #[Assert\NotBlank(message: 'La date de création de la data d\'un pays est obligatoire')]
     private ?\DateTimeImmutable $createdAt = null;

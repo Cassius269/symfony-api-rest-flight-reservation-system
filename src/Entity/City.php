@@ -2,13 +2,34 @@
 
 namespace App\Entity;
 
-use App\Repository\CityRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
+use App\Dto\CityResponseDto;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\Post;
 use Doctrine\DBAL\Types\Types;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Delete;
 use Doctrine\ORM\Mapping as ORM;
+use App\State\CityStateProcessor;
+use App\Repository\CityRepository;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\GetCollection;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: CityRepository::class)]
+#[ApiResource(
+    operations: [
+        new Post( // enregistrer une nouvelle ressource City sur le serveur 
+            processor: CityStateProcessor::class, // liaison du processor (traitement) avec l'entité
+            input: CityResponseDto::class // utilisation d'un Dto plutôt que l'entité pour séparer les responsabilités
+        ),
+        new Get(),
+        new GetCollection(),
+        new Delete(),
+        new Patch()
+    ]
+)]
 class City
 {
     #[ORM\Id]
@@ -17,6 +38,11 @@ class City
     private ?int $id = null;
 
     #[ORM\Column(length: 50)]
+    #[Assert\Length(
+        min: 4,
+        minMessage: 'Le nom d\'une ville est trop court'
+    )]
+    #[Assert\NotBlank(message: 'Le nom d\'une ville est obligatoire')]
     private ?string $name = null;
 
     #[ORM\ManyToOne(inversedBy: 'cities')]
@@ -30,6 +56,7 @@ class City
     private Collection $flights;
 
     #[ORM\Column(type: Types::DATE_IMMUTABLE)]
+    #[Assert\NotBlank(message: 'La date de création de la donnée d\'une ville est obligatoire')]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
