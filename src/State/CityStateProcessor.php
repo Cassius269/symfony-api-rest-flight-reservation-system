@@ -33,7 +33,6 @@ class CityStateProcessor implements ProcessorInterface
         }
 
         // Création d'un nouvel objet City
-        // la date de création est gérée par un évènement Doctrine
         $city = new City;
         $city->setCreatedAt(new \DateTimeImmutable())
             ->setName($data->name)

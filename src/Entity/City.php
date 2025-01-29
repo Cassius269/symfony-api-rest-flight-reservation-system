@@ -24,10 +24,10 @@ use Symfony\Component\Validator\Constraints as Assert;
             processor: CityStateProcessor::class, // liaison du processor (traitement) avec l'entité
             input: CityResponseDto::class // utilisation d'un Dto plutôt que l'entité pour séparer les responsabilités
         ),
-        new Get(),
-        new GetCollection(),
-        new Delete(),
-        new Patch()
+        new Get(), // récuperer une ressource City à l'aide de son ID
+        new GetCollection(), // récuperer l'ensemble des ressources City présentes dans le serveur
+        new Delete(), // supprimer une ressource City à l'aide de son ID
+        new Patch() // modifier une ressource City à l'aide de son ID
     ]
 )]
 class City
@@ -52,7 +52,7 @@ class City
     /**
      * @var Collection<int, Flight>
      */
-    #[ORM\OneToMany(targetEntity: Flight::class, mappedBy: 'city_departure')]
+    #[ORM\OneToMany(targetEntity: Flight::class, mappedBy: 'cityDeparture')]
     private Collection $flights;
 
     #[ORM\Column(type: Types::DATE_IMMUTABLE)]
