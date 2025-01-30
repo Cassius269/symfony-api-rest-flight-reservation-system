@@ -4,6 +4,8 @@ namespace App\Entity;
 
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Post;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Delete;
@@ -66,6 +68,17 @@ class Airplane
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     #[Groups(['airplane.read', 'airplane.write'])]
     private ?\DateTimeInterface $updatedAt = null;
+
+    /**
+     * @var Collection<int, Flight>
+     */
+    #[ORM\OneToMany(targetEntity: Flight::class, mappedBy: 'airplane')]
+    private Collection $flights;
+
+    public function __construct()
+    {
+        $this->flights = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -132,6 +145,36 @@ class Airplane
     public function setUpdatedAt($updatedAt)
     {
         $this->updatedAt = $updatedAt;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Flight>
+     */
+    public function getFlights(): Collection
+    {
+        return $this->flights;
+    }
+
+    public function addFlight(Flight $flight): static
+    {
+        if (!$this->flights->contains($flight)) {
+            $this->flights->add($flight);
+            $flight->setAirplane($this);
+        }
+
+        return $this;
+    }
+
+    public function removeFlight(Flight $flight): static
+    {
+        if ($this->flights->removeElement($flight)) {
+            // set the owning side to null (unless already changed)
+            if ($flight->getAirplane() === $this) {
+                $flight->setAirplane(null);
+            }
+        }
 
         return $this;
     }

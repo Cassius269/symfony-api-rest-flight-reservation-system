@@ -13,6 +13,8 @@ use App\State\CityStateProcessor;
 use App\Repository\CityRepository;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
+use App\Dto\CityRequestDto;
+use App\State\CityStateProvider;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -24,7 +26,10 @@ use Symfony\Component\Validator\Constraints as Assert;
             processor: CityStateProcessor::class, // liaison du processor (traitement) avec l'entité
             input: CityResponseDto::class // utilisation d'un Dto plutôt que l'entité pour séparer les responsabilités
         ),
-        new Get(), // récuperer une ressource City à l'aide de son ID
+        new Get( // récuperer une ressource City à l'aide de son ID
+            provider: CityStateProvider::class,
+            output: CityRequestDto::class
+        ),
         new GetCollection(), // récuperer l'ensemble des ressources City présentes dans le serveur
         new Delete(), // supprimer une ressource City à l'aide de son ID
         new Patch() // modifier une ressource City à l'aide de son ID

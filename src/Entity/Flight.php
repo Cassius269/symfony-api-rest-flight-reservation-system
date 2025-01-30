@@ -2,15 +2,16 @@
 
 namespace App\Entity;
 
-use ApiPlatform\Metadata\ApiResource;
-use App\Repository\FlightRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\FlightRepository;
+use ApiPlatform\Metadata\ApiResource;
+use Doctrine\Common\Collections\Collection;
+use Symfony\Component\Validator\Constraints as Assert;
+use Doctrine\Common\Collections\ArrayCollection;
 
 #[ORM\Entity(repositoryClass: FlightRepository::class)]
-#[ApiResource]
+#[ApiResource] // Déclaration de l'entité Flight comme ressource de l'API
 class Flight
 {
     #[ORM\Id]
@@ -19,17 +20,21 @@ class Flight
     private ?int $id = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[Assert\NotBlank(message: "Une date de départ doit être renseignée")]
     private ?\DateTimeInterface $dateDeparture = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[Assert\NotBlank(message: "Une date d'arrivée doit être renseignée")]
     private ?\DateTimeInterface $dateArrival = null;
 
     #[ORM\ManyToOne(inversedBy: 'flights')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Assert\NotBlank(message: "Une ville de départ doit être renseignée")]
     private ?City $cityDeparture = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
+    #[Assert\NotBlank(message: "Une ville d'arrivée doit être renseignée")]
     private ?City $cityArrival = null;
 
     #[ORM\Column(type: Types::DATE_IMMUTABLE)]
@@ -43,6 +48,11 @@ class Flight
      */
     #[ORM\OneToMany(targetEntity: Reservation::class, mappedBy: 'flight', orphanRemoval: true)]
     private Collection $reservations;
+
+    #[ORM\ManyToOne(inversedBy: 'flights')]
+    #[ORM\JoinColumn(nullable: false)]
+    #[Assert\NotBlank(message: "Un avion doit renseigné pour le vol")]
+    private ?Airplane $airplane = null;
 
     public function __construct()
     {
@@ -200,6 +210,18 @@ class Flight
     public function setCityArrival($cityArrival)
     {
         $this->cityArrival = $cityArrival;
+
+        return $this;
+    }
+
+    public function getAirplane(): ?Airplane
+    {
+        return $this->airplane;
+    }
+
+    public function setAirplane(?Airplane $airplane): static
+    {
+        $this->airplane = $airplane;
 
         return $this;
     }
