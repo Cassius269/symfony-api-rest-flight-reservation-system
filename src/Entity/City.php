@@ -17,6 +17,7 @@ use App\Dto\CityRequestDto;
 use App\State\CityStateProvider;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: CityRepository::class)]
@@ -27,13 +28,17 @@ use Symfony\Component\Validator\Constraints as Assert;
             input: CityResponseDto::class // utilisation d'un Dto plutôt que l'entité pour séparer les responsabilités
         ),
         new Get( // récuperer une ressource City à l'aide de son ID
-            provider: CityStateProvider::class,
-            output: CityRequestDto::class
+            provider: CityStateProvider::class, // liaison avec le traitement (provider) lié à cette opération
+            output: CityRequestDto::class // liaison du provider avec le DTO CityRequestDto
         ),
         new GetCollection(), // récuperer l'ensemble des ressources City présentes dans le serveur
         new Delete(), // supprimer une ressource City à l'aide de son ID
         new Patch() // modifier une ressource City à l'aide de son ID
     ]
+)]
+#[UniqueEntity( // mettre une contrainte d'unicité sur le nom, le code postal (s'il y en a), le pays d'une ville pour éviter les villes doublons
+    fields: ['name', 'zipCode', 'country'],
+    message: 'Une ville similaire existe',
 )]
 class City
 {
@@ -66,6 +71,9 @@ class City
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $updatedAt = null;
+
+    #[ORM\Column(length: 10, nullable: true)]
+    private ?string $zipCode = null;
 
     public function __construct()
     {
@@ -167,6 +175,18 @@ class City
     public function setUpdatedAt($updatedAt)
     {
         $this->updatedAt = $updatedAt;
+
+        return $this;
+    }
+
+    public function getZipCode(): ?string
+    {
+        return $this->zipCode;
+    }
+
+    public function setZipCode(string $zipCode): static
+    {
+        $this->zipCode = $zipCode;
 
         return $this;
     }

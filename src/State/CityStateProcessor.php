@@ -36,6 +36,7 @@ class CityStateProcessor implements ProcessorInterface
         $city = new City;
         $city->setCreatedAt(new \DateTimeImmutable())
             ->setName($data->name)
+            ->setZipCode($data->zipCode)
             ->setCountry($isCountryExist);
 
         // Validation des données avant envoi en base de données 
@@ -47,7 +48,7 @@ class CityStateProcessor implements ProcessorInterface
             $this->entityManager->persist($city);
             $this->entityManager->flush();
 
-            return $data;
+            return $data; // renvoyer le DTO en cas de succès d'enregistrement de la nouvelle ressource City
         }
 
         if (count($errors) > 0) { // s'il y a des erreurs trouvées 
