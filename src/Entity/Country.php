@@ -176,4 +176,10 @@ class Country
 
         return $this;
     }
+
+    // Cette méthode permet de stringifier l'objet Country
+    public function __toString(): string
+    {
+        return $this->getName(); // Supposons que la propriété s'appelle 'name'
+    }
 }

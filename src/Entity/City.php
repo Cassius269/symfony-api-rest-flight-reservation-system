@@ -38,7 +38,8 @@ use Symfony\Component\Validator\Constraints as Assert;
 )]
 #[UniqueEntity( // mettre une contrainte d'unicité sur le nom, le code postal (s'il y en a), le pays d'une ville pour éviter les villes doublons
     fields: ['name', 'zipCode', 'country'],
-    message: 'Une ville similaire existe',
+    message: 'Une ville similaire ayant le même code postal existe en {{ value }}',
+    errorPath: 'country'
 )]
 class City
 {
