@@ -5,6 +5,7 @@ namespace App\Dto;
 use DateTimeImmutable;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 
+// Création d'un DTO pour la création de nouvelle ressource Passager d'un vol
 class PassengerResponseDto implements PasswordAuthenticatedUserInterface
 {
     // Rendre publiques les données que l'on souhaite traiter
