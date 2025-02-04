@@ -2,7 +2,7 @@
 
 namespace App\Dto;
 
-// Création d'un DTO pour le transfert de données lors de la création d'une nouvelle ressource Avion
+// Création d'un DTO pour retourner les données d'un nouvel avion créé
 class AirplaneResponseDto
 {
     public ?string $model = null;

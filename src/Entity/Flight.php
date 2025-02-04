@@ -2,16 +2,35 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\Get;
+use App\Dto\FlightRequestDto;
+use ApiPlatform\Metadata\Post;
 use Doctrine\DBAL\Types\Types;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Delete;
 use Doctrine\ORM\Mapping as ORM;
+use App\State\FlightStateProcessor;
 use App\Repository\FlightRepository;
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\GetCollection;
 use Doctrine\Common\Collections\Collection;
-use Symfony\Component\Validator\Constraints as Assert;
 use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: FlightRepository::class)]
-#[ApiResource] // Déclaration de l'entité Flight comme ressource de l'API
+#[ApiResource( // Déclaration de l'entité Flight comme ressource de l'API
+    operations: [
+        new Get(), // récuperer une ressource vol d'avion à l'aide de son ID
+        new GetCollection(), // récuperer l'ensemble des ressources de type vol d'avion présent dans le serveur
+        new Post(
+            // créer une nouvelle ressource vol d'avion
+            processor: FlightStateProcessor::class,
+            input: FlightRequestDto::class
+        ),
+        new Patch(), // modifier une ressource vol d'avion à l'aide de son ID
+        new Delete() // supprimer une ressource vol d'avion à l'aide de son ID
+    ]
+)]
 class Flight
 {
     #[ORM\Id]
@@ -37,7 +56,7 @@ class Flight
     #[Assert\NotBlank(message: "Une ville d'arrivée doit être renseignée")]
     private ?City $cityArrival = null;
 
-    #[ORM\Column(type: Types::DATE_IMMUTABLE)]
+    #[ORM\Column]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
