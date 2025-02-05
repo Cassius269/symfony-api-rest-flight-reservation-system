@@ -4,7 +4,6 @@ namespace App\State;
 
 use App\Entity\Flight;
 use App\Dto\CityRequestDto;
-use App\Dto\CityResponseDto;
 use App\Dto\FlightResponseDto;
 use App\Repository\CityRepository;
 use ApiPlatform\Metadata\Operation;
@@ -27,24 +26,21 @@ class FlightStateProcessor implements ProcessorInterface
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): object
     {
-        // Rechercher l'objet pays de départ
-        $countryArrival = $this->countryRepository->findOneByName([
-            'name' => $data->getCityArrival()->country
-        ]);
+        // Rechercher l'objet pays d'arrivée
+        $countryArrival = $this->countryRepository->findCountryByName($data->getCityArrival()->country);
 
         // Rechercher l'objet pays de départ
-        $countryDeparture = $this->countryRepository->findOneByName([
-            'name' => $data->getCityDeparture()->country
-        ]);
+        $countryDeparture = $this->countryRepository->findCountryByName($data->getCityDeparture()->country);
 
-
-        // // Rechercher les villes de départ et de destination
+        // Rechercher les villes de départ et de destination
         $isExistCityDeparture = $this->cityRepository->findOneBy(
             [
                 'name' => $data->getCityDeparture()->name, // le nom de la ville de départ
                 'country' => $countryDeparture // le pays de départ
             ]
         );
+
+        dd($isExistCityDeparture);
 
         $isExistCityArrival = $this->cityRepository->findOneBy(
             [
