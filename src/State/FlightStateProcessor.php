@@ -7,12 +7,14 @@ use App\Dto\CityRequestDto;
 use App\Dto\FlightResponseDto;
 use App\Repository\CityRepository;
 use ApiPlatform\Metadata\Operation;
+use App\Repository\FlightRepository;
 use App\Repository\CountryRepository;
 use App\Repository\AirplaneRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use ApiPlatform\State\ProcessorInterface;
-use App\Repository\FlightRepository;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 
 class FlightStateProcessor implements ProcessorInterface
 {
@@ -26,52 +28,34 @@ class FlightStateProcessor implements ProcessorInterface
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): object
     {
-        // Rechercher l'objet pays d'arrivée
-        $countryArrival = $this->countryRepository->findCountryByName($data->getCityArrival()->country);
+        // Rechercher les villes de départ et de destination à l'aide du nom de la ville et du pays
+        $isExistCityDeparture = $this->cityRepository->findDestinationByCityAndCountry($data->getCityDeparture()->name, $data->getCityDeparture()->country);
 
-        // Rechercher l'objet pays de départ
-        $countryDeparture = $this->countryRepository->findCountryByName($data->getCityDeparture()->country);
+        $isExistCityArrival = $this->cityRepository->findDestinationByCityAndCountry($data->getCityArrival()->name, $data->getCityArrival()->country);
 
-        // Rechercher les villes de départ et de destination
-        $isExistCityDeparture = $this->cityRepository->findOneBy(
-            [
-                'name' => $data->getCityDeparture()->name, // le nom de la ville de départ
-                'country' => $countryDeparture // le pays de départ
-            ]
-        );
-
-        dd($isExistCityDeparture);
-
-        $isExistCityArrival = $this->cityRepository->findOneBy(
-            [
-                'name' => $data->getCityArrival()->name,
-                'country' => $countryArrival
-            ]
-        );
+        // dd($isExistCityArrival);
 
         // Rechercher l'avion à assigner
         $isExistAirplane = $this->airplaneRepository->findOneById($data->airplaneId);
 
-        // dd($isExistAirplane);
-
-        // vérifier si les villes de départ et d'arrivée ainsi que l'avion pour le vol existent dans le serveur
+        // Vérifier si les villes de départ et d'arrivée ainsi que l'avion pour le vol existent dans le serveur
         if (!$isExistCityArrival || !$isExistCityDeparture || !$isExistAirplane) {
 
             if (!$isExistCityArrival) {
-                throw new BadRequestHttpException(json_encode([
-                    'message' => 'La ville d\'arrivée choisie n\'est pas desservie pour le moment'
+                throw new NotFoundHttpException(json_encode([ // renvoyer un code d'erreur 404 car ressource non trouvée
+                    'message' => 'La ville d\'arrivée choisie est introuvable dans le système'
                 ]));
             }
 
             if (!$isExistCityDeparture) {
-                throw new BadRequestHttpException(json_encode([
-                    'message' => 'La ville de départ choisie n\'est pas desservie pour le moment'
+                throw new NotFoundHttpException(json_encode([ // renvoyer un code d'erreur 404 car ressource non trouvée
+                    'message' => 'La ville de départ choisie est introuvable dans le système'
                 ]));
             }
 
             if (!$isExistAirplane) {
-                throw new BadRequestHttpException(json_encode([
-                    'message' => 'L\'avion choisi n\'est pas trouvé'
+                throw new NotFoundHttpException(json_encode([ // renvoyer un code d'erreur 404 car ressource non trouvée
+                    'message' => 'L\'avion choisi est introuvable'
                 ]));
             }
         }
@@ -79,14 +63,14 @@ class FlightStateProcessor implements ProcessorInterface
 
         // Vérifier si les villes de destination et d'arrivée sont bien differentes
         if ($isExistCityDeparture == $isExistCityArrival) {
-            throw new BadRequestHttpException(json_encode([
+            throw new UnprocessableEntityHttpException(json_encode([ // renvoyer un code d'erreur 422 car problème logique des données
                 'message' => 'Les villes de départ et de destination doivent être differentes'
             ]));
         }
 
         // Vérifier si la date d'arrivée est superieure à la date de départ
         if ($data->dateDeparture >= $data->dateArrival) {
-            throw new BadRequestHttpException(json_encode([
+            throw new UnprocessableEntityHttpException(json_encode([ // renvoyer un code d'erreur 422 car problème logique des données
                 'message' => 'La date d\'arrivée doit être supérieure à la date de départ'
             ]));
         }
@@ -103,7 +87,7 @@ class FlightStateProcessor implements ProcessorInterface
         // dd($isExistFlight);
 
         if ($isExistFlight) {
-            throw new BadRequestHttpException(json_encode([
+            throw new ConflictHttpException(json_encode([
                 'message' => 'Un vol similaire portant les mêmes informations de vol existent'
             ]));
         }
@@ -122,11 +106,11 @@ class FlightStateProcessor implements ProcessorInterface
         $this->entityManager->flush();
 
         // Retourner une réponse au client (exemple navigateur ou Postman)
-        $CityDepartureDto = new CityRequestDto; // Exceptionnellement j'ai utilisé ce DTO car la structure de données n'est pas pareille qu'avec le DTO CityResponseDto
+        $CityDepartureDto = new CityRequestDto; // Exceptionnellement j'ai utilisé ce DTO de requête car la structure de données n'est pas pareille qu'avec le DTO CityResponseDto
         $CityDepartureDto->name = $flight->getCityArrival()->getName();
         $CityDepartureDto->country = $flight->getCityDeparture()->getCountry()->getName();
 
-        $CityArrivalDto = new CityRequestDto; // Exceptionnellement j'ai utilisé ce DTO car la structure de données n'est pas pareille qu'avec le DTO CityResponseDto
+        $CityArrivalDto = new CityRequestDto; // Exceptionnellement j'ai utilisé ce DTO de requête car la structure de données n'est pas pareille qu'avec le DTO CityResponseDto
         $CityArrivalDto->name = $flight->getCityArrival()->getName();
         $CityArrivalDto->country = $flight->getCityArrival()->getCountry()->getName();
 
