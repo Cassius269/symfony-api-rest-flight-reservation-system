@@ -2,11 +2,23 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
 use App\Repository\ReservationRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: ReservationRepository::class)]
+#[UniqueEntity(
+    fields: ['numberFlightSeat'],
+    message: 'Le siège {{ value }} est déjà réservé.',
+)]
+#[UniqueEntity(
+    fields: ['passenger'],
+    message: 'Le passager a déjà réservé pour ce vol.',
+)]
+#[ApiResource]
 class Reservation
 {
     #[ORM\Id]
@@ -14,21 +26,31 @@ class Reservation
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column]
-    private ?int $number_flight_seat = null;
+    #[ORM\Column(length: 4)]
+    #[Assert\NotBlank(message: "Le numéro de siège est obligatoire")]
+    #[Assert\Regex(
+        pattern: '/\d{1,3}[A-Z]$/',
+        message: 'Le numéro de siège doit être une chaîne alphanumérique de 1 à 4 caractères au format nombre(s)-lettre.'
+    )]
+    private ?string $numberFlightSeat = null; // chaque passager un numéro unique 
 
     #[ORM\Column(type: Types::DECIMAL, precision: 6, scale: 2)]
+    #[Assert\NotBlank(message: "Le prix d'une réservation est obligatoire")]
+    #[Assert\PositiveOrZero(message: 'Le prix doit être supérieur ou égal à zéro')] // le prix peut être égal à zéro dans certains cas par exemple après un avoir ou une promo
     private ?string $price = null;
 
     #[ORM\ManyToOne(inversedBy: 'reservations')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Assert\NotBlank(message: "Le passager doit être renseigné ")]
     private ?Passenger $passenger = null;
 
     #[ORM\ManyToOne(inversedBy: 'reservations')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Assert\NotBlank(message: "Les informations sur le vol sont obligatoires")]
     private ?Flight $flight = null;
 
     #[ORM\Column]
+    #[Assert\NotBlank(message: "La date de création de la donnée est obligatoire")]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
@@ -39,14 +61,14 @@ class Reservation
         return $this->id;
     }
 
-    public function getNumberFlightSeat(): ?int
+    public function getNumberFlightSeat(): ?string
     {
-        return $this->number_flight_seat;
+        return $this->numberFlightSeat;
     }
 
-    public function setNumberFlightSeat(int $number_flight_seat): static
+    public function setNumberFlightSeat(string $numberFlightSeat): static
     {
-        $this->number_flight_seat = $number_flight_seat;
+        $this->numberFlightSeat = $numberFlightSeat;
 
         return $this;
     }
