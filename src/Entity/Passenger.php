@@ -21,7 +21,7 @@ use Doctrine\Common\Collections\ArrayCollection;
     operations: [
         new GetCollection(), // récupérer toutes les ressources passagers
         new Get(), // récuperer une ressource passager à l'aide de son ID
-        new Post( // envoyer une nouvelle ressource passager
+        new Post( // envoyer une nouvelle ressource passager au serveur
             processor: InsertPassengerProcessor::class, // liaison du processeur à la route de création de ressource passagers, 
             // input: PassengerResponseDto::class
         ),

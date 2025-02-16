@@ -25,11 +25,11 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 )]
 #[ApiResource(
     operations: [
-        new Get(),
-        new GetCollection(),
-        new Post(),
-        new Patch(),
-        new Delete
+        new Get(), // récupérer une ressource de type Réservation à l'aide de son ID
+        new GetCollection(), // récupérer l'ensemble des ressources de type Réservation
+        new Post(), // envoyer une nouvelle ressource Réservation au serveur
+        new Patch(), // mettre à jour une ressource Réservation partiellement
+        new Delete // supprimer une ressource Réservation à l'aide de son ID
     ]
 )]
 class Reservation
