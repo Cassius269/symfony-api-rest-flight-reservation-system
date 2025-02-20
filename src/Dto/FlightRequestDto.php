@@ -6,7 +6,7 @@ use App\Dto\CityRequestDto;
 use DateTime;
 use Symfony\Component\Validator\Constraints as Assert;
 
-// Création d'un DTO pour le recueille de la requête de création d'un nouveau vol d'avion
+// Création d'un DTO pour le recueille des informations de la requête de création d'un nouveau vol d'avion
 
 class FlightRequestDto
 {

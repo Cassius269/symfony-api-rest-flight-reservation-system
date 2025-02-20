@@ -10,7 +10,9 @@ use ApiPlatform\Metadata\Delete;
 use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
+use App\Dto\ReservationRequestDto;
 use App\Repository\ReservationRepository;
+use App\State\ReservationStateProcessor;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
@@ -27,7 +29,11 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
     operations: [
         new Get(), // récupérer une ressource de type Réservation à l'aide de son ID
         new GetCollection(), // récupérer l'ensemble des ressources de type Réservation
-        new Post(), // envoyer une nouvelle ressource Réservation au serveur
+        new Post(
+            // envoyer une nouvelle ressource Réservation au serveur
+            processor: ReservationStateProcessor::class, // traitement des données entrantes pour création de nouvelle ressource
+            input: ReservationRequestDto::class
+        ),
         new Patch(), // mettre à jour une ressource Réservation partiellement
         new Delete // supprimer une ressource Réservation à l'aide de son ID
     ]

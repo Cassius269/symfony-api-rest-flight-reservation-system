@@ -25,11 +25,11 @@ use Symfony\Component\Validator\Constraints as Assert;
     operations: [
         new Post( // enregistrer une nouvelle ressource City sur le serveur 
             processor: CityStateProcessor::class, // liaison du processor (traitement) avec l'entité
-            input: CityResponseDto::class // utilisation d'un Dto plutôt que l'entité pour séparer les responsabilités
+            input: CityRequestDto::class // utilisation d'un Dto plutôt que l'entité pour séparer les responsabilités
         ),
         new Get( // récuperer une ressource City à l'aide de son ID
             provider: CityStateProvider::class, // liaison avec le traitement (provider) lié à cette opération
-            output: CityRequestDto::class // liaison du provider avec le DTO CityRequestDto
+            output: CityResponseDto::class  // liaison du provider avec le DTO CityRequestDto
         ),
         new GetCollection(), // récuperer l'ensemble des ressources City présentes dans le serveur
         new Delete(), // supprimer une ressource City à l'aide de son ID

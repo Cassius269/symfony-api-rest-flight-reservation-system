@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Flight;
+use DateTime;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -40,4 +41,13 @@ class FlightRepository extends ServiceEntityRepository
     //            ->getOneOrNullResult()
     //        ;
     //    }
+
+    public function searchFlightByCitiesAndDates(string $cityDeparture, string $cityArrival,  DateTime $dateDeparture, DateTime $dateArrival)
+    {
+        return $this->createQueryBuilder('f')
+            ->where('f.cityDeparture.name = :cityDeparture')
+            ->andWhere('f.cityArrival.name = :cityArrival')
+            ->andWhere('f.dateDeparture = :dateDeparture')
+            ->andWhere('f.dateArrival = :dateArrival');
+    }
 }

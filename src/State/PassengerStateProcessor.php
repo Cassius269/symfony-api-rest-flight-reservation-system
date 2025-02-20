@@ -57,12 +57,7 @@ class PassengerStateProcessor implements ProcessorInterface
         $this->entityManager->flush();
 
 
-        // Retourner au client en tant que réponse le passager nouvellement créé
-        $passengerDto = new PassengerResponseDto;
-        $passengerDto->firstname = $data->firstname;
-        $passengerDto->lastname = $data->lastname;
-        $passengerDto->email = $data->email;
-
-        return $passengerDto;
+        // Retourner au client le même DTO de requête car les informations à renvoyer sont les mêmes
+        return $data;
     }
 }

@@ -45,10 +45,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(length: 30)]
     #[Groups(['passenger.read', 'passenger.write'])]
+    #[Assert\NotBlank(message: 'Le prénom est obligatoire')]
     private ?string $firstname = null;
 
     #[ORM\Column(length: 30)]
     #[Groups(['passenger.read', 'passenger.write'])]
+    #[Assert\NotBlank(message: 'Le nom de famille est obligatoire')]
     private ?string $lastname = null;
 
     #[ORM\Column]
@@ -58,6 +60,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     // #[Groups(['passenger.read', 'passenger.write'])]
     private ?\DateTimeInterface $updatedAt = null;
+
+    #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
+    private ?\DateTimeInterface $birthDate = null;
 
     public function getId(): ?int
     {
@@ -193,6 +198,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setUpdatedAt($updatedAt)
     {
         $this->updatedAt = $updatedAt;
+
+        return $this;
+    }
+
+    public function getBirthDate(): ?\DateTimeInterface
+    {
+        return $this->birthDate;
+    }
+
+    public function setBirthDate(\DateTimeInterface $birthDate): static
+    {
+        $this->birthDate = $birthDate;
 
         return $this;
     }

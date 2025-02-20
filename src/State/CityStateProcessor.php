@@ -24,12 +24,12 @@ class CityStateProcessor implements ProcessorInterface
     {
         // Rechercher le pays si il est déjà présent dans le serveur
         $isCountryExist = $this->countryRepository->findOneBy([
-            'name' => $data->countryName
+            'name' => $data->country
         ]);
 
         // dd($data);
         if (!$isCountryExist) {
-            throw new NotFoundHttpException("Le pays '{$data->countryName}' n'est pas disponible dans la liste des destinations.");
+            throw new NotFoundHttpException("Le pays '{$data->country}' n'est pas disponible dans la liste des destinations.");
         }
 
         // Création d'un nouvel objet City
