@@ -55,7 +55,7 @@ class ReservationStateProcessor implements ProcessorInterface
             $newPassenger = new Passenger();
             $newPassenger->setCreatedAt(new \DateTimeImmutable())
                 ->setFirstname($passenger->firstname)
-                ->setLastname($passenger->firstname)
+                ->setLastname($passenger->lastname)
                 ->setEmail($passenger->email)
                 ->setRoles(["ROLE_PASSENGER"]);
 
@@ -143,7 +143,7 @@ class ReservationStateProcessor implements ProcessorInterface
 
         $reservation = new Reservation();
         $reservation->setCreatedAt(new \DateTimeImmutable())
-            ->setNumberFlightSeat('30A')
+            ->setNumberFlightSeat('51A')
             ->setPrice(800)
             ->setFlight($isExistFlight)
             ->setPassenger($isExistPassenger ?? $newPassenger);

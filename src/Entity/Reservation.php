@@ -18,11 +18,11 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 #[ORM\Entity(repositoryClass: ReservationRepository::class)]
 #[UniqueEntity(
-    fields: ['numberFlightSeat'],
+    fields: ['numberFlightSeat', 'flight'],
     message: 'Le siège {{ value }} est déjà réservé.',
 )]
 #[UniqueEntity(
-    fields: ['passenger'],
+    fields: ['passenger', 'flight'],
     message: 'Le passager a déjà réservé pour ce vol.',
 )]
 #[ApiResource(
