@@ -71,4 +71,10 @@ class Passenger extends User
 
         return $this;
     }
+
+    public function __toString(): string
+    {
+
+        return $this->getFirstname() . ' ' . $this->getLastname() . ' avec l\'email ' . $this->getEmail();
+    }
 }

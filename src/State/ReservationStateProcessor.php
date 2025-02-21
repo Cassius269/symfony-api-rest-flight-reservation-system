@@ -7,6 +7,7 @@ use App\Entity\Reservation;
 use App\Repository\CityRepository;
 use ApiPlatform\Metadata\Operation;
 use App\Repository\FlightRepository;
+use App\Service\HashPasswordService;
 use App\Repository\AirplaneRepository;
 use App\Repository\PassengerRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -14,8 +15,6 @@ use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\Validator\ValidatorInterface;
 use ApiPlatform\Validator\Exception\ValidationException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\HttpFoundation\Exception\BadRequestException;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 
@@ -29,7 +28,8 @@ class ReservationStateProcessor implements ProcessorInterface
         private FlightRepository $flightRepository,
         private CityRepository $cityRepository,
         private AirplaneRepository $airplaneRepository,
-        private ValidatorInterface $validator
+        private ValidatorInterface $validator,
+        private HashPasswordService $hashPasswordService
     ) {}
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): object
@@ -59,16 +59,8 @@ class ReservationStateProcessor implements ProcessorInterface
                 ->setEmail($passenger->email)
                 ->setRoles(["ROLE_PASSENGER"]);
 
-            // Hasher le mot de passe 
-            $plainTextPassword = "12345566"; // mot de passe par défaut
-            $hashedPassword = $this->passwordHasher->hashPassword(
-                $newPassenger,
-                $plainTextPassword
-            );
-
-            // Stoker le mot de passe hashé dans le nouvel objet Passenger
-            $newPassenger->setPassword($hashedPassword);
-
+            // Hasher le mot de passe à l'aide d'un service personnalisé de hashage de mot de passage
+            $this->hashPasswordService->hashPassword("12345566", $newPassenger);
 
             // Enregistrer avant d'envoyer en base de données
             $this->entityManager->persist($newPassenger);
@@ -143,7 +135,7 @@ class ReservationStateProcessor implements ProcessorInterface
 
         $reservation = new Reservation();
         $reservation->setCreatedAt(new \DateTimeImmutable())
-            ->setNumberFlightSeat('51A')
+            ->setNumberFlightSeat('32A')
             ->setPrice(800)
             ->setFlight($isExistFlight)
             ->setPassenger($isExistPassenger ?? $newPassenger);

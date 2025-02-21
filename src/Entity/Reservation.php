@@ -17,13 +17,13 @@ use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 #[ORM\Entity(repositoryClass: ReservationRepository::class)]
-#[UniqueEntity(
+#[UniqueEntity( // dans un même vol, un siège ne peut pas être occupé par plusieurs passagers
     fields: ['numberFlightSeat', 'flight'],
     message: 'Le siège {{ value }} est déjà réservé.',
 )]
-#[UniqueEntity(
+#[UniqueEntity( // un passager avec le même email ne peut pas réserver deux fois pour le même voyage
     fields: ['passenger', 'flight'],
-    message: 'Le passager a déjà réservé pour ce vol.',
+    message: 'Le passager {{ value }} a déjà réservé pour ce vol.',
 )]
 #[ApiResource(
     operations: [
