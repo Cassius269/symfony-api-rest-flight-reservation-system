@@ -15,8 +15,6 @@ class HashPasswordService
     public function hashPassword(string $plainTextPassword, Passenger $passenger)
     {
         // Hasher le mot de passe 
-        $plainTextPassword = "12345566"; // mot de passe par défaut
-
         $hashedPassword = $this->passwordHasher->hashPassword(
             $passenger,
             $plainTextPassword

@@ -10,6 +10,7 @@ use App\Repository\FlightRepository;
 use App\Service\HashPasswordService;
 use App\Repository\AirplaneRepository;
 use App\Repository\PassengerRepository;
+use App\Service\SeatReservationService;
 use Doctrine\ORM\EntityManagerInterface;
 use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\Validator\ValidatorInterface;
@@ -29,7 +30,8 @@ class ReservationStateProcessor implements ProcessorInterface
         private CityRepository $cityRepository,
         private AirplaneRepository $airplaneRepository,
         private ValidatorInterface $validator,
-        private HashPasswordService $hashPasswordService
+        private HashPasswordService $hashPasswordService,
+        private SeatReservationService $seatReservationService
     ) {}
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): object
@@ -62,7 +64,7 @@ class ReservationStateProcessor implements ProcessorInterface
             // Hasher le mot de passe à l'aide d'un service personnalisé de hashage de mot de passage
             $this->hashPasswordService->hashPassword("12345566", $newPassenger);
 
-            // Enregistrer avant d'envoyer en base de données
+            // Préparer la requête avant d'envoyer en base de données
             $this->entityManager->persist($newPassenger);
         }
 
@@ -135,10 +137,12 @@ class ReservationStateProcessor implements ProcessorInterface
 
         $reservation = new Reservation();
         $reservation->setCreatedAt(new \DateTimeImmutable())
-            ->setNumberFlightSeat('32A')
-            ->setPrice(800)
+            // ->setNumberFlightSeat('7A')
+            ->setPrice(800) // prix par défaut 800euros
             ->setFlight($isExistFlight)
             ->setPassenger($isExistPassenger ?? $newPassenger);
+
+        $this->seatReservationService->attributeASeat($isExistFlight, $reservation);
 
         $errors = $this->validator->validate($reservation);
 
@@ -146,12 +150,12 @@ class ReservationStateProcessor implements ProcessorInterface
             throw new ValidationException((string) $errors);
         }
 
-        // Enregistrer et envoyer en base de données le nouveau passager
+        // Enregistrer et envoyer en base de données le nouveau passager (si création) et la réservation
         $this->entityManager->persist($reservation);
         $this->entityManager->flush();
 
 
         // Renvoyer une réponse JSON au client en cas de réussite de la création de la réservation pour un passager
-        return $data;
+        return $data; // retouner les valeurs entrée si pas de traitement particulier en sortie
     }
 }
