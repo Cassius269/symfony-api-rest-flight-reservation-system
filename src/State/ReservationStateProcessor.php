@@ -62,7 +62,7 @@ class ReservationStateProcessor implements ProcessorInterface
                 ->setRoles(["ROLE_PASSENGER"]);
 
             // Hasher le mot de passe à l'aide d'un service personnalisé de hashage de mot de passage
-            $this->hashPasswordService->hashPassword("12345566", $newPassenger);
+            $this->hashPasswordService->hashPassword("123456789", $newPassenger);
 
             // Préparer la requête avant d'envoyer en base de données
             $this->entityManager->persist($newPassenger);
