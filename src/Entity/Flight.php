@@ -13,6 +13,7 @@ use App\State\FlightStateProcessor;
 use App\Repository\FlightRepository;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
+use App\State\CustomGetCollectionAvailableFlightsProvider;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -23,6 +24,16 @@ use Symfony\Component\Validator\Constraints as Assert;
     operations: [
         new Get(), // récuperer une ressource vol d'avion à l'aide de son ID
         new GetCollection(), // récuperer l'ensemble des ressources de type vol d'avion présent dans le serveur
+        new GetCollection(
+            // récuperer l'ensemble des ressources de type vol d'avion disponibles dans le serveur
+            paginationEnabled: true, // activer la pagination
+            paginationItemsPerPage: 15, // nbre d'items par page
+            paginationClientEnabled: true, // donner la possibilité au client de choisir d'activer ou pas la pagination
+            paginationClientItemsPerPage: true, // donner la possible au client de choisir le nombre de ressources par page
+            uriTemplate: '/getAvailableFlights', // création d'une route personnalisée (endpoint)
+            name: 'getAvailableFlights',
+            provider: CustomGetCollectionAvailableFlightsProvider::class
+        ),
         new Post(
             // créer une nouvelle ressource vol d'avion
             processor: FlightStateProcessor::class,
