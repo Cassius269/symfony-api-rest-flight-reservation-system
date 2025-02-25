@@ -21,7 +21,11 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
     fields: 'isoCode',
     message: 'Le code ISO {{ value }} existe déjà'
 )]
-#[ApiResource] // Transformer l'entité Country en une ressource API, avec toutes les opérations CRUD
+#[
+    ApiResource( // Transformer l'entité Country en une ressource API, avec toutes les opérations CRUD
+        security: "is_granted('ROLE_ADMIN')", // seul un utilisateur au rôle Admin peut avoir accès à toutes les opérations d'une ressource
+    )
+]
 class Country
 {
     #[ORM\Id]

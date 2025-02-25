@@ -26,6 +26,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
     message: 'Le passager {{ value }} a déjà réservé pour ce vol.',
 )]
 #[ApiResource(
+    security: "is_granted('ROLE_ADMIN')", // seul un utilisateur au rôle Admin peut avoir accès à toutes les opérations d'une ressource
     operations: [
         new Get(), // récupérer une ressource de type Réservation à l'aide de son ID
         new GetCollection(), // récupérer l'ensemble des ressources de type Réservation

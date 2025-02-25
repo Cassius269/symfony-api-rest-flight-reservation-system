@@ -22,6 +22,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: CityRepository::class)]
 #[ApiResource(
+    security: "is_granted('ROLE_ADMIN')", // seul un utilisateur au rôle Admin peut avoir accès à toutes les opérations d'une ressource
     operations: [
         new Post( // enregistrer une nouvelle ressource City sur le serveur 
             processor: CityStateProcessor::class, // liaison du processor (traitement) avec l'entité

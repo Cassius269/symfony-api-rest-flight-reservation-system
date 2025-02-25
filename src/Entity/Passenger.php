@@ -16,6 +16,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 
 #[ORM\Entity(repositoryClass: PassengerRepository::class)]
 #[ApiResource(
+    security: "is_granted('ROLE_ADMIN')", // seul un utilisateur au rôle Admin peut avoir accès à toutes les opérations d'une ressource
     normalizationContext: ['groups' => ['passenger.read']],
     // denormalizationContext: ['groups' => ['passenger.write']],
     operations: [

@@ -19,6 +19,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: FlightRepository::class)]
 #[ApiResource( // Déclaration de l'entité Flight comme ressource de l'API
+    security: "is_granted('ROLE_ADMIN')", // seul un utilisateur au rôle Admin peut avoir accès à toutes les opérations d'une ressource
     operations: [
         new Get(), // récuperer une ressource vol d'avion à l'aide de son ID
         new GetCollection(), // récuperer l'ensemble des ressources de type vol d'avion présent dans le serveur

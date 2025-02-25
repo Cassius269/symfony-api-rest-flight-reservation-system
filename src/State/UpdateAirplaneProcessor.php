@@ -46,7 +46,7 @@ class UpdateAirplaneProcessor implements ProcessorInterface
 
         return $airplaneResponseDto;
 
-        //2ème façon de mettre à jour la donnée sans DTO
+        //2ème façon de mettre à jour la donnée, sans utilisation de DTO
         // $data->setUpdatedAt(new \DateTime()); // mettre à jour la date de mise à la date du jour
 
         // $this->entityManager->flush(); // envoyer la ressource de type avion à jour au serveur
