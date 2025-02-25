@@ -8,12 +8,12 @@ use Doctrine\DBAL\Types\Types;
 use ApiPlatform\Metadata\Patch;
 use App\Dto\AirplaneRequestDto;
 use ApiPlatform\Metadata\Delete;
-use App\Dto\AirplaneResponseDto;
 use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Metadata\ApiResource;
 use App\State\AirplaneStateProcessor;
 use App\Repository\AirplaneRepository;
 use ApiPlatform\Metadata\GetCollection;
+use App\State\UpdateAirplaneProcessor;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Serializer\Attribute\Groups;
@@ -36,13 +36,18 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
         ),
         new Post(
             // créer une nouvelle ressource de type Avion à l'aide de son ID
+            // security: "is_granted('ROLE_ADMIN')", // seul un utilisateur avec le rôle d'administrateur peut enregistrer une nouvelle ressource de type avion
             processor: AirplaneStateProcessor::class,
             input: AirplaneRequestDto::class, // DTO d'entrée dédié
         ),
         new Delete(), // supprimer une ressource du serveur à l'aide son ID
-        new Patch( // convertir une donnée JSON en objet, utile en écriture
+        new Patch( // mettre à jour partiellement une ressource à l'aide de son ID
+
+            security: "is_granted('ROLE_ADMIN')", // seul un utilisateur avec le rôle d'administrateur peut modifier partiellement une ressource de type avion
+            processor: UpdateAirplaneProcessor::class,
+            // convertir une donnée JSON en objet, utile en écriture
             normalizationContext: ['groups' => ['airplane:write']],
-        ), // mettre à jour partiellement une ressource à l'aide de son ID
+        ),
     ]
 )]
 class Airplane
@@ -59,12 +64,12 @@ class Airplane
         max: 12,
         maxMessage: 'Le modèle de l\'avion ne doit pas dépasser 12 caractères'
     )]
-    // #[Groups(['airplane:read', 'airplane:write'])]
+    #[Groups(['airplane:write'])]
     private ?string $model = null;
 
     #[ORM\Column]
     #[Assert\Positive(message: 'La capacité de l\'avion doit être un nombre supérieur à zéro')]
-    // #[Groups(['airplane:read', 'airplane:write'])]
+    #[Groups(['airplane:write'])]
     private ?int $capacity = null;
 
     #[ORM\Column]
