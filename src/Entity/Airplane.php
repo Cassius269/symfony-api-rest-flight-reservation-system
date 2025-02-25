@@ -45,8 +45,9 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
             security: "is_granted('ROLE_ADMIN')", // seul un utilisateur avec le rôle d'administrateur peut modifier partiellement une ressource de type avion
             processor: UpdateAirplaneProcessor::class,
+            input: AirplaneRequestDto::class,
             // convertir une donnée JSON en objet, utile en écriture
-            normalizationContext: ['groups' => ['airplane:write']],
+            // normalizationContext: ['groups' => ['airplane:write']],
         ),
     ]
 )]
@@ -64,12 +65,12 @@ class Airplane
         max: 12,
         maxMessage: 'Le modèle de l\'avion ne doit pas dépasser 12 caractères'
     )]
-    #[Groups(['airplane:write'])]
+    // #[Groups(['airplane:write'])]
     private ?string $model = null;
 
     #[ORM\Column]
     #[Assert\Positive(message: 'La capacité de l\'avion doit être un nombre supérieur à zéro')]
-    #[Groups(['airplane:write'])]
+    // #[Groups(['airplane:write'])]
     private ?int $capacity = null;
 
     #[ORM\Column]
