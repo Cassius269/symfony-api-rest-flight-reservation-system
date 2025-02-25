@@ -4,6 +4,9 @@ controllers:
     namespace: App\Controller
   type: attribute
 
-auth:
+auth: # route de génération de token JWT
   path: "/auth"
   methods: ["POST"]
+
+api_refresh_token: # route de rafraichissement de token
+  path: /token/refresh

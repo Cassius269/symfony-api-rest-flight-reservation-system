@@ -24,6 +24,9 @@ security:
         success_handler: lexik_jwt_authentication.handler.authentication_success
         failure_handler: lexik_jwt_authentication.handler.authentication_failure
       jwt: ~ # cette ligne est essentielle pour indiquer à l'application d'intercepter les token et les vérifier
+      refresh_jwt: # désignation de la route de rafraîchissement de token JWT dans le système de parefeu
+        check_path: /token/refresh
+      entry_point: jwt # le pare-feu par défaut est le jwt
 
       # activate different ways to authenticate
       # https://symfony.com/doc/current/security.html#the-firewall
@@ -36,9 +39,10 @@ security:
   access_control:
     # - { path: ^/admin, roles: ROLE_ADMIN }
     # - { path: ^/profile, roles: ROLE_USER }
-    - { path: ^/api/$, roles: PUBLIC_ACCESS } # la page de documentation de l'API avec Swagger
+    - { path: ^/api/$, roles: PUBLIC_ACCESS } # la page de Swagger UI ne necessite pas d'authentication de l'utilisateur
     - { path: ^/auth, roles: PUBLIC_ACCESS } # la page "/auth" ne necessite pas d'authentication pour permettre la génération de token aux utilisateurs qui s'authentifient
-    - { path: ^/api/, roles: IS_AUTHENTICATED_FULLY } # toutes les routes commençant par "/api/ doivent être accédées avec un token valide à chaque fois
+    - { path: ^/token/refresh, roles: PUBLIC_ACCESS } # la route de rafraichissement est accessible pour tous les utilisateurs pour permettre la régenération de token d'authentification
+    - { path: ^/api/, roles: IS_AUTHENTICATED_FULLY } # toutes les routes commençant par "/api/ doivent être accédés avec un token valide à chaque fois
 
 when@test:
   security:
