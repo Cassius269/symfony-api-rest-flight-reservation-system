@@ -18,6 +18,7 @@ class SeatReservationService
 
     public function attributeASeat(Flight $flight, Reservation $reservation)
     {
+        // ----- Algo d'attribution de siège ----
         // Etape 1: Rechercher la capacité de l'avion
         // Etape 2: Définir le nombre de rangée maximal possible (6 sièges par rangée)
         // Etape 3: Assigner le premier siège disponible au passager
