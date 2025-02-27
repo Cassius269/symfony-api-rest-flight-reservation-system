@@ -1,5 +1,5 @@
 gesdinet_jwt_refresh_token:
   refresh_token_class: App\Entity\RefreshToken # This is the class name of the refresh token, you will need to adjust this to match the class your application will use
   return_expiration: true # retourner un token expirable par défaut
-  ttl: 2592000 # token de rafraichissement valide pendant un mois
-  single_use: true # rendre des tokens uniques
+  ttl: 111600 # token de rafraichissement valide pendant 31 jours
+  single_use: true # rendre les refresh token à usage unique

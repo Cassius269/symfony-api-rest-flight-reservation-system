@@ -6,7 +6,6 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
 use App\Dto\AvailableFlightResponseDto;
 use App\Dto\CityResponseDto;
-use App\Dto\FlightResponseDto;
 use App\Repository\FlightRepository;
 
 class CustomGetCollectionAvailableFlightsProvider implements ProviderInterface
@@ -24,7 +23,7 @@ class CustomGetCollectionAvailableFlightsProvider implements ProviderInterface
         $availableFlights = $this->flightRepository->findAvailableFlights();
         // return $availableFlights; // retourner le résultat au client
 
-        // 2ème méthode: utilisation de DTO
+        // 2ème méthode: utilisation de DTO en partant du resutlat obtenu de recherches d'avion disponibles 
         $availableFlightsResults = [];
 
         foreach ($availableFlights as $flight) {

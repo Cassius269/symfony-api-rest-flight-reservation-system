@@ -6,6 +6,7 @@ use App\Dto\CityRequestDto;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
 use ApiPlatform\State\Pagination\PaginatorInterface;
+use App\Dto\CityResponseDto;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -26,16 +27,19 @@ class CityStateProvider implements ProviderInterface
             // Créer un DTO et parcourir les informations pour les stocker dans un DTO
             foreach ($data as $key => $value) {
 
-                $city = new CityRequestDto();
+                $city = new CityResponseDto();
                 // Remplissage de l'objet CityDTO avec les données de l'entité City
-                $city->id = ($value->getId());
-                $city->country = $value->getCountry()->getName();
+                // dd($value->getId());
+                $city->id = $value->getId();
+                $city->countryName = $value->getCountry()->getName();
                 $city->name = $value->getName();
+
 
 
                 // Ajout de l'objet ArticleDto dans le tableau $response à rendre à l'interface API
                 $response = $city;
             }
+            // dd($response);
 
             return $response;
         } else {
