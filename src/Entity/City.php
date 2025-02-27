@@ -33,6 +33,10 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
             provider: CityStateProvider::class, // liaison avec le traitement (provider) lié à cette opération
         ),
         new GetCollection( // récuperer l'ensemble des ressources City présentes dans le serveur
+            paginationEnabled: true, // pagination de la data activée par défaut
+            paginationItemsPerPage: 20,  // définir le nombre de ressources villes à afficher par page, 
+            paginationClientEnabled: true, // donner la possibilité au client de choisir l'activation de la pagination
+            paginationClientItemsPerPage: true, // donner la possibilité au client de choisir le nombre d'objets ressources par page, 
             provider: CustomCityGetCollectionStateProvier::class,
         ),
         new Delete(), // supprimer une ressource City à l'aide de son ID

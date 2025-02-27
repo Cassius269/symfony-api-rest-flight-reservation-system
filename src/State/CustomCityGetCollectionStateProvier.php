@@ -2,24 +2,30 @@
 
 namespace App\State;
 
-use ApiPlatform\Metadata\Operation;
-use ApiPlatform\State\ProviderInterface;
 use App\Dto\CityResponseDto;
 use App\Repository\CityRepository;
+use ApiPlatform\Metadata\Operation;
+use ApiPlatform\State\ProviderInterface;
+use ApiPlatform\State\Pagination\ArrayPaginator;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 class CustomCityGetCollectionStateProvier implements ProviderInterface
 {
     // Injection de dépendances
-    public function __construct(private CityRepository $cityRepository) {}
+    public function __construct(
+        private CityRepository $cityRepository,
+        #[Autowire(service: 'api_platform.doctrine.orm.state.collection_provider')]
+        private ProviderInterface $providerInterface
+    ) {}
 
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
     {
         // Rechercher toutes les villes
-        $cities = $this->cityRepository->findAll();
+        $data = $this->providerInterface->provide($operation, $uriVariables, $context);
 
         $results = [];
 
-        foreach ($cities as $city) {
+        foreach ($data as $city) {
             $cityDto = new CityResponseDto;
             $cityDto->id = $city->getId();
             $cityDto->name = $city->getName();
