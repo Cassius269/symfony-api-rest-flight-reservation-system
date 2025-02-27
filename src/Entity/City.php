@@ -2,23 +2,24 @@
 
 namespace App\Entity;
 
+use App\Dto\CityRequestDto;
 use App\Dto\CityResponseDto;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Post;
 use Doctrine\DBAL\Types\Types;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Delete;
+use App\State\CityStateProvider;
 use Doctrine\ORM\Mapping as ORM;
 use App\State\CityStateProcessor;
 use App\Repository\CityRepository;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
-use App\Dto\CityRequestDto;
-use App\State\CityStateProvider;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
-use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use App\State\CustomCityGetCollectionStateProvier;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 #[ORM\Entity(repositoryClass: CityRepository::class)]
 #[ApiResource(
@@ -30,9 +31,10 @@ use Symfony\Component\Validator\Constraints as Assert;
         ),
         new Get( // récuperer une ressource City à l'aide de son ID
             provider: CityStateProvider::class, // liaison avec le traitement (provider) lié à cette opération
-            output: CityResponseDto::class  // liaison du provider avec le DTO CityRequestDto
         ),
-        new GetCollection(), // récuperer l'ensemble des ressources City présentes dans le serveur
+        new GetCollection( // récuperer l'ensemble des ressources City présentes dans le serveur
+            provider: CustomCityGetCollectionStateProvier::class,
+        ),
         new Delete(), // supprimer une ressource City à l'aide de son ID
         new Patch() // modifier une ressource City à l'aide de son ID
     ]
