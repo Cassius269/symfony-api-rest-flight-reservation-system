@@ -12,6 +12,7 @@ use App\Repository\CountryRepository;
 use App\Repository\AirplaneRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use ApiPlatform\State\ProcessorInterface;
+use DateTime;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
@@ -74,6 +75,15 @@ class FlightStateProcessor implements ProcessorInterface
                 'message' => 'La date d\'arrivée doit être supérieure à la date de départ'
             ]));
         }
+
+        if ($data->dateDeparture <= new DateTime()) {
+            throw new unprocessableEntityHttpException(json_encode( // renvoyer un code d'erreur 422 car problème logique des données
+                [
+                    'message' => 'La date date départ ne doit pas être inférieure à la date du jour'
+                ]
+            ));
+        }
+
 
         // Rechercher s'il n'y pas de vol similaire
         $isExistFlight = $this->flightRepository->findOneBy([

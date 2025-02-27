@@ -32,7 +32,8 @@ use Symfony\Component\Validator\Constraints as Assert;
             paginationClientItemsPerPage: true, // donner la possible au client de choisir le nombre de ressources par page
             uriTemplate: '/getAvailableFlights', // création d'une route personnalisée (endpoint)
             name: 'getAvailableFlights',
-            provider: CustomGetCollectionAvailableFlightsProvider::class
+            provider: CustomGetCollectionAvailableFlightsProvider::class,
+            security: 'is_granted("ROLE_PASSENGER") or is_granted("ROLE_ADMIN")' // seul un utilisateur ayant le rôle Admin ou passager peut regarder l'ensemble des vols disponibles
         ),
         new Post(
             // créer une nouvelle ressource vol d'avion
