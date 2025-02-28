@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\Get;
 use App\Dto\FlightRequestDto;
 use ApiPlatform\Metadata\Post;
@@ -23,7 +25,10 @@ use Symfony\Component\Validator\Constraints as Assert;
     security: "is_granted('ROLE_ADMIN')", // seul un utilisateur au rôle Admin peut avoir accès à toutes les opérations d'une ressource
     operations: [
         new Get(), // récuperer une ressource vol d'avion à l'aide de son ID
-        new GetCollection(), // récuperer l'ensemble des ressources de type vol d'avion présent dans le serveur
+        new GetCollection(
+            filters: ['flight.search_filter']
+
+        ), // récuperer l'ensemble des ressources de type vol d'avion présent dans le serveur
         new GetCollection(
             // récuperer l'ensemble des ressources de type vol d'avion disponibles dans le serveur
             paginationEnabled: true, // activer la pagination
@@ -33,7 +38,8 @@ use Symfony\Component\Validator\Constraints as Assert;
             uriTemplate: '/getAvailableFlights', // création d'une route personnalisée (endpoint)
             name: 'getAvailableFlights',
             provider: CustomGetCollectionAvailableFlightsProvider::class,
-            security: 'is_granted("ROLE_PASSENGER") or is_granted("ROLE_ADMIN")' // seul un utilisateur ayant le rôle Admin ou passager peut regarder l'ensemble des vols disponibles
+            security: 'is_granted("ROLE_PASSENGER") or is_granted("ROLE_ADMIN")', // seul un utilisateur ayant le rôle Admin ou passager peut regarder l'ensemble des vols disponibles
+            filters: ['flight.search_filter']
         ),
         new Post(
             // créer une nouvelle ressource vol d'avion
