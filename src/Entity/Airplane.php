@@ -12,12 +12,13 @@ use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Metadata\ApiResource;
 use App\State\AirplaneStateProcessor;
 use App\Repository\AirplaneRepository;
-use ApiPlatform\Metadata\GetCollection;
 use App\State\UpdateAirplaneProcessor;
+use ApiPlatform\Metadata\GetCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
+use App\State\CustomAirplaneGetCollectionStateProvider;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 #[ORM\Entity(repositoryClass: AirplaneRepository::class)]
@@ -32,7 +33,8 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
         new Get(), // obtenir une ressource Avion à l'aide de son ID
         new GetCollection( // obtenir toutes les ressources de type avion se trouvant dans le serveur
             paginationEnabled: true, // activer la pagination des ressources Avions
-            paginationItemsPerPage: 10 // 10 ressources avions affichées par page
+            paginationItemsPerPage: 10, // 10 ressources avions affichées par page
+            provider: CustomAirplaneGetCollectionStateProvider::class
         ),
         new Post(
             // créer une nouvelle ressource de type Avion à l'aide de son ID
