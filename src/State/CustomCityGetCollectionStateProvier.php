@@ -8,6 +8,7 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
 use ApiPlatform\State\Pagination\ArrayPaginator;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class CustomCityGetCollectionStateProvier implements ProviderInterface
 {
@@ -22,6 +23,10 @@ class CustomCityGetCollectionStateProvier implements ProviderInterface
     {
         // Rechercher toutes les villes
         $data = $this->providerInterface->provide($operation, $uriVariables, $context);
+
+        if (!$data) {
+            throw new NotFoundHttpException('Aucune destination trouvée');
+        }
 
         $results = [];
 

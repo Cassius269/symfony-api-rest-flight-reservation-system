@@ -2,10 +2,11 @@
 
 namespace App\State;
 
+use App\Dto\AirplaneResponseDto;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
-use App\Dto\AirplaneResponseDto;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class AirplaneStateProvider implements ProviderInterface
 {
@@ -16,6 +17,10 @@ class AirplaneStateProvider implements ProviderInterface
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
     {
         $data = $this->itemProvider->provide($operation, $uriVariables, $context);
+
+        if (!$data) {
+            throw new NotFoundHttpException('Aucun avion retrouvé avec l\'id fourni');
+        }
 
         $airplaneDto = new AirplaneResponseDto;
         $airplaneDto->id = $data->getId();

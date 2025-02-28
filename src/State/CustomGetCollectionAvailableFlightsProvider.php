@@ -2,11 +2,12 @@
 
 namespace App\State;
 
-use ApiPlatform\Metadata\Operation;
-use ApiPlatform\State\ProviderInterface;
-use App\Dto\AvailableFlightResponseDto;
 use App\Dto\CityResponseDto;
+use ApiPlatform\Metadata\Operation;
 use App\Repository\FlightRepository;
+use App\Dto\AvailableFlightResponseDto;
+use ApiPlatform\State\ProviderInterface;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class CustomGetCollectionAvailableFlightsProvider implements ProviderInterface
 {
@@ -18,12 +19,13 @@ class CustomGetCollectionAvailableFlightsProvider implements ProviderInterface
 
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
     {
-        // 1ère méthode : retourner un resultat direct des résultats de la recherche personnalisée Doctrine
         // Rechercher tous les vols disponibles 
         $availableFlights = $this->flightRepository->findAvailableFlights();
-        // return $availableFlights; // retourner le résultat au client
 
-        // 2ème méthode: utilisation de DTO en partant du resutlat obtenu de recherches d'avion disponibles 
+        if (!$availableFlights) {
+            throw new NotFoundHttpException('Aucun vol disponible trouvé');
+        }
+
         $availableFlightsResults = [];
 
         foreach ($availableFlights as $flight) {
