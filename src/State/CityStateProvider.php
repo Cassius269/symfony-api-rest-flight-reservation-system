@@ -13,7 +13,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 class CityStateProvider implements ProviderInterface
 {
     public function __construct(
-        #[Autowire(service: 'api_platform.doctrine.orm.state.collection_provider')]
+        #[Autowire(service: 'api_platform.doctrine.orm.state.item_provider')]
         private ProviderInterface $collectionProvider
     ) {}
 

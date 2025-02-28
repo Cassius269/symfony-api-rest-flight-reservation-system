@@ -14,6 +14,7 @@ use App\State\AirplaneStateProcessor;
 use App\Repository\AirplaneRepository;
 use App\State\UpdateAirplaneProcessor;
 use ApiPlatform\Metadata\GetCollection;
+use App\State\AirplaneStateProvider;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Serializer\Attribute\Groups;
@@ -30,7 +31,9 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
     // Exposition des champs en phase de sérialisation
     // normalizationContext: ['groups' => ['airplane:read']], // convertir un objet Airplane au format json, utile en lecture
     operations: [
-        new Get(), // obtenir une ressource Avion à l'aide de son ID
+        new Get( // obtenir une ressource Avion à l'aide de son ID
+            provider: AirplaneStateProvider::class
+        ),
         new GetCollection( // obtenir toutes les ressources de type avion se trouvant dans le serveur
             paginationEnabled: true, // activer la pagination des ressources Avions
             paginationItemsPerPage: 10, // 10 ressources avions affichées par page

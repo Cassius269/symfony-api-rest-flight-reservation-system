@@ -11,13 +11,13 @@ class CustomAirplaneGetCollectionStateProvider implements ProviderInterface
 {
     public function __construct(
         #[Autowire(service: 'api_platform.doctrine.orm.state.collection_provider')]
-        private ProviderInterface $providerInterface
+        private ProviderInterface $collectionProvider
     ) {}
 
 
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
     {
-        $data = $this->providerInterface->provide($operation, $uriVariables, $context);
+        $data = $this->collectionProvider->provide($operation, $uriVariables, $context);
         // dd($data);
 
         $results = [];
