@@ -2,15 +2,15 @@
 
 namespace App\State;
 
-use App\Entity\Airplane;
+use App\Entity\AirplaneModel;
 use ApiPlatform\Metadata\Operation;
+use App\Dto\AirplaneModelResponseDto;
 use Doctrine\ORM\EntityManagerInterface;
 use ApiPlatform\State\ProcessorInterface;
-use App\Dto\AirplaneResponseDto;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
-class AirplaneStateProcessor implements ProcessorInterface
+class AirplaneModelStateProcessor implements ProcessorInterface
 {
     // Injection des dépendances
     public function __construct(
@@ -23,7 +23,7 @@ class AirplaneStateProcessor implements ProcessorInterface
     {
         // dd($data);
 
-        $airplane = new Airplane;
+        $airplane = new AirplaneModel;
         $airplane->setModel($data->model)
             ->setCapacity($data->capacity)
             ->setCreatedAt(new \DateTimeImmutable());
@@ -48,7 +48,7 @@ class AirplaneStateProcessor implements ProcessorInterface
 
 
         // Retourner une réponse à l'interface API
-        $airplaneDto = new AirplaneResponseDto;
+        $airplaneDto = new AirplaneModelResponseDto;
         $airplaneDto->model = $airplane->getModel();
         $airplaneDto->capacity = $airplane->getCapacity();
 

@@ -3,7 +3,7 @@
 namespace App\Dto;
 
 // Création d'un DTO pour retourner les données d'un nouvel avion créé
-class AirplaneResponseDto
+class AirplaneModelResponseDto
 {
     public ?int $id = null;
     public ?string $model = null;

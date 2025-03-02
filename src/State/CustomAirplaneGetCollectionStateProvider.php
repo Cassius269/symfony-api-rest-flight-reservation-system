@@ -3,8 +3,8 @@
 namespace App\State;
 
 use ApiPlatform\Metadata\Operation;
+use App\Dto\AirplaneModelResponseDto;
 use ApiPlatform\State\ProviderInterface;
-use App\Dto\AirplaneResponseDto;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 class CustomAirplaneGetCollectionStateProvider implements ProviderInterface
@@ -22,7 +22,7 @@ class CustomAirplaneGetCollectionStateProvider implements ProviderInterface
 
         $results = [];
         foreach ($data as $airplane) {
-            $airplaneDto = new AirplaneResponseDto;
+            $airplaneDto = new AirplaneModelResponseDto;
             $airplaneDto->id = $airplane->getId();
             $airplaneDto->model = $airplane->getModel();
             $airplaneDto->capacity = $airplane->getCapacity();

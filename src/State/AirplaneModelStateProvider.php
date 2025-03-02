@@ -2,13 +2,13 @@
 
 namespace App\State;
 
-use App\Dto\AirplaneResponseDto;
 use ApiPlatform\Metadata\Operation;
+use App\Dto\AirplaneModelResponseDto;
 use ApiPlatform\State\ProviderInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
-class AirplaneStateProvider implements ProviderInterface
+class AirplaneModelStateProvider implements ProviderInterface
 {
     public function __construct(
         #[Autowire(service: 'api_platform.doctrine.orm.state.item_provider')]
@@ -22,7 +22,7 @@ class AirplaneStateProvider implements ProviderInterface
             throw new NotFoundHttpException('Aucun avion retrouvé avec l\'id fourni');
         }
 
-        $airplaneDto = new AirplaneResponseDto;
+        $airplaneDto = new AirplaneModelResponseDto;
         $airplaneDto->id = $data->getId();
         $airplaneDto->model = $data->getModel();
         $airplaneDto->capacity = $data->getCapacity();

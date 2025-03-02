@@ -4,17 +4,18 @@ namespace App\State;
 
 use App\Dto\AirplaneResponseDto;
 use ApiPlatform\Metadata\Operation;
-use App\Repository\AirplaneRepository;
+use App\Dto\AirplaneModelResponseDto;
 use Doctrine\ORM\EntityManagerInterface;
 use ApiPlatform\State\ProcessorInterface;
-use ApiPlatform\Validator\Exception\ValidationException;
+use App\Repository\AirplaneModelRepository;
 use ApiPlatform\Validator\ValidatorInterface;
+use ApiPlatform\Validator\Exception\ValidationException;
 
 class UpdateAirplaneProcessor implements ProcessorInterface
 {
     public function __construct(
         private EntityManagerInterface $entityManager,
-        private AirplaneRepository $airplaneRepository,
+        private AirplaneModelRepository $airplaneRepository,
         private ValidatorInterface $validator
     ) {}
 
@@ -40,7 +41,7 @@ class UpdateAirplaneProcessor implements ProcessorInterface
         $this->entityManager->flush();
 
         // Préparer la réponse sous forme de DTO
-        $airplaneResponseDto = new AirplaneResponseDto;
+        $airplaneResponseDto = new AirplaneModelResponseDto;
         $airplaneResponseDto->model = $airplane->getModel();
         $airplaneResponseDto->capacity = $airplane->getCapacity();
 

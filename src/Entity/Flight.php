@@ -87,11 +87,6 @@ class Flight
     #[ORM\OneToMany(targetEntity: Reservation::class, mappedBy: 'flight', orphanRemoval: true)]
     private Collection $reservations;
 
-    #[ORM\ManyToOne(inversedBy: 'flights')]
-    #[ORM\JoinColumn(nullable: false)]
-    #[Assert\NotBlank(message: "Un avion doit renseigné pour le vol")]
-    private ?Airplane $airplane = null;
-
     public function __construct()
     {
         $this->reservations = new ArrayCollection();
@@ -248,18 +243,6 @@ class Flight
     public function setCityArrival($cityArrival)
     {
         $this->cityArrival = $cityArrival;
-
-        return $this;
-    }
-
-    public function getAirplane(): ?Airplane
-    {
-        return $this->airplane;
-    }
-
-    public function setAirplane(?Airplane $airplane): static
-    {
-        $this->airplane = $airplane;
 
         return $this;
     }

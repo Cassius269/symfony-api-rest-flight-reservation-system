@@ -2,6 +2,7 @@
 
 namespace App\State;
 
+use DateTime;
 use App\Entity\Flight;
 use App\Dto\CityRequestDto;
 use App\Dto\FlightResponseDto;
@@ -9,10 +10,9 @@ use App\Repository\CityRepository;
 use ApiPlatform\Metadata\Operation;
 use App\Repository\FlightRepository;
 use App\Repository\CountryRepository;
-use App\Repository\AirplaneRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use ApiPlatform\State\ProcessorInterface;
-use DateTime;
+use App\Repository\AirplaneModelRepository;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
@@ -22,7 +22,7 @@ class FlightStateProcessor implements ProcessorInterface
     public function __construct(
         private CityRepository $cityRepository,
         private CountryRepository $countryRepository,
-        private AirplaneRepository $airplaneRepository,
+        private AirplaneModelRepository $airplaneModelRepository,
         private FlightRepository $flightRepository,
         private EntityManagerInterface $entityManager
     ) {}
@@ -37,7 +37,7 @@ class FlightStateProcessor implements ProcessorInterface
         // dd($isExistCityArrival);
 
         // Rechercher l'avion à assigner
-        $isExistAirplane = $this->airplaneRepository->findOneById($data->airplaneId);
+        $isExistAirplane = $this->airplaneModelRepository->findOneById($data->airplaneId);
 
         // Vérifier si les villes de départ et d'arrivée ainsi que l'avion pour le vol existent dans le serveur
         if (!$isExistCityArrival || !$isExistCityDeparture || !$isExistAirplane) {
@@ -107,7 +107,7 @@ class FlightStateProcessor implements ProcessorInterface
         $flight->setCreatedAt(new \DateTimeImmutable())
             ->setCityDeparture($isExistCityDeparture)
             ->setCityArrival($isExistCityArrival)
-            ->setAirplane($isExistAirplane)
+            // ->setAirplaneModel($isExistAirplane)
             ->setDateDeparture($data->dateDeparture)
             ->setDateArrival($data->dateArrival);
 

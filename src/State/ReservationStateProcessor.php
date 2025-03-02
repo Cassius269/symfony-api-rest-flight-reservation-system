@@ -8,11 +8,11 @@ use App\Repository\CityRepository;
 use ApiPlatform\Metadata\Operation;
 use App\Repository\FlightRepository;
 use App\Service\HashPasswordService;
-use App\Repository\AirplaneRepository;
 use App\Repository\PassengerRepository;
 use App\Service\SeatReservationService;
 use Doctrine\ORM\EntityManagerInterface;
 use ApiPlatform\State\ProcessorInterface;
+use App\Repository\AirplaneModelRepository;
 use ApiPlatform\Validator\ValidatorInterface;
 use ApiPlatform\Validator\Exception\ValidationException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -28,7 +28,7 @@ class ReservationStateProcessor implements ProcessorInterface
         private UserPasswordHasherInterface $passwordHasher,
         private FlightRepository $flightRepository,
         private CityRepository $cityRepository,
-        private AirplaneRepository $airplaneRepository,
+        // private AirplaneModelRepository $airplaneModelRepository,
         private ValidatorInterface $validator,
         private HashPasswordService $hashPasswordService,
         private SeatReservationService $seatReservationService
