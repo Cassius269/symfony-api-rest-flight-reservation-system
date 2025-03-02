@@ -4,8 +4,6 @@ namespace App\Entity;
 
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Post;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Delete;
@@ -17,6 +15,9 @@ use ApiPlatform\Metadata\GetCollection;
 use App\State\AirplaneModelStateProvider;
 use App\State\AirplaneModelStateProcessor;
 use App\Repository\AirplaneModelRepository;
+use App\State\UpdateAirplaneModelProcessor;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Validator\Constraints as Assert;
 use App\State\CustomAirplaneGetCollectionStateProvider;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
@@ -47,8 +48,8 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
         new Delete(), // supprimer une ressource du serveur à l'aide son ID
         new Patch( // mettre à jour partiellement une ressource à l'aide de son ID
 
-            security: "is_granted('ROLE_ADMIN')", // seul un utilisateur avec le rôle d'administrateur peut modifier partiellement une ressource de type avion
-            processor: UpdateAirplaneProcessor::class,
+            security: "is_granted('ROLE_ADMIN')", // seul un utilisateur avec le rôle d'administrateur peut modifier partiellement une ressource de type model d'avion
+            processor: UpdateAirplaneModelProcessor::class,
             input: AirplaneModelRequestDto::class,
             // convertir une donnée JSON en objet, utile en écriture
             // normalizationContext: ['groups' => ['airplane:write']],

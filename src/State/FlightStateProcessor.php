@@ -12,7 +12,7 @@ use App\Repository\FlightRepository;
 use App\Repository\CountryRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use ApiPlatform\State\ProcessorInterface;
-use App\Repository\AirplaneModelRepository;
+use App\Repository\AirplaneRepository;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
@@ -22,7 +22,7 @@ class FlightStateProcessor implements ProcessorInterface
     public function __construct(
         private CityRepository $cityRepository,
         private CountryRepository $countryRepository,
-        private AirplaneModelRepository $airplaneModelRepository,
+        private AirplaneRepository $airplaneRepository,
         private FlightRepository $flightRepository,
         private EntityManagerInterface $entityManager
     ) {}
@@ -31,13 +31,14 @@ class FlightStateProcessor implements ProcessorInterface
     {
         // Rechercher les villes de départ et de destination à l'aide du nom de la ville et du pays
         $isExistCityDeparture = $this->cityRepository->findDestinationByCityAndCountry($data->getCityDeparture()->name, $data->getCityDeparture()->country);
+        // dd($isExistCityDeparture);
 
         $isExistCityArrival = $this->cityRepository->findDestinationByCityAndCountry($data->getCityArrival()->name, $data->getCityArrival()->country);
 
         // dd($isExistCityArrival);
 
         // Rechercher l'avion à assigner
-        $isExistAirplane = $this->airplaneModelRepository->findOneById($data->airplaneId);
+        $isExistAirplane = $this->airplaneRepository->findOneById($data->airplaneId);
 
         // Vérifier si les villes de départ et d'arrivée ainsi que l'avion pour le vol existent dans le serveur
         if (!$isExistCityArrival || !$isExistCityDeparture || !$isExistAirplane) {
@@ -107,7 +108,7 @@ class FlightStateProcessor implements ProcessorInterface
         $flight->setCreatedAt(new \DateTimeImmutable())
             ->setCityDeparture($isExistCityDeparture)
             ->setCityArrival($isExistCityArrival)
-            // ->setAirplaneModel($isExistAirplane)
+            ->setAirplane($isExistAirplane)
             ->setDateDeparture($data->dateDeparture)
             ->setDateArrival($data->dateArrival);
 

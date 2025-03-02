@@ -56,16 +56,17 @@ class FlightRepository extends ServiceEntityRepository
         return $this->createQueryBuilder('f')
             ->select('f.id, f.dateDeparture, f.dateArrival')
             ->addSelect('cd.name AS cityDeparture, ca.name AS cityArrival')
-            ->addSelect('a.capacity')
+            ->addSelect('am.capacity')
             ->addSelect('COUNT(r.passenger) AS passengerCount')
             ->innerJoin('f.airplane', 'a')
+            ->innerJoin('a.airplaneModel', 'am')
             ->leftJoin('f.reservations', 'r')
             ->leftJoin('f.cityDeparture', 'cd')
             ->leftJoin('f.cityArrival', 'ca')
             ->where('f.dateDeparture > :now')
             ->setParameter('now', new \DateTime())
-            ->groupBy('f.id, f.dateDeparture, f.dateArrival, cd.name, ca.name, a.capacity')
-            ->having('COUNT(r.passenger) < a.capacity')
+            ->groupBy('f.id, f.dateDeparture, f.dateArrival, cd.name, ca.name, am.capacity') // Include am.capacity
+            ->having('COUNT(r.passenger) < am.capacity') // Compare with the correct capacity
             ->getQuery()
             ->getResult();
     }

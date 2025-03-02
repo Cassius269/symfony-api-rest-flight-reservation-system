@@ -129,7 +129,7 @@ class ReservationStateProcessor implements ProcessorInterface
         }
         // dd($passengersCount);
 
-        if ($isExistFlight->getAirPlane()->getcapacity() <= $passengersCount) {
+        if ($isExistFlight->getAirPlane()->getAirplaneModel()->getcapacity() <= $passengersCount) {
             throw new UnprocessableEntityHttpException(json_encode([ // renvoyer un code d'erreur 422 car problème logique des données
                 'message' => 'La capacité maximale de l\'avion choisi pour le vol est atteinte'
             ]));

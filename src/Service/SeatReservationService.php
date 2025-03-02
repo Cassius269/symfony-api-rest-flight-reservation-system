@@ -26,7 +26,7 @@ class SeatReservationService
         $reservations = $flight->getReservations();
         $countPassengers = count($reservations); // compter le nombre de réservations actuelles d'un vol
 
-        $airplaneCapacity = $flight->getAirplane()->getCapacity(); // retrouver la capacité maximale de l'avion en termes de passagers
+        $airplaneCapacity = $flight->getAirplane()->getAirplaneModel()->getCapacity(); // retrouver la capacité maximale de l'avion en termes de passagers depuis le modèle de l'avion
         $maxRangees = ceil(($airplaneCapacity / 6)); // le nombre de rangée maximum dans l'avion
 
         // Si l'avion n'est pas plein

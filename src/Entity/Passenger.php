@@ -6,6 +6,7 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Delete;
+use App\Dto\PassengerRequestDto;
 use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
@@ -24,7 +25,8 @@ use Doctrine\Common\Collections\ArrayCollection;
         new Get(), // récuperer une ressource passager à l'aide de son ID
         new Post( // envoyer une nouvelle ressource passager au serveur
             processor: InsertPassengerProcessor::class, // liaison du processeur à la route de création de ressource passagers, 
-            // input: PassengerResponseDto::class
+            // input: PassengerRequestDto::class
+
         ),
         new Patch(), // modifier une ressource passager présente dans le serveur à l'aide de son ID,
         new Delete() // supprimer une ressource passager présent dans le serveur à l'aide de son ID

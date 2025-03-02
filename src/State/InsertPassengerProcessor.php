@@ -23,7 +23,7 @@ class InsertPassengerProcessor implements ProcessorInterface
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): object
     {
         if (!$data instanceof Passenger) {
-            throw new \InvalidArgumentException('Data is not an instance of Passenger');
+            throw new \InvalidArgumentException('L\'objet reccueilli n\'est pas une instance de la classe Passenger');
         }
 
         // Hasher le mot de passe du nouveau passager

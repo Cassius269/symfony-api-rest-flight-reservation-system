@@ -11,7 +11,7 @@ use App\Repository\AirplaneModelRepository;
 use ApiPlatform\Validator\ValidatorInterface;
 use ApiPlatform\Validator\Exception\ValidationException;
 
-class UpdateAirplaneProcessor implements ProcessorInterface
+class UpdateAirplaneModelProcessor implements ProcessorInterface
 {
     public function __construct(
         private EntityManagerInterface $entityManager,
