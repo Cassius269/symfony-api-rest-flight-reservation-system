@@ -3,10 +3,15 @@
 namespace App\Entity;
 
 
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\Post;
 use Doctrine\DBAL\Types\Types;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Delete;
 use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Metadata\ApiResource;
 use App\Repository\CountryRepository;
+use ApiPlatform\Metadata\GetCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -24,6 +29,14 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 #[
     ApiResource( // Transformer l'entité Country en une ressource API, avec toutes les opérations CRUD
         security: "is_granted('ROLE_ADMIN')", // seul un utilisateur au rôle Admin peut avoir accès à toutes les opérations d'une ressource
+        operations: [
+            new Get(), // rendre accessible une ressource grâce à son ID 
+            new GetCollection(), // rendre accessible l'ensemble des ressources 
+            new Post(), // créer une nouvelle ressource 
+            new Patch(), // mettre à jour partiellement une ressource grâce à l'ID
+            new Delete() // supprimer une ressource de type pays à l'aide de son ID
+        ]
+
     )
 ]
 class Country
