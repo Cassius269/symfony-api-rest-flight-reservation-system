@@ -37,7 +37,6 @@ class CustomCityGetCollectionStateProvier implements ProviderInterface
             $cityDto->zipCode = $city->getZipCode();
             $cityDto->countryName = $city->getCountry()->getName();
 
-
             $results[] = $cityDto; // stocker le DTO de chaque ville dans un tableau de résultat
         }
 

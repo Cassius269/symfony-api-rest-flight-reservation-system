@@ -3,7 +3,6 @@
 namespace App\Entity;
 
 use App\Dto\CityRequestDto;
-use App\Dto\CityResponseDto;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Post;
 use Doctrine\DBAL\Types\Types;
