@@ -2,8 +2,7 @@
 
 namespace App\Entity;
 
-use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
-use ApiPlatform\Metadata\ApiFilter;
+use ApiPlatform\Doctrine\Orm\Filter\DateFilter;
 use ApiPlatform\Metadata\Get;
 use App\Dto\FlightRequestDto;
 use ApiPlatform\Metadata\Post;
@@ -11,14 +10,16 @@ use Doctrine\DBAL\Types\Types;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Delete;
 use Doctrine\ORM\Mapping as ORM;
+use ApiPlatform\Metadata\ApiFilter;
 use App\State\FlightStateProcessor;
 use App\Repository\FlightRepository;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
-use App\State\CustomGetCollectionAvailableFlightsProvider;
+use ApiPlatform\Metadata\QueryParameter;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Validator\Constraints as Assert;
+use App\State\CustomGetCollectionAvailableFlightsProvider;
 
 #[ORM\Entity(repositoryClass: FlightRepository::class)]
 #[ApiResource( // Déclaration de l'entité Flight comme ressource de l'API
@@ -26,8 +27,21 @@ use Symfony\Component\Validator\Constraints as Assert;
     operations: [
         new Get(), // récuperer une ressource vol d'avion à l'aide de son ID
         new GetCollection(
-            filters: ['flight.search_filter']
+            // récuperer l'ensemble des ressources de type vol d'avion disponibles dans le serveur
+            paginationEnabled: true, // activer la pagination
+            paginationItemsPerPage: 15, // nbre d'items par page
+            paginationClientEnabled: true, // donner la possibilité au client de choisir d'activer ou pas la pagination
+            paginationClientItemsPerPage: true, // donner la possible au client de choisir le nombre de ressources par page
 
+            // Injection de filtre personnalisé déclaré depuis le fichier "/config/packages/filters.yaml"
+            filters: ['flight.search_filter'],
+            // Paramètrage optionnel pour transformer les paramètres optionnelles de requêtes de majuscules en minuscule
+            parameters: [
+                'datedeparture' => new QueryParameter(filter: 'flight.search_filter', property: 'dateDeparture'),
+                'datearrival' => new QueryParameter(filter: 'flight.search_filter', property: 'dateArrival'),
+                'citydeparture' => new QueryParameter(filter: 'flight.search_filter', property: 'cityDeparture.name'),
+                'cityarrival' => new QueryParameter(filter: 'flight.search_filter', property: 'cityArrival.name'),
+            ],
         ), // récuperer l'ensemble des ressources de type vol d'avion présent dans le serveur
         new GetCollection(
             // récuperer l'ensemble des ressources de type vol d'avion disponibles dans le serveur
@@ -35,11 +49,11 @@ use Symfony\Component\Validator\Constraints as Assert;
             paginationItemsPerPage: 15, // nbre d'items par page
             paginationClientEnabled: true, // donner la possibilité au client de choisir d'activer ou pas la pagination
             paginationClientItemsPerPage: true, // donner la possible au client de choisir le nombre de ressources par page
-            uriTemplate: '/getAvailableFlights', // création d'une route personnalisée (endpoint)
+            uriTemplate: '/get-available-flights', // création d'une route personnalisée (endpoint)
             name: 'getAvailableFlights',
             provider: CustomGetCollectionAvailableFlightsProvider::class,
             security: 'is_granted("ROLE_PASSENGER") or is_granted("ROLE_ADMIN")', // seul un utilisateur ayant le rôle Admin ou passager peut regarder l'ensemble des vols disponibles
-            filters: ['flight.search_filter']
+            filters: ['flight.search_filter'], // injection de filtre personnalisé crée sous forme de service
         ),
         new Post(
             // créer une nouvelle ressource vol d'avion
@@ -50,6 +64,7 @@ use Symfony\Component\Validator\Constraints as Assert;
         new Delete() // supprimer une ressource vol d'avion à l'aide de son ID
     ]
 )]
+#[ApiFilter(DateFilter::class, properties: ['dateDeparture', 'dateArrival'])]
 class Flight
 {
     #[ORM\Id]

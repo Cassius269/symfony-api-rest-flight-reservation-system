@@ -1,12 +1,10 @@
 services:
-  flight.search_filter: # nom personnalisé du filtre
-    parent: "api_platform.doctrine.orm.search_filter"
+  flight.search_filter: # nom personnalisé du filtre de recherches des villes de destination ou de provenance
+    parent: "api_platform.doctrine.orm.search_filter" # le searchFilter est recommandé uniquement pour les recherches de correspondances de textes
     arguments: [
         {
           cityDeparture.name: "exact", # recherche d'occurences exactes portant le nom de la ville de départ
           cityArrival.name: "exact",
-          dateDeparture: "partial", # recherche d'occurences exactes portant une date presque similaire à exacte
-          dateArrival: "partial",
         },
       ]
     tags: ["api_platform.filter"]
