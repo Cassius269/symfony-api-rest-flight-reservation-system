@@ -15,6 +15,7 @@ use ApiPlatform\State\ProcessorInterface;
 use App\Repository\AirplaneModelRepository;
 use ApiPlatform\Validator\ValidatorInterface;
 use ApiPlatform\Validator\Exception\ValidationException;
+use App\Service\EmailService;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
@@ -31,7 +32,8 @@ class ReservationStateProcessor implements ProcessorInterface
         // private AirplaneModelRepository $airplaneModelRepository,
         private ValidatorInterface $validator,
         private HashPasswordService $hashPasswordService,
-        private SeatReservationService $seatReservationService
+        private SeatReservationService $seatReservationService,
+        private EmailService $emailService
     ) {}
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): object
@@ -121,10 +123,10 @@ class ReservationStateProcessor implements ProcessorInterface
         }
 
         // Compter le nombre de passagers d'un vols
-        $passengers = $isExistFlight->getReservations();
+        $actualReservations = $isExistFlight->getReservations();
 
         $passengersCount = null;
-        foreach ($passengers as $passenger) {
+        foreach ($actualReservations as $actualReservation) {
             $passengersCount++;
         }
         // dd($passengersCount);
@@ -154,6 +156,9 @@ class ReservationStateProcessor implements ProcessorInterface
         $this->entityManager->persist($reservation);
         $this->entityManager->flush();
 
+        // dd($passenger);
+        // Envoyer un mail de confirmation au passage
+        $this->emailService->confirmReservation($passenger->email, $isExistCityDeparture->getName(), $isExistCityArrival->getName(), $reservation->getFlight()->getDateDeparture()); // récuperer l'information depuis le DTO de requête
 
         // Renvoyer une réponse JSON au client en cas de réussite de la création de la réservation pour un passager
         return $data; // retouner les valeurs entrée si pas de traitement particulier en sortie
