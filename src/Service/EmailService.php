@@ -19,7 +19,7 @@ class EmailService
     {
         // Création du mail
         $email = (new TemplatedEmail())
-            ->from('Service client <contact@fahami.fr>')
+            ->from('Service client App Réservation de vols <contact@fahami.fr>')
             ->to($reservation->getPassenger()->getEmail()) // configurer le mail du destinataire dynamiquement depuis la réservation du passager 
             ->subject('Votre réservation est confirmée')
             ->htmlTemplate('@emails/email_confirmation_reservation.html.twig')
