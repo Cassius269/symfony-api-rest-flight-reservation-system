@@ -33,7 +33,11 @@
         "symfony/serializer": "7.2.*",
         "symfony/twig-bundle": "7.2.*",
         "symfony/validator": "7.2.*",
-        "symfony/yaml": "7.2.*"
+        "symfony/yaml": "7.2.*",
+        "twig/cssinliner-extra": "^3.20",
+        "twig/extra-bundle": "^3.20",
+        "twig/inky-extra": "^3.20",
+        "twig/markdown-extra": "^3.20"
     },
     "config": {
         "allow-plugins": {

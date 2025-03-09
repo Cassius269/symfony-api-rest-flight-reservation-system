@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="fr">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>Email de confirmation de réservation</title>
+	</head>
+	<body>
+		{% apply inline_css(source('@css/email_confirmation_reservation.css')) %}
+		<h1>Réservation confirmée</h1>
+		<p>Cher(e)
+			<b>{{ reservation.passenger.fullname|escape }}</b>,<br>
+			Nous vous remercions de votre confiance en choisissant notre compagnie aérienne pour votre prochain voyage.
+			<br>Nous sommes ravis de vous confirmer la réservation de votre vol comme suit :<br>
+		</p>
+		<ul>
+			<li>
+				<b>Numéro de réservation</b>:
+				{{ reservation.passengerNameRecord}}</li>
+			<li>
+				<b>Numéro de vol</b>:
+				{{ reservation.flight.id}}</li>
+		</li>
+		<li>
+			<b>Date de départ</b>:
+			{{ reservation.flight.dateDeparture|date('m/d/Y H') }}</li>
+		<li>
+			<b>Ville de départ</b>:
+			{{ reservation.flight.cityDeparture.name|escape }}</li>
+		<li>
+			<b>Ville d'arrivée</b>:
+			{{ reservation.flight.cityArrival.name|escape }}</li>
+		<li>
+			<b>Siège</b>:
+			{{ reservation.numberFlightSeat|escape }}
+		</li>
+	</body>
+</html></ul>{# Souhaiter un agréable moment de la journée au passager en fonction de la date d'enregistrement de la réservation #}{% if reservation.createdAt|date('H') < '14' %}
+<p>Vous souhaitant une excellente journée.</p>{% elseif reservation.createdAt|date('H') < '17'  %}
+<p>Vous souhaitant un agréable après-midi.</p>{% else %}
+<p>Vous souhaitant une agréable soirée.</p>{% endif %}<br><p>Merci de votre confiance et à bientôt pour votre prochain vol.</p>{% endapply %}

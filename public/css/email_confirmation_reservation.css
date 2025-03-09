@@ -1,0 +1,14 @@
+h1 {
+    color: blue;
+    font-size: 25px;
+}
+
+li {
+    padding: 10px;
+    margin-bottom: 10px;
+    border-bottom: 1px solid #ccc;
+    font-size: 18px;
+    line-height: 22px;
+    max-width: 300px;
+}
+

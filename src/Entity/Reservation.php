@@ -53,7 +53,7 @@ class Reservation
         pattern: '/\d{1,3}[A-Z]$/',
         message: 'Le numéro de siège doit être une chaîne alphanumérique de 1 à 4 caractères au format nombre(s)-lettre.'
     )]
-    private ?string $numberFlightSeat = null; // chaque passager un numéro unique 
+    private ?string $numberFlightSeat = null; // chaque passager d'un vol un numéro de siège unique 
 
     #[ORM\Column(type: Types::DECIMAL, precision: 6, scale: 2)]
     #[Assert\NotBlank(message: "Le prix d'une réservation est obligatoire")]
@@ -76,6 +76,10 @@ class Reservation
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $updatedAt = null;
+
+    #[ORM\Column(length: 6, nullable: false)]
+    #[Assert\NotBlank(message: "La référence PNR est obligatoire")]
+    private ?string $passengerNameRecord = null; // Passenger Name Record appelé aussi PNR est une réference unique de chaque réservation à un vol
 
     public function getId(): ?int
     {
@@ -166,6 +170,18 @@ class Reservation
     public function setUpdatedAt($updatedAt)
     {
         $this->updatedAt = $updatedAt;
+
+        return $this;
+    }
+
+    public function getPassengerNameRecord(): ?string
+    {
+        return $this->passengerNameRecord;
+    }
+
+    public function setPassengerNameRecord(string $passengerNameRecord): static
+    {
+        $this->passengerNameRecord = $passengerNameRecord;
 
         return $this;
     }

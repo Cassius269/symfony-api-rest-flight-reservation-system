@@ -162,6 +162,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+
+    public function getFullname()
+    {
+        return  $this->lastname . ' ' . $this->firstname;
+    }
+
     /**
      * Get the value of createdAt
      */

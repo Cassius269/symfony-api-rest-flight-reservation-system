@@ -4,18 +4,17 @@ namespace App\State;
 
 use App\Entity\Passenger;
 use App\Entity\Reservation;
+use App\Service\EmailService;
 use App\Repository\CityRepository;
 use ApiPlatform\Metadata\Operation;
 use App\Repository\FlightRepository;
 use App\Service\HashPasswordService;
 use App\Repository\PassengerRepository;
-use App\Service\SeatReservationService;
 use Doctrine\ORM\EntityManagerInterface;
 use ApiPlatform\State\ProcessorInterface;
-use App\Repository\AirplaneModelRepository;
 use ApiPlatform\Validator\ValidatorInterface;
 use ApiPlatform\Validator\Exception\ValidationException;
-use App\Service\EmailService;
+use App\Service\SeatReservationService;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
@@ -142,7 +141,8 @@ class ReservationStateProcessor implements ProcessorInterface
             // ->setNumberFlightSeat('7A')
             ->setPrice(800) // prix par défaut 800euros
             ->setFlight($isExistFlight)
-            ->setPassenger($isExistPassenger ?? $newPassenger);
+            ->setPassenger($isExistPassenger ?? $newPassenger)
+            ->setPassengerNameRecord('ABC123');
 
         $this->seatReservationService->attributeASeat($isExistFlight, $reservation);
 
@@ -158,7 +158,7 @@ class ReservationStateProcessor implements ProcessorInterface
 
         // dd($passenger);
         // Envoyer un mail de confirmation au passage
-        $this->emailService->confirmReservation($passenger->email, $isExistCityDeparture->getName(), $isExistCityArrival->getName(), $reservation->getFlight()->getDateDeparture()); // récuperer l'information depuis le DTO de requête
+        $this->emailService->confirmReservation($reservation); // récuperer l'information depuis le DTO de requête
 
         // Renvoyer une réponse JSON au client en cas de réussite de la création de la réservation pour un passager
         return $data; // retouner les valeurs entrée si pas de traitement particulier en sortie
