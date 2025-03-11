@@ -36,6 +36,7 @@
 		</li>
 	</body>
 </html></ul>{# Souhaiter un agréable moment de la journée au passager en fonction de la date d'enregistrement de la réservation #}{% if reservation.createdAt|date('H') < '14' %}
+<br>
 <p>Vous souhaitant une excellente journée.</p>{% elseif reservation.createdAt|date('H') < '17'  %}
 <p>Vous souhaitant un agréable après-midi.</p>{% else %}
-<p>Vous souhaitant une agréable soirée.</p>{% endif %}<br><p>Merci de votre confiance et à bientôt pour votre prochain vol.</p>{% endapply %}
+<p>Vous souhaitant une agréable soirée.</p>{% endif %}<p>Merci de votre confiance et à bientôt pour votre prochain vol.</p>{% endapply %}
