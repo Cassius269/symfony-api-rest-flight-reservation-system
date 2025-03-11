@@ -14,6 +14,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\Validator\ValidatorInterface;
 use ApiPlatform\Validator\Exception\ValidationException;
+use App\Service\PNRGenerationService;
 use App\Service\SeatReservationService;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -32,7 +33,8 @@ class ReservationStateProcessor implements ProcessorInterface
         private ValidatorInterface $validator,
         private HashPasswordService $hashPasswordService,
         private SeatReservationService $seatReservationService,
-        private EmailService $emailService
+        private EmailService $emailService,
+        private PNRGenerationService $pnrGenerationService // injection de la dépendance de génération de PNR
     ) {}
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): object
@@ -138,13 +140,12 @@ class ReservationStateProcessor implements ProcessorInterface
 
         $reservation = new Reservation();
         $reservation->setCreatedAt(new \DateTimeImmutable())
-            // ->setNumberFlightSeat('7A')
             ->setPrice(800) // prix par défaut 800euros
             ->setFlight($isExistFlight)
             ->setPassenger($isExistPassenger ?? $newPassenger)
-            ->setPassengerNameRecord('ABC123');
+            ->setPassengerNameRecord($this->pnrGenerationService->attributePNRNumber());
 
-        $this->seatReservationService->attributeASeat($isExistFlight, $reservation);
+        $this->seatReservationService->attributeASeat($isExistFlight, $reservation); // attribuer un siège au passager de la réservation
 
         $errors = $this->validator->validate($reservation);
 

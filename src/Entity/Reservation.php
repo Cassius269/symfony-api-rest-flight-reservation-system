@@ -25,6 +25,10 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
     fields: ['passenger', 'flight'],
     message: 'Le passager {{ value }} a déjà réservé pour ce vol.',
 )]
+#[UniqueEntity( // le PNR est unique
+    fields: ['passengerNameRecord'],
+    message: 'Un PNR similaire existe déjà'
+)]
 #[ApiResource(
     security: "is_granted('ROLE_ADMIN')", // par défaut seul un utilisateur au rôle Admin peut avoir accès à toutes les opérations d'une ressource
     operations: [
@@ -65,6 +69,10 @@ class Reservation
     #[Assert\NotBlank(message: "Le passager doit être renseigné ")]
     private ?Passenger $passenger = null;
 
+    #[ORM\Column(length: 6, nullable: false)]
+    #[Assert\NotBlank(message: "La référence PNR est obligatoire")]
+    private ?string $passengerNameRecord = null; // Passenger Name Record appelé aussi PNR est une réference unique de chaque réservation à un vol
+
     #[ORM\ManyToOne(inversedBy: 'reservations')]
     #[ORM\JoinColumn(nullable: false)]
     #[Assert\NotBlank(message: "Les informations sur le vol sont obligatoires")]
@@ -76,10 +84,6 @@ class Reservation
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $updatedAt = null;
-
-    #[ORM\Column(length: 6, nullable: false)]
-    #[Assert\NotBlank(message: "La référence PNR est obligatoire")]
-    private ?string $passengerNameRecord = null; // Passenger Name Record appelé aussi PNR est une réference unique de chaque réservation à un vol
 
     public function getId(): ?int
     {
