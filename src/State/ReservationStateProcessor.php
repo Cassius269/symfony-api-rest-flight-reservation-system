@@ -159,7 +159,7 @@ class ReservationStateProcessor implements ProcessorInterface
 
         // dd($passenger);
         // Envoyer un mail de confirmation au passage
-        $this->emailService->confirmReservation($reservation); // récuperer l'information depuis le DTO de requête
+        $this->emailService->confirmReservation($reservation); // récuperer les informations depuis le nouvel objet de réservation nouvellement créé 
 
         // Renvoyer une réponse JSON au client en cas de réussite de la création de la réservation pour un passager
         return $data; // retouner les valeurs entrée si pas de traitement particulier en sortie

@@ -27,6 +27,6 @@ class PNRGenerationService
             // }
         } while ($isPNRexist); // continuer d'itérér jusqu'à trouver une valeur PNR unique
 
-        return strtoupper($pnr); // dans tous les cas, un PNR unique finira par être généré
+        return strtoupper($pnr); // dans tous les cas, un PNR unique finira par être généré et retourner sa valeur
     }
 }

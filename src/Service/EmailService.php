@@ -3,7 +3,6 @@
 namespace App\Service;
 
 use App\Entity\Reservation;
-use DateTime;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\Mailer\MailerInterface;
 
@@ -28,8 +27,6 @@ class EmailService
                     'reservation' => $reservation
                 ]
             );
-
-        // ->text('Nous vous confirmons la réservation du vol en provenance de ' . $cityDeparture . ' pour ' . $cityArrival . ' le ' . $dateDeparture->format('Y-m-d H:i:s'));
 
         // Envoi du mail
         $this->mailer->send($email);
