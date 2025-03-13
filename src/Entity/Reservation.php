@@ -13,6 +13,7 @@ use ApiPlatform\Metadata\GetCollection;
 use App\Dto\ReservationRequestDto;
 use App\Repository\ReservationRepository;
 use App\State\ReservationStateProcessor;
+use App\State\ReservationStateProvider;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
@@ -30,9 +31,10 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
     message: 'Un PNR similaire existe déjà'
 )]
 #[ApiResource(
-    security: "is_granted('ROLE_ADMIN')", // par défaut seul un utilisateur au rôle Admin peut avoir accès à toutes les opérations d'une ressource
     operations: [
-        new Get(), // récupérer une ressource de type Réservation à l'aide de son ID
+        new Get( // récupérer une ressource de type Réservation à l'aide de son ID
+            provider: ReservationStateProvider::class
+        ),
         new GetCollection(), // récupérer l'ensemble des ressources de type Réservation
         new Post(
             // envoyer une nouvelle ressource Réservation au serveur
@@ -40,8 +42,14 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
             input: ReservationRequestDto::class,
             security: "is_granted('ROLE_ADMIN') or is_granted('ROLE_PASSENGER')", // seul un utilisateur au rôle Admin  ou passager peut avoir accès à l'endpoint de création d'une nouvelle réservation
         ),
-        new Patch(), // mettre à jour une ressource Réservation partiellement
-        new Delete // supprimer une ressource Réservation à l'aide de son ID
+        new Patch( // mettre à jour une ressource Réservation partiellement
+            security: "is_granted('RESERVATION_VIEW', object)", // utilisation de voter personnalisé pour gérer la permission de lecture d'une réservation
+            securityMessage: 'Désolé, vous êtes ni admin ni le propriétaire de la réservation',
+        ),
+        new Delete( // supprimer une ressource Réservation à l'aide de son ID
+            security: "is_granted('ROLE_ADMIN')", // par défaut seul un utilisateur au rôle Admin peut avoir accès à toutes les opérations d'une ressource
+            securityMessage: 'accès non autorisé'
+        )
     ]
 )]
 class Reservation

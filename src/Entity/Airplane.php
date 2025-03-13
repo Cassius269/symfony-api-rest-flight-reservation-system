@@ -10,7 +10,9 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: AirplaneRepository::class)]
-#[ApiResource()] // Déclarer l'entité Airplane en tant que ressource avec tous les verbes HTTP autorisés
+#[ApiResource( // Déclarer l'entité Airplane en tant que ressource avec tous les verbes HTTP autorisés
+    security: "is_granted('ROLE_ADMIN')", // par défaut seul un utilisateur au rôle Admin peut avoir accès à toutes les opérations d'une ressource de type Avion
+)]
 class Airplane
 {
     #[ORM\Id]

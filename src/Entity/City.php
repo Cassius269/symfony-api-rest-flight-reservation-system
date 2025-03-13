@@ -17,6 +17,7 @@ use ApiPlatform\Metadata\GetCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
 use App\State\CustomCityGetCollectionStateProvier;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
@@ -37,6 +38,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
             paginationClientEnabled: true, // donner la possibilité au client de choisir l'activation de la pagination
             paginationClientItemsPerPage: true, // donner la possibilité au client de choisir le nombre d'objets ressources par page, 
             provider: CustomCityGetCollectionStateProvier::class,
+            security: "is_granted('ROLE_ADMIN') or is_granted('ROLE_PASSENGER')", // seuls des utilisateurs au rôle Admin ou Passager peut avoir accès à l'endpoint de récupération de toutes les ressources de type City
         ),
         new Delete(), // supprimer une ressource City à l'aide de son ID
         new Patch() // modifier une ressource City à l'aide de son ID
@@ -60,10 +62,12 @@ class City
         minMessage: 'Le nom d\'une ville est trop court'
     )]
     #[Assert\NotBlank(message: 'Le nom d\'une ville est obligatoire')]
+    #[Groups(['flight:read'])]
     private ?string $name = null;
 
     #[ORM\ManyToOne(inversedBy: 'cities')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['flight:read'])]
     private ?Country $country = null;
 
     /**

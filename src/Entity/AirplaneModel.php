@@ -10,7 +10,6 @@ use ApiPlatform\Metadata\Delete;
 use Doctrine\ORM\Mapping as ORM;
 use App\Dto\AirplaneModelRequestDto;
 use ApiPlatform\Metadata\ApiResource;
-use App\State\UpdateAirplaneProcessor;
 use ApiPlatform\Metadata\GetCollection;
 use App\State\AirplaneModelStateProvider;
 use App\State\AirplaneModelStateProcessor;
@@ -30,6 +29,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 #[ApiResource(
     // Exposition des champs en phase de sérialisation
     // normalizationContext: ['groups' => ['airplane:read']], // convertir un objet Airplane au format json, utile en lecture
+    security: "is_granted('ROLE_ADMIN')", // par défaut seul un utilisateur au rôle Admin peut avoir accès à toutes les opérations d'une ressource de type modèle d'avion
     operations: [
         new Get( // obtenir une ressource Avion à l'aide de son ID
             provider: AirplaneModelStateProvider::class
@@ -47,8 +47,6 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
         ),
         new Delete(), // supprimer une ressource du serveur à l'aide son ID
         new Patch( // mettre à jour partiellement une ressource à l'aide de son ID
-
-            security: "is_granted('ROLE_ADMIN')", // seul un utilisateur avec le rôle d'administrateur peut modifier partiellement une ressource de type model d'avion
             processor: UpdateAirplaneModelProcessor::class,
             input: AirplaneModelRequestDto::class,
             // convertir une donnée JSON en objet, utile en écriture

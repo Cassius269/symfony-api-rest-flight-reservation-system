@@ -2,7 +2,6 @@
 
 namespace App\Entity;
 
-use ApiPlatform\Doctrine\Orm\Filter\DateFilter;
 use ApiPlatform\Metadata\Get;
 use App\Dto\FlightRequestDto;
 use ApiPlatform\Metadata\Post;
@@ -17,7 +16,9 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\QueryParameter;
 use Doctrine\Common\Collections\Collection;
+use ApiPlatform\Doctrine\Orm\Filter\DateFilter;
 use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use App\State\CustomGetCollectionAvailableFlightsProvider;
 
@@ -27,12 +28,14 @@ use App\State\CustomGetCollectionAvailableFlightsProvider;
     operations: [
         new Get(), // récuperer une ressource vol d'avion à l'aide de son ID
         new GetCollection(
+            // Exposition des champs en phase de sérialisation et de déserialisation
+            normalizationContext: ['groups' => ['flight:read']],
             // récuperer l'ensemble des ressources de type vol d'avion disponibles dans le serveur
             paginationEnabled: true, // activer la pagination
             paginationItemsPerPage: 15, // nbre d'items par page
             paginationClientEnabled: true, // donner la possibilité au client de choisir d'activer ou pas la pagination
             paginationClientItemsPerPage: true, // donner la possible au client de choisir le nombre de ressources par page
-
+            security: 'is_granted("ROLE_PASSENGER") or is_granted("ROLE_ADMIN")', // seuls des utilisateurs ayant le rôle Admin ou passager peut regarder l'ensemble des vols disponibles
             // Injection de filtre personnalisé déclaré depuis le fichier "/config/packages/filters.yaml"
             filters: ['flight.search_filter'],
             // Paramètrage optionnel pour transformer les paramètres optionnelles de requêtes de majuscules en minuscule
@@ -52,7 +55,7 @@ use App\State\CustomGetCollectionAvailableFlightsProvider;
             uriTemplate: '/get-available-flights', // création d'une route personnalisée (endpoint)
             name: 'getAvailableFlights',
             provider: CustomGetCollectionAvailableFlightsProvider::class,
-            security: 'is_granted("ROLE_PASSENGER") or is_granted("ROLE_ADMIN")', // seul un utilisateur ayant le rôle Admin ou passager peut regarder l'ensemble des vols disponibles
+            security: 'is_granted("ROLE_PASSENGER") or is_granted("ROLE_ADMIN")', // seuls des utilisateurs ayant le rôle Admin ou passager peut regarder l'ensemble des vols disponibles
             filters: ['flight.search_filter'], // injection de filtre personnalisé crée sous forme de service
         ),
         new Post(
@@ -70,24 +73,29 @@ class Flight
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['flight:read'])]
     private ?int $id = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     #[Assert\NotBlank(message: "Une date de départ doit être renseignée")]
+    #[Groups(['flight:read'])]
     private ?\DateTimeInterface $dateDeparture = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     #[Assert\NotBlank(message: "Une date d'arrivée doit être renseignée")]
+    #[Groups(['flight:read'])]
     private ?\DateTimeInterface $dateArrival = null;
 
     #[ORM\ManyToOne(inversedBy: 'flights')]
     #[ORM\JoinColumn(nullable: false)]
     #[Assert\NotBlank(message: "Une ville de départ doit être renseignée")]
+    #[Groups(['flight:read'])]
     private ?City $cityDeparture = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
     #[Assert\NotBlank(message: "Une ville d'arrivée doit être renseignée")]
+    #[Groups(['flight:read'])]
     private ?City $cityArrival = null;
 
     #[ORM\Column]

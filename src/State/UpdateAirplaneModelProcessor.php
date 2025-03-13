@@ -2,7 +2,6 @@
 
 namespace App\State;
 
-use App\Dto\AirplaneResponseDto;
 use ApiPlatform\Metadata\Operation;
 use App\Dto\AirplaneModelResponseDto;
 use Doctrine\ORM\EntityManagerInterface;

@@ -14,6 +14,7 @@ use App\Repository\CountryRepository;
 use ApiPlatform\Metadata\GetCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use App\State\CustomCountriesGetCollectionStateProvider;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
@@ -29,11 +30,12 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 )]
 #[
     ApiResource( // Transformer l'entité Country en une ressource API, avec toutes les opérations CRUD
-        security: "is_granted('ROLE_ADMIN')", // seul un utilisateur au rôle Admin peut avoir accès à toutes les opérations d'une ressource
+        security: "is_granted('ROLE_ADMIN')", // par défaut, seul un utilisateur au rôle Admin peut avoir accès à toutes les opérations d'une ressource
         operations: [
             new Get(), // rendre accessible une ressource grâce à son ID 
             new GetCollection( // rendre accessible l'ensemble des ressources 
-                provider: CustomCountriesGetCollectionStateProvider::class
+                provider: CustomCountriesGetCollectionStateProvider::class,
+                security: "is_granted('ROLE_ADMIN') or is_granted('ROLE_PASSENGER')", // seuls des utilisateurs au rôle Admin ou Passager peut avoir accès à cet endpoint traité avec un provider
             ),
             new Post(), // créer une nouvelle ressource 
             new Patch(), // mettre à jour partiellement une ressource grâce à l'ID
@@ -50,6 +52,7 @@ class Country
 
     #[ORM\Column(length: 50)]
     #[Assert\NotBlank(message: 'Le nom du pays est obligatoire')]
+    #[Groups(['flight:read'])]
     private ?string $name = null;
 
     #[ORM\Column(length: 3, nullable: true)]
