@@ -10,6 +10,7 @@ use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
 use App\Repository\PassengerRepository;
+use App\State\CustomPassengerGetCollectionStateProvider;
 use App\State\InsertPassengerProcessor;
 use App\State\PassengerStateProvider;
 use Doctrine\Common\Collections\Collection;
@@ -19,7 +20,9 @@ use Doctrine\Common\Collections\ArrayCollection;
 #[ApiResource(
     security: "is_granted('ROLE_ADMIN')", // seul un utilisateur au rôle Admin peut avoir accès à toutes les opérations d'une ressource
     operations: [
-        new GetCollection(), // récupérer toutes les ressources passagers
+        new GetCollection( // récupérer toutes les ressources passagers
+            provider: CustomPassengerGetCollectionStateProvider::class
+        ),
         new Get( // récuperer une ressource passager à l'aide de son ID
             provider: PassengerStateProvider::class // liaison du provider à l'endpoint de récupération d'une ressource de type passager, 
         ),
