@@ -2,10 +2,8 @@
 
 namespace App\State;
 
-use App\Dto\CityRequestDto;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
-use ApiPlatform\State\Pagination\PaginatorInterface;
 use App\Dto\CityResponseDto;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -14,36 +12,24 @@ class CityStateProvider implements ProviderInterface
 {
     public function __construct(
         #[Autowire(service: 'api_platform.doctrine.orm.state.item_provider')]
-        private ProviderInterface $collectionProvider
+        private ProviderInterface $itemProvider
     ) {}
 
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
     {
-        // Executer une requête de recherche de la ressource portant l'id indiquée en paramètre dynamique dans l'URL
-        $data = $this->collectionProvider->provide($operation, $uriVariables, $context); // contenu de la requête
+        // Récupérer la ville à l'aide de son ID entré dans l'URL
+        $city = $this->itemProvider->provide($operation, $uriVariables, $context); // contenu de la requête
 
-        // S'il n' y a pas de ville correspndante à l'ID
-        if ($data instanceof PaginatorInterface && $data->count() > 0) {
-            // Créer un DTO et parcourir les informations pour les stocker dans un DTO
-            foreach ($data as $key => $value) {
-
-                $city = new CityResponseDto();
-                // Remplissage de l'objet CityDTO avec les données de l'entité City
-                // dd($value->getId());
-                $city->id = $value->getId();
-                $city->countryName = $value->getCountry()->getName();
-                $city->name = $value->getName();
-
-
-
-                // Ajout de l'objet ArticleDto dans le tableau $response à rendre à l'interface API
-                $response = $city;
-            }
-            // dd($response);
-
-            return $response;
-        } else {
-            throw new NotFoundHttpException('Aucune ville retrouvée avec l\'id fourni');
+        if (!$city) {
+            throw new NotFoundHttpException('Aucune ville trouvée avec l\'id fourni');
         }
+
+        // Créer un DTO de réponse
+        $cityDto = new CityResponseDto();
+        $cityDto->id = $city->getId();
+        $cityDto->countryName = $city->getCountry()->getName();
+        $cityDto->name = $city->getName();
+
+        return $cityDto; // retourner au client le DTO au lieu de l'objet issu de l'entité City
     }
 }

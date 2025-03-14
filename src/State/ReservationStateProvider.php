@@ -22,6 +22,7 @@ class ReservationStateProvider implements ProviderInterface
 
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
     {
+        // Récupérer la réservation
         $reservation = $this->itemProvider->provide($operation, $uriVariables, $context);
 
         // Refuser l'accès si l'utilasateur n'est pas Admin ou propriétaire de la réservation
@@ -31,6 +32,7 @@ class ReservationStateProvider implements ProviderInterface
             ]));
         };
 
+        // Préparer un DTO à retourner au client
         $reservationDto = new ReservationResponseDto;
         $reservationDto->id = $reservation->getId();
         $reservationDto->numberFlightSeat = $reservation->getNumberFlightSeat();

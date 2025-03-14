@@ -6,7 +6,6 @@ use ApiPlatform\Metadata\Operation;
 use App\Repository\PassengerRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use ApiPlatform\State\ProcessorInterface;
-use App\Dto\PassengerResponseDto;
 use App\Entity\Passenger;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 

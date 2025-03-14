@@ -5,7 +5,6 @@ namespace App\Entity;
 use App\Dto\CityRequestDto;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Post;
-use Doctrine\DBAL\Types\Types;
 use ApiPlatform\Metadata\Patch;
 use App\Entity\Trait\DateTrait;
 use ApiPlatform\Metadata\Delete;

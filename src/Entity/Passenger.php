@@ -11,6 +11,7 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
 use App\Repository\PassengerRepository;
 use App\State\InsertPassengerProcessor;
+use App\State\PassengerStateProvider;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
 
@@ -19,9 +20,11 @@ use Doctrine\Common\Collections\ArrayCollection;
     security: "is_granted('ROLE_ADMIN')", // seul un utilisateur au rôle Admin peut avoir accès à toutes les opérations d'une ressource
     operations: [
         new GetCollection(), // récupérer toutes les ressources passagers
-        new Get(), // récuperer une ressource passager à l'aide de son ID
+        new Get( // récuperer une ressource passager à l'aide de son ID
+            provider: PassengerStateProvider::class // liaison du provider à l'endpoint de récupération d'une ressource de type passager, 
+        ),
         new Post( // envoyer une nouvelle ressource passager au serveur
-            processor: InsertPassengerProcessor::class, // liaison du processeur à la route de création de ressource passagers, 
+            processor: InsertPassengerProcessor::class, // liaison du processeur à l'endpoint de création de ressource passagers, 
             // input: PassengerRequestDto::class
         ),
         new Patch(), // modifier une ressource passager présente dans le serveur à l'aide de son ID,
