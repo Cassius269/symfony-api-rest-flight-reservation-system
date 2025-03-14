@@ -7,6 +7,7 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Post;
 use Doctrine\DBAL\Types\Types;
 use ApiPlatform\Metadata\Patch;
+use App\Entity\Trait\DateTrait;
 use ApiPlatform\Metadata\Delete;
 use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Metadata\ApiResource;
@@ -45,6 +46,8 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 ]
 class Country
 {
+    use DateTrait; // intégrer le trait des dates de créations et de mise à jour
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -70,18 +73,17 @@ class Country
         maxMessage: 'La timezone est trop longue'
     )]
     private ?string $timezone = null;
-    #[ORM\Column(type: Types::DATE_IMMUTABLE)]
-    #[Assert\NotBlank(message: 'La date de création de la data d\'un pays est obligatoire')]
-    private ?\DateTimeImmutable $createdAt = null;
 
-    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
-    private ?\DateTimeInterface $updatedAt = null;
 
     /**
      * @var Collection<int, City>
      */
     #[ORM\OneToMany(targetEntity: City::class, mappedBy: 'country', orphanRemoval: true)]
     private Collection $cities;
+
+    #[ORM\ManyToOne(inversedBy: 'countries')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Continent $continent = null;
 
     public function __construct()
     {
@@ -159,49 +161,21 @@ class Country
         return $this;
     }
 
-    /**
-     * Get the value of createdAt
-     */
-    public function getCreatedAt()
-    {
-        return $this->createdAt;
-    }
-
-    /**
-     * Set the value of createdAt
-     *
-     * @return  self
-     */
-    public function setCreatedAt($createdAt)
-    {
-        $this->createdAt = $createdAt;
-
-        return $this;
-    }
-
-    /**
-     * Get the value of updatedAt
-     */
-    public function getUpdatedAt()
-    {
-        return $this->updatedAt;
-    }
-
-    /**
-     * Set the value of updatedAt
-     *
-     * @return  self
-     */
-    public function setUpdatedAt($updatedAt)
-    {
-        $this->updatedAt = $updatedAt;
-
-        return $this;
-    }
-
     // Cette méthode permet de stringifier l'objet Country
     public function __toString(): string
     {
         return $this->getName(); // Supposons que la propriété s'appelle 'name'
+    }
+
+    public function getContinent(): ?Continent
+    {
+        return $this->continent;
+    }
+
+    public function setContinent(?Continent $continent): static
+    {
+        $this->continent = $continent;
+
+        return $this;
     }
 }

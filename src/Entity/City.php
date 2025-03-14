@@ -7,6 +7,7 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Post;
 use Doctrine\DBAL\Types\Types;
 use ApiPlatform\Metadata\Patch;
+use App\Entity\Trait\DateTrait;
 use ApiPlatform\Metadata\Delete;
 use App\State\CityStateProvider;
 use Doctrine\ORM\Mapping as ORM;
@@ -51,6 +52,8 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 )]
 class City
 {
+    use DateTrait; // intégrer le trait des dates de créations et de mise à jour
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -75,13 +78,6 @@ class City
      */
     #[ORM\OneToMany(targetEntity: Flight::class, mappedBy: 'cityDeparture')]
     private Collection $flights;
-
-    #[ORM\Column(type: Types::DATE_IMMUTABLE)]
-    #[Assert\NotBlank(message: 'La date de création de la donnée d\'une ville est obligatoire')]
-    private ?\DateTimeImmutable $createdAt = null;
-
-    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
-    private ?\DateTimeInterface $updatedAt = null;
 
     #[ORM\Column(length: 10, nullable: true)]
     private ?string $zipCode = null;
@@ -146,46 +142,6 @@ class City
                 $flight->setCityDeparture(null);
             }
         }
-
-        return $this;
-    }
-
-    /**
-     * Get the value of createdAt
-     */
-    public function getCreatedAt()
-    {
-        return $this->createdAt;
-    }
-
-    /**
-     * Set the value of createdAt
-     *
-     * @return  self
-     */
-    public function setCreatedAt($createdAt)
-    {
-        $this->createdAt = $createdAt;
-
-        return $this;
-    }
-
-    /**
-     * Get the value of updatedAt
-     */
-    public function getUpdatedAt()
-    {
-        return $this->updatedAt;
-    }
-
-    /**
-     * Set the value of updatedAt
-     *
-     * @return  self
-     */
-    public function setUpdatedAt($updatedAt)
-    {
-        $this->updatedAt = $updatedAt;
 
         return $this;
     }

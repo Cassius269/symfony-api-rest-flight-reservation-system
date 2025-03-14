@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Entity\Trait\DateTrait;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\UserRepository;
@@ -17,6 +18,8 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 #[ORM\InheritanceType('JOINED')]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
+    use DateTrait; // intégrer le trait des dates de créations et de mise à jour
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -44,22 +47,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $password = null;
 
     #[ORM\Column(length: 30)]
-    #[Groups(['passenger.read', 'passenger.write'])]
     #[Assert\NotBlank(message: 'Le prénom est obligatoire')]
     private ?string $firstname = null;
 
     #[ORM\Column(length: 30)]
-    #[Groups(['passenger.read', 'passenger.write'])]
+    // #[Groups(['passenger.read', 'passenger.write'])]
     #[Assert\NotBlank(message: 'Le nom de famille est obligatoire')]
     private ?string $lastname = null;
-
-    #[ORM\Column]
-    #[Groups(['passenger.read'])]
-    private ?\DateTimeImmutable $createdAt = null;
-
-    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
-    // #[Groups(['passenger.read', 'passenger.write'])]
-    private ?\DateTimeInterface $updatedAt = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $birthDate = null;
@@ -168,45 +162,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return  $this->lastname . ' ' . $this->firstname;
     }
 
-    /**
-     * Get the value of createdAt
-     */
-    public function getCreatedAt()
-    {
-        return $this->createdAt;
-    }
-
-    /**
-     * Set the value of createdAt
-     *
-     * @return  self
-     */
-    public function setCreatedAt($createdAt)
-    {
-        $this->createdAt = $createdAt;
-
-        return $this;
-    }
-
-    /**
-     * Get the value of updatedAt
-     */
-    public function getUpdatedAt()
-    {
-        return $this->updatedAt;
-    }
-
-    /**
-     * Set the value of updatedAt
-     *
-     * @return  self
-     */
-    public function setUpdatedAt($updatedAt)
-    {
-        $this->updatedAt = $updatedAt;
-
-        return $this;
-    }
 
     public function getBirthDate(): ?\DateTimeInterface
     {

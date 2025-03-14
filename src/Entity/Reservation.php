@@ -6,14 +6,15 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Post;
 use Doctrine\DBAL\Types\Types;
 use ApiPlatform\Metadata\Patch;
+use App\Entity\Trait\DateTrait;
 use ApiPlatform\Metadata\Delete;
 use Doctrine\ORM\Mapping as ORM;
+use App\Dto\ReservationRequestDto;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
-use App\Dto\ReservationRequestDto;
-use App\Repository\ReservationRepository;
-use App\State\ReservationStateProcessor;
 use App\State\ReservationStateProvider;
+use App\State\ReservationStateProcessor;
+use App\Repository\ReservationRepository;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
@@ -33,7 +34,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 #[ApiResource(
     operations: [
         new Get( // récupérer une ressource de type Réservation à l'aide de son ID
-            provider: ReservationStateProvider::class
+            provider: ReservationStateProvider::class,
         ),
         new GetCollection(), // récupérer l'ensemble des ressources de type Réservation
         new Post(
@@ -43,7 +44,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
             security: "is_granted('ROLE_ADMIN') or is_granted('ROLE_PASSENGER')", // seul un utilisateur au rôle Admin  ou passager peut avoir accès à l'endpoint de création d'une nouvelle réservation
         ),
         new Patch( // mettre à jour une ressource Réservation partiellement
-            security: "is_granted('RESERVATION_VIEW', object)", // utilisation de voter personnalisé pour gérer la permission de lecture d'une réservation
+            security: "is_granted('RESERVATION_EDIT', object)", // utilisation de voter personnalisé pour gérer la permission de modification d'une réservation
             securityMessage: 'Désolé, vous êtes ni admin ni le propriétaire de la réservation',
         ),
         new Delete( // supprimer une ressource Réservation à l'aide de son ID
@@ -54,6 +55,8 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 )]
 class Reservation
 {
+    use DateTrait; // intégrer le trait des dates de créations et de mise à jour
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -85,13 +88,6 @@ class Reservation
     #[ORM\JoinColumn(nullable: false)]
     #[Assert\NotBlank(message: "Les informations sur le vol sont obligatoires")]
     private ?Flight $flight = null;
-
-    #[ORM\Column]
-    #[Assert\NotBlank(message: "La date de création de la donnée est obligatoire")]
-    private ?\DateTimeImmutable $createdAt = null;
-
-    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
-    private ?\DateTimeInterface $updatedAt = null;
 
     public function getId(): ?int
     {
@@ -142,46 +138,6 @@ class Reservation
     public function setFlight(?Flight $flight): static
     {
         $this->flight = $flight;
-
-        return $this;
-    }
-
-    /**
-     * Get the value of createdAt
-     */
-    public function getCreatedAt()
-    {
-        return $this->createdAt;
-    }
-
-    /**
-     * Set the value of createdAt
-     *
-     * @return  self
-     */
-    public function setCreatedAt($createdAt)
-    {
-        $this->createdAt = $createdAt;
-
-        return $this;
-    }
-
-    /**
-     * Get the value of updatedAt
-     */
-    public function getUpdatedAt()
-    {
-        return $this->updatedAt;
-    }
-
-    /**
-     * Set the value of updatedAt
-     *
-     * @return  self
-     */
-    public function setUpdatedAt($updatedAt)
-    {
-        $this->updatedAt = $updatedAt;
 
         return $this;
     }

@@ -2,11 +2,12 @@
 
 namespace App\Entity;
 
+use App\Entity\Trait\DateTrait;
+use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Metadata\ApiResource;
 use App\Repository\AirplaneRepository;
-use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: AirplaneRepository::class)]
@@ -15,6 +16,8 @@ use Symfony\Component\Validator\Constraints as Assert;
 )]
 class Airplane
 {
+    use DateTrait; // intégrer le trait des dates de créations et de mise à jour
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
