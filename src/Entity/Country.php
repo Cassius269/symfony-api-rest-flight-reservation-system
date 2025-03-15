@@ -37,6 +37,10 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
             new GetCollection( // rendre accessible l'ensemble des ressources 
                 provider: CustomCountriesGetCollectionStateProvider::class,
                 security: "is_granted('ROLE_ADMIN') or is_granted('ROLE_PASSENGER')", // seuls des utilisateurs au rôle Admin ou Passager peut avoir accès à cet endpoint traité avec un provider
+                paginationEnabled: true, // pagination de la data activée par défaut
+                paginationItemsPerPage: 10,  // définir le nombre de ressources Pays à afficher par page, 
+                paginationClientEnabled: true, // donner la possibilité au client de choisir l'activation de la pagination
+                paginationClientItemsPerPage: true, // donner la possibilité au client de choisir le nombre d'objets ressources par page, 
             ),
             new Post(), // créer une nouvelle ressource 
             new Patch(), // mettre à jour partiellement une ressource grâce à l'ID

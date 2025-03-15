@@ -21,6 +21,10 @@ use Doctrine\Common\Collections\ArrayCollection;
     security: "is_granted('ROLE_ADMIN')", // seul un utilisateur au rôle Admin peut avoir accès à toutes les opérations d'une ressource
     operations: [
         new GetCollection( // récupérer toutes les ressources passagers
+            paginationEnabled: true, // pagination de la data activée par défaut
+            paginationItemsPerPage: 10,  // définir le nombre de ressources Passagers à afficher par page, 
+            paginationClientEnabled: true, // donner la possibilité au client de choisir l'activation de la pagination
+            paginationClientItemsPerPage: true, // donner la possibilité au client de choisir le nombre d'objets ressources par page, 
             provider: CustomPassengerGetCollectionStateProvider::class
         ),
         new Get( // récuperer une ressource passager à l'aide de son ID

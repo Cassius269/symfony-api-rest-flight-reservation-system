@@ -36,7 +36,12 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
         new Get( // récupérer une ressource de type Réservation à l'aide de son ID
             provider: ReservationStateProvider::class,
         ),
-        new GetCollection(), // récupérer l'ensemble des ressources de type Réservation
+        new GetCollection( // récupérer l'ensemble des ressources de type Réservation
+            paginationEnabled: true, // pagination de la data activée par défaut
+            paginationItemsPerPage: 20,  // définir le nombre de ressources réservation à afficher par page, 
+            paginationClientEnabled: true, // donner la possibilité au client de choisir l'activation de la pagination
+            paginationClientItemsPerPage: true, // donner la possibilité au client de choisir le nombre d'objets ressources par page, 
+        ),
         new Post(
             // envoyer une nouvelle ressource Réservation au serveur
             processor: ReservationStateProcessor::class, // traitement des données entrantes pour création de nouvelle ressource
