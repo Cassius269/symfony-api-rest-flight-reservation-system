@@ -11,19 +11,24 @@ use ApiPlatform\State\ProviderInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use ApiPlatform\Symfony\Security\Exception\AccessDeniedException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class ReservationStateProvider implements ProviderInterface
 {
     public function __construct(
+        private Security $security,
         #[Autowire(service: 'api_platform.doctrine.orm.state.item_provider')]
-        private ProviderInterface $itemProvider,
-        private Security $security
+        private ProviderInterface $itemProvider
     ) {}
 
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
     {
         // Récupérer la réservation
         $reservation = $this->itemProvider->provide($operation, $uriVariables, $context);
+
+        if (!$reservation) { // s'il n'ya pas de réservation trouvée envoyer un message d'erreur avec le code 404
+            throw new NotFoundHttpException('Aucune réservation trouvée avec l\'id fourni');
+        }
 
         // Refuser l'accès si l'utilasateur n'est pas Admin ou propriétaire de la réservation
         if (!$this->security->isGranted('RESERVATION_VIEW', $reservation)) {

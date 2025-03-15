@@ -5,6 +5,8 @@
 namespace App\Entity\Trait;
 
 use Doctrine\DBAL\Types\Types;
+use Symfony\Component\Serializer\Attribute\Groups;
+
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -12,6 +14,7 @@ trait DateTrait
 {
     #[ORM\Column]
     #[Assert\NotBlank(message: "La date de création de la donnée est obligatoire")]
+    #[Groups(['passenger:read', 'passenger:write'])]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]

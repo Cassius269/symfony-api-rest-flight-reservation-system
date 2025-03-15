@@ -11,5 +11,4 @@ class PassengerRequestDto
     public ?string $lastname = null;
     public ?string $email = null;
     public ?string $password = null;
-    public ?DateTimeImmutable $createdAt = null;
 }

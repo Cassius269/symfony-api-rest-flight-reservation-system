@@ -4,6 +4,8 @@ api_platform:
   formats:
     json: ["application/json"] # format par défaut de retour des ressources API
     jsonld: ["application/ld+json"] #format optionnel pour les tests
+  patch_formats:
+    json: ["application/merge-patch+json"]
   defaults:
     stateless: true
     cache_headers:

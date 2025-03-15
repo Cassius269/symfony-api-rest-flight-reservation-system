@@ -9,6 +9,7 @@ use ApiPlatform\Metadata\Delete;
 use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
+use App\Dto\PassengerRequestDto;
 use App\Repository\PassengerRepository;
 use App\State\CustomPassengerGetCollectionStateProvider;
 use App\State\InsertPassengerProcessor;
@@ -18,7 +19,8 @@ use Doctrine\Common\Collections\ArrayCollection;
 
 #[ORM\Entity(repositoryClass: PassengerRepository::class)]
 #[ApiResource(
-    security: "is_granted('ROLE_ADMIN')", // seul un utilisateur au rôle Admin peut avoir accès à toutes les opérations d'une ressource
+    // security: "is_granted('ROLE_ADMIN')", // seul un utilisateur au rôle Admin peut avoir accès à toutes les opérations d'une ressource
+    securityMessage: 'Desolé, vous n\'avez pas le rôle Admin ou ce ne sont pas vos informations personnelles',
     operations: [
         new GetCollection( // récupérer toutes les ressources passagers
             paginationEnabled: true, // pagination de la data activée par défaut
@@ -28,13 +30,19 @@ use Doctrine\Common\Collections\ArrayCollection;
             provider: CustomPassengerGetCollectionStateProvider::class
         ),
         new Get( // récuperer une ressource passager à l'aide de son ID
-            provider: PassengerStateProvider::class // liaison du provider à l'endpoint de récupération d'une ressource de type passager, 
+            // security: 'is_granted("PASSENGER_VIEW", object)', // syntaxe applicable si endpoint sans provider
+            provider: PassengerStateProvider::class, // liaison du provider à l'endpoint de récupération d'une ressource de type passager, 
         ),
         new Post( // envoyer une nouvelle ressource passager au serveur
             processor: InsertPassengerProcessor::class, // liaison du processeur à l'endpoint de création de ressource passagers, 
             // input: PassengerRequestDto::class
+            denormalizationContext: ['groups' => ['passenger:write']],
+            normalizationContext: ['groups' => ['passenger:read']]
+
         ),
-        new Patch(), // modifier une ressource passager présente dans le serveur à l'aide de son ID,
+        new Patch( // modifier partiellement une ressource passager présente dans le serveur à l'aide de son ID,
+            security: 'is_granted("PASSENGER_EDIT", object)', // syntaxe applicable si endpoint sans provider
+        ),
         new Delete() // supprimer une ressource passager présent dans le serveur à l'aide de son ID
     ]
 )]
@@ -43,7 +51,7 @@ class Passenger extends User
     /**
      * @var Collection<int, Reservation>
      */
-    #[ORM\OneToMany(targetEntity: Reservation::class, mappedBy: 'passenger')]
+    #[ORM\OneToMany(targetEntity: Reservation::class, mappedBy: 'passenger', cascade: ['persist', 'remove'], orphanRemoval: true)]
     private Collection $reservations;
 
     public function __construct()
