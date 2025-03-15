@@ -9,7 +9,6 @@ use ApiPlatform\Metadata\Delete;
 use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
-use App\Dto\PassengerRequestDto;
 use App\Repository\PassengerRepository;
 use App\State\CustomPassengerGetCollectionStateProvider;
 use App\State\InsertPassengerProcessor;
@@ -43,7 +42,9 @@ use Doctrine\Common\Collections\ArrayCollection;
         new Patch( // modifier partiellement une ressource passager présente dans le serveur à l'aide de son ID,
             security: 'is_granted("PASSENGER_EDIT", object)', // syntaxe applicable si endpoint sans provider
         ),
-        new Delete() // supprimer une ressource passager présent dans le serveur à l'aide de son ID
+        new Delete( // supprimer une ressource passager présent dans le serveur à l'aide de son ID
+            security: 'is_granted("PASSENGER_EDIT", object)', // syntaxe applicable si endpoint sans provider
+        )
     ]
 )]
 class Passenger extends User
