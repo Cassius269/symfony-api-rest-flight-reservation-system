@@ -2,8 +2,6 @@
 
 namespace App\Dto;
 
-use DateTimeImmutable;
-
 // Création d'un DTO pour récupérer les données d'un passager entrées côtés client
 class PassengerRequestDto
 {

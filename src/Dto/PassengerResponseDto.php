@@ -2,9 +2,6 @@
 
 namespace App\Dto;
 
-use DateTimeImmutable;
-use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
-
 // Création d'un DTO pour retourner la réponse d'une ressource de type Passager d'un vol
 class PassengerResponseDto
 {
