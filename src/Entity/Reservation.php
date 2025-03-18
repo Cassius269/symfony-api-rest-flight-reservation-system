@@ -15,6 +15,7 @@ use ApiPlatform\Metadata\GetCollection;
 use App\State\ReservationStateProvider;
 use App\State\ReservationStateProcessor;
 use App\Repository\ReservationRepository;
+use App\State\UpdateReservationProcessor;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
@@ -49,11 +50,13 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
             security: "is_granted('ROLE_ADMIN') or is_granted('ROLE_PASSENGER')", // seul un utilisateur au rôle Admin  ou passager peut avoir accès à l'endpoint de création d'une nouvelle réservation
         ),
         new Patch( // mettre à jour une ressource Réservation partiellement
-            security: "is_granted('RESERVATION_EDIT', object)", // utilisation de voter personnalisé pour gérer la permission de modification d'une réservation
+            // security: "is_granted('RESERVATION_EDIT', object)", // utilisation de voter personnalisé pour gérer la permission de modification d'une réservation
             securityMessage: 'Désolé, vous êtes ni admin ni le propriétaire de la réservation',
+            processor: UpdateReservationProcessor::class,
+            input: ReservationRequestDto::class
         ),
         new Delete( // supprimer une ressource Réservation à l'aide de son ID
-            security: "is_granted('ROLE_ADMIN')", // par défaut seul un utilisateur au rôle Admin peut avoir accès à toutes les opérations d'une ressource
+            security: "is_granted('ROLE_ADMIN')", // par défaut seul un utilisateur au rôle Admin peut supprimer une réservation
             securityMessage: 'accès non autorisé'
         )
     ]
