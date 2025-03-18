@@ -147,6 +147,7 @@ class ReservationStateProcessor implements ProcessorInterface
 
         $this->seatReservationService->attributeASeat($isExistFlight, $reservation); // attribuer un siège au passager de la réservation
 
+        // Vérifier les contraintes de validation d'envoyer la ressource au serveur
         $errors = $this->validator->validate($reservation);
 
         if (count($errors ?? []) > 0) {

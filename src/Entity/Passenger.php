@@ -17,6 +17,7 @@ use App\State\UpdatePassengerProcessor;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
 use App\State\CustomPassengerGetCollectionStateProvider;
+use App\State\PassengerStateProcessor;
 
 #[ORM\Entity(repositoryClass: PassengerRepository::class)]
 #[ApiResource(
@@ -35,10 +36,10 @@ use App\State\CustomPassengerGetCollectionStateProvider;
             provider: PassengerStateProvider::class, // liaison du provider à l'endpoint de récupération d'une ressource de type passager, 
         ),
         new Post( // envoyer une nouvelle ressource passager au serveur
-            processor: InsertPassengerProcessor::class, // liaison du processeur à l'endpoint de création de ressource passagers, 
-            // input: PassengerRequestDto::class
-            denormalizationContext: ['groups' => ['passenger:write']],
-            normalizationContext: ['groups' => ['passenger:read']]
+            processor: PassengerStateProcessor::class, // liaison du processeur à l'endpoint de création de ressource passagers, 
+            input: PassengerRequestDto::class
+            // denormalizationContext: ['groups' => ['passenger:write']],
+            // normalizationContext: ['groups' => ['passenger:read']]
 
         ),
         new Patch( // modifier partiellement une ressource passager présente dans le serveur à l'aide de son ID,

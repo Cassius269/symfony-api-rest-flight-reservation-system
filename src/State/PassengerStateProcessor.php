@@ -2,37 +2,39 @@
 
 namespace App\State;
 
+use App\Entity\Passenger;
+use App\Dto\PassengerResponseDto;
 use ApiPlatform\Metadata\Operation;
+use App\Service\HashPasswordService;
 use App\Repository\PassengerRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use ApiPlatform\State\ProcessorInterface;
-use App\Entity\Passenger;
-use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use ApiPlatform\Validator\Exception\ValidationException;
+use ApiPlatform\Validator\ValidatorInterface;
+use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 
 // Ce processor utilise le principe de Data Transfert Object (pas besoin de groupe de sérialisation avec les DTO)
-// Finalement seul le processeur InsertPassengerProcessor sans DTO est utilisé
 class PassengerStateProcessor implements ProcessorInterface
 {
     public function __construct(
         private EntityManagerInterface $entityManager,
         private PassengerRepository $passengerRepository,
-        private UserPasswordHasherInterface $passwordHasher
+        private HashPasswordService $hashPasswordService,
+        private ValidatorInterface $validator
     ) {}
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): object
     {
-        // dd($data);
 
-        // Rechercher un passager similaire
-        $isSimilarPassenger = $this->passengerRepository->findOneByEmail($data->email); // Vérifier la présence d'un auteur ayant le même email se trouvant dans la charge utile de la requête POST
-
-        if ($isSimilarPassenger) {
-        };
 
         // Si aucun utilisateur n'utilise le mail
         if (!isset($data->firstname) || !isset($data->lastname) || !isset($data->email) || !isset($data->firstname)) {
-            dd('Requête mal formulée');
-        }
+            throw new UnprocessableEntityHttpException(json_encode(
+                [
+                    'message' => 'réponse mal formatée'
+                ]
+            ));
+        };
         // Créer un nouvel objet ressource Passenger
         $passenger = new Passenger;
         $passenger->setCreatedAt(new \DateTimeImmutable())
@@ -41,15 +43,16 @@ class PassengerStateProcessor implements ProcessorInterface
             ->setEmail($data->email)
             ->setRoles(["ROLE_PASSENGER"]);
 
-        // Hasher le mot de passe 
+        // Hasher le mot de passe  et le stoker dans le nouvel objet Passenger depuis le service personnalisé
         $plainTextPassword = $data->password;
-        $hashedPassword = $this->passwordHasher->hashPassword(
-            $passenger,
-            $plainTextPassword
-        );
+        $this->hashPasswordService->hashPassword($plainTextPassword, $passenger);
 
-        // Stoker le mot de passe hashé dans le nouvel objet Passenger
-        $passenger->setPassword($hashedPassword);
+        // Vérifier les contraintes de validation avant d'envoyer la ressource au serveur
+        $errors = $this->validator->validate($passenger);
+
+        if (count($errors ?? []) > 0) {
+            throw new ValidationException((string) $errors);
+        }
 
         // Enregistrer et envoyer en base de données le nouveau passager
         $this->entityManager->persist($passenger);
@@ -57,6 +60,12 @@ class PassengerStateProcessor implements ProcessorInterface
 
 
         // Retourner au client le même DTO de requête car les informations à renvoyer sont les mêmes
-        return $data;
+        $passengerResponseDto = new PassengerResponseDto;
+        $passengerResponseDto->id = $passenger->getId();
+        $passengerResponseDto->firstname = $passenger->getFirstname();
+        $passengerResponseDto->lastname = $passenger->getLastname();
+        $passengerResponseDto->email = $passenger->getEmail();
+
+        return $passengerResponseDto;
     }
 }
