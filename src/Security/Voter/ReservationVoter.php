@@ -38,6 +38,7 @@ final class ReservationVoter extends Voter
                 }
                 break;
             case self::VIEW:
+                dd($subject);
                 // si l'utilisateur est un ADMIN ou propriétaire de la réservation, il a la permission de regarder une réservation
                 if (in_array("ROLE_ADMIN", $user->getRoles()) || $subject->getPassenger()->getEmail() === $user->getEmail()) {
                     return true;

@@ -12,4 +12,5 @@ class ReservationResponseDto
     public ?float $price = null;
     public ?PassengerResponseDto $passenger = null;
     public ?FlightResponseDto $flight = null;
+    public ?string $passengerNameRecord = null;
 }

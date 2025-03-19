@@ -10,12 +10,15 @@ use App\Entity\Trait\DateTrait;
 use ApiPlatform\Metadata\Delete;
 use Doctrine\ORM\Mapping as ORM;
 use App\Dto\ReservationRequestDto;
+use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
 use App\State\ReservationStateProvider;
 use App\State\ReservationStateProcessor;
 use App\Repository\ReservationRepository;
 use App\State\UpdateReservationProcessor;
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use App\State\CustomReservationGetCollectionStateProvider;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
@@ -42,6 +45,9 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
             paginationItemsPerPage: 20,  // définir le nombre de ressources réservation à afficher par page, 
             paginationClientEnabled: true, // donner la possibilité au client de choisir l'activation de la pagination
             paginationClientItemsPerPage: true, // donner la possibilité au client de choisir le nombre d'objets ressources par page, 
+            provider: CustomReservationGetCollectionStateProvider::class,
+            security: "is_granted('ROLE_ADMIN')", // seul un utilisateur au rôle Admin peut avoir accès aux réservations
+            securityMessage: 'Vous n\'êtes pas Admin, Vous n\'êtes pas autorisé à accéder à ces ressources'
         ),
         new Post(
             // envoyer une nouvelle ressource Réservation au serveur
@@ -59,6 +65,12 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
             security: "is_granted('ROLE_ADMIN')", // par défaut seul un utilisateur au rôle Admin peut supprimer une réservation
             securityMessage: 'accès non autorisé'
         )
+    ]
+)]
+#[ApiFilter(
+    SearchFilter::class,
+    properties: [
+        'passengerNameRecord' => 'exact'
     ]
 )]
 class Reservation
