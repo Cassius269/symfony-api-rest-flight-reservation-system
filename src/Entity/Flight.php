@@ -111,6 +111,10 @@ class Flight
     #[ORM\JoinColumn(nullable: false)]
     private ?Airplane $airplane = null;
 
+    #[ORM\ManyToOne(inversedBy: 'flights')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Captain $captain = null;
+
     public function __construct()
     {
         $this->reservations = new ArrayCollection();
@@ -239,6 +243,18 @@ class Flight
     public function setAirplane(?Airplane $airplane): static
     {
         $this->airplane = $airplane;
+
+        return $this;
+    }
+
+    public function getCaptain(): ?Captain
+    {
+        return $this->captain;
+    }
+
+    public function setCaptain(?Captain $captain): static
+    {
+        $this->captain = $captain;
 
         return $this;
     }
