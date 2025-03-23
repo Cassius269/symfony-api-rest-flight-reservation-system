@@ -15,7 +15,6 @@ class InsertPassengerProcessor implements ProcessorInterface
 {
     public function __construct(
         private UserPasswordHasherInterface $passwordHasher,
-        private EntityManagerInterface $entityManager,
         #[Autowire(service: 'api_platform.doctrine.orm.state.persist_processor')]
         private ProcessorInterface $processor
     ) {}

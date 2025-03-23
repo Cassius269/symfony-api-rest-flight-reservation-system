@@ -2,7 +2,7 @@
 
 namespace App\Service;
 
-use App\Entity\Passenger;
+use App\Entity\User;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class HashPasswordService
@@ -12,15 +12,15 @@ class HashPasswordService
     ) {}
 
 
-    public function hashPassword(string $plainTextPassword, Passenger $passenger)
+    public function hashPassword(string $plainTextPassword, User $user)
     {
         // Hasher le mot de passe 
         $hashedPassword = $this->passwordHasher->hashPassword(
-            $passenger,
+            $user,
             $plainTextPassword
         );
 
         // Stoker le mot de passe hashé dans le nouvel objet Passenger
-        $passenger->setPassword($hashedPassword);
+        $user->setPassword($hashedPassword);
     }
 }
