@@ -13,6 +13,7 @@ use App\Repository\CountryRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use ApiPlatform\State\ProcessorInterface;
 use App\Repository\AirplaneRepository;
+use App\Repository\CaptainRepository;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
@@ -24,11 +25,13 @@ class FlightStateProcessor implements ProcessorInterface
         private CountryRepository $countryRepository,
         private AirplaneRepository $airplaneRepository,
         private FlightRepository $flightRepository,
+        private CaptainRepository $captainRepository,
         private EntityManagerInterface $entityManager
     ) {}
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): object
     {
+        // dd($data);
         // Rechercher les villes de départ et de destination à l'aide du nom de la ville et du pays
         $isExistCityDeparture = $this->cityRepository->findDestinationByCityAndCountry($data->getCityDeparture()->name, $data->getCityDeparture()->country);
         // dd($isExistCityDeparture);
@@ -44,45 +47,40 @@ class FlightStateProcessor implements ProcessorInterface
         if (!$isExistCityArrival || !$isExistCityDeparture || !$isExistAirplane) {
 
             if (!$isExistCityArrival) {
-                throw new NotFoundHttpException(json_encode([ // renvoyer un code d'erreur 404 car ressource non trouvée
-                    'message' => 'La ville d\'arrivée choisie est introuvable dans le système'
-                ]));
+                // renvoyer un code d'erreur 404 car ressource non trouvée
+                throw new NotFoundHttpException(
+                    'La ville d\'arrivée choisie est introuvable dans le système'
+                );
             }
 
             if (!$isExistCityDeparture) {
-                throw new NotFoundHttpException(json_encode([ // renvoyer un code d'erreur 404 car ressource non trouvée
-                    'message' => 'La ville de départ choisie est introuvable dans le système'
-                ]));
+                // renvoyer un code d'erreur 404 car ressource non trouvée
+                throw new NotFoundHttpException('La ville de départ choisie est introuvable dans le système');
             }
 
             if (!$isExistAirplane) {
-                throw new NotFoundHttpException(json_encode([ // renvoyer un code d'erreur 404 car ressource non trouvée
-                    'message' => 'L\'avion choisi est introuvable'
-                ]));
+                throw new NotFoundHttpException( // renvoyer un code d'erreur 404 car ressource non trouvée
+                    'L\'avion choisi est introuvable'
+                );
             }
         }
 
 
         // Vérifier si les villes de destination et d'arrivée sont bien differentes
         if ($isExistCityDeparture == $isExistCityArrival) {
-            throw new UnprocessableEntityHttpException(json_encode([ // renvoyer un code d'erreur 422 car problème logique des données
-                'message' => 'Les villes de départ et de destination doivent être differentes'
-            ]));
+            // renvoyer un code d'erreur 422 car problème logique des données
+            throw new UnprocessableEntityHttpException('Les villes de départ et de destination doivent être differentes');
         }
 
         // Vérifier si la date d'arrivée est superieure à la date de départ
         if ($data->dateDeparture >= $data->dateArrival) {
-            throw new UnprocessableEntityHttpException(json_encode([ // renvoyer un code d'erreur 422 car problème logique des données
-                'message' => 'La date d\'arrivée doit être supérieure à la date de départ'
-            ]));
+            // renvoyer un code d'erreur 422 car problème logique des données
+            throw new UnprocessableEntityHttpException('La date d\'arrivée doit être supérieure à la date de départ');
         }
 
         if ($data->dateDeparture <= new DateTime()) {
-            throw new unprocessableEntityHttpException(json_encode( // renvoyer un code d'erreur 422 car problème logique des données
-                [
-                    'message' => 'La date date départ ne doit pas être inférieure à la date du jour'
-                ]
-            ));
+            // renvoyer un code d'erreur 422 car problème logique des données
+            throw new unprocessableEntityHttpException('La date date départ ne doit pas être inférieure à la date du jour');
         }
 
 
@@ -98,9 +96,18 @@ class FlightStateProcessor implements ProcessorInterface
         // dd($isExistFlight);
 
         if ($isExistFlight) {
-            throw new ConflictHttpException(json_encode([
-                'message' => 'Un vol similaire portant les mêmes informations de vol existent'
-            ]));
+            throw new ConflictHttpException('Un vol similaire portant les mêmes informations de vol existent');
+        }
+
+        // Vérifier si le pilote existe
+        $isExistCaptain = $this->captainRepository->findOneBy([
+            'firstname' => $data->captain->firstname,
+            'lastname' => $data->captain->lastname,
+            'email' => $data->captain->email
+        ]);
+
+        if (!$isExistCaptain) {
+            throw new ConflictHttpException("Aucun commandant de bord trouvé avec les informations fournies");
         }
 
         // Ecrire la requête et envoyer au serveur le nouveau vol d'avion
@@ -110,7 +117,8 @@ class FlightStateProcessor implements ProcessorInterface
             ->setCityArrival($isExistCityArrival)
             ->setAirplane($isExistAirplane)
             ->setDateDeparture($data->dateDeparture)
-            ->setDateArrival($data->dateArrival);
+            ->setDateArrival($data->dateArrival)
+            ->setCaptain($isExistCaptain);
 
         // dd($flight);
         $this->entityManager->persist($flight);

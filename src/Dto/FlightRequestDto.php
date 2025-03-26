@@ -26,6 +26,8 @@ class FlightRequestDto
     #[Assert\NotBlank(message: "La date d'arrivée doit être renseignée")]
     public ?DateTime $dateArrival = null;
 
+    public ?CaptainRequestDto $captain = null;
+
     /* Exceptionnement j'ai rajouté les accesseurs des villes de destination et de départ 
     pour manipuler facilement les données imbriquées des vols renseignés côtés cliens 
     */

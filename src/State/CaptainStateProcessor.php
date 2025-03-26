@@ -35,6 +35,7 @@ class CaptainStateProcessor implements ProcessorInterface
         $captain->setFirstname($data->firstname)
             ->setLastname($data->lastname)
             ->setEmail($data->email)
+            ->setRoles(['ROLE_CAPTAIN'])
             ->setCreatedAt(new \DateTimeImmutable());
 
         // Hasher le mot de passer à l'aide du service personnalisé
