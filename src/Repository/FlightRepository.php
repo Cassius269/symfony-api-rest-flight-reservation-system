@@ -70,4 +70,24 @@ class FlightRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
+
+    // Compter le nombre de vols occupés pendant la période d'un vol
+    public function countOverlappingFlights(int $captainId, DateTime $start, DateTime $end): int
+    {
+        return $this->createQueryBuilder('f')
+            ->select('COUNT(f.id)')
+            ->where('f.captain = :captainId')
+            ->andWhere('
+                (:start BETWEEN f.dateDeparture AND f.dateArrival) OR
+                (:end BETWEEN f.dateDeparture AND f.dateArrival) OR
+                (f.dateDeparture BETWEEN :start AND :end) OR
+                (f.dateDeparture <= :start AND f.dateArrival >= :end)
+            ')
+            ->setParameter('captainId', $captainId)
+            ->setParameter('start', $start->format('Y-m-d H:i:s'))
+            ->setParameter('end', $end->format('Y-m-d H:i:s'))
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
 }

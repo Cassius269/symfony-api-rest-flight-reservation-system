@@ -13,12 +13,13 @@ use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 
 class CaptainStateProcessor implements ProcessorInterface
 {
-    // Injeciton de dépendance
+    // Injection de dépendance
     public function __construct(
         private HashPasswordService $passwordHasher,
         private EntityManagerInterface $entityManager,
         private CaptainRepository $captainRepository
     ) {}
+
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): object
     {
         // Rechercher s'il n'existe pas encore le commandant
@@ -26,9 +27,7 @@ class CaptainStateProcessor implements ProcessorInterface
         // dd($isExistCaptain);
 
         if ($isExistCaptain) {
-            throw new UnprocessableEntityHttpException(json_encode([
-                'message' => 'un commandant de bord avec le mail existe déjà'
-            ]));
+            throw new UnprocessableEntityHttpException('un commandant de bord avec le mail existe déjà');
         };
 
         $captain = new Captain;

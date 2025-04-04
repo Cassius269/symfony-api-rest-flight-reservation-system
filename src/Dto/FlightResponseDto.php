@@ -7,6 +7,7 @@ use DateTime;
 // Création d'un DTO pour retourner les données d'une nouveau vol créée
 class FlightResponseDto
 {
+    public ?int $id = null;
     public ?int $airplaneId = null;
     public ?CityRequestDto $cityDeparture = null; // ville de départ
     public ?CityRequestDto $cityArrival = null; // ville d'arrivée

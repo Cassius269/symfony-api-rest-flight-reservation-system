@@ -80,23 +80,18 @@ class FlightStateProcessor implements ProcessorInterface
 
         if ($data->dateDeparture <= new DateTime()) {
             // renvoyer un code d'erreur 422 car problème logique des données
-            throw new unprocessableEntityHttpException('La date date départ ne doit pas être inférieure à la date du jour');
+            throw new UnprocessableEntityHttpException('La date date départ ne doit pas être inférieure à la date du jour');
         }
 
+        // Déterminer la durée du voyage
+        $durationFlight = date_diff($data->dateDeparture, $data->dateArrival);
 
-        // Rechercher s'il n'y pas de vol similaire
-        $isExistFlight = $this->flightRepository->findOneBy([
-            'dateDeparture' => $data->dateDeparture,
-            'dateArrival' => $data->dateArrival,
-            'cityDeparture' => $isExistCityDeparture,
-            'cityArrival' => $isExistCityArrival,
-            'airplane' => $isExistAirplane
-        ]);
-
-        // dd($isExistFlight);
-
-        if ($isExistFlight) {
-            throw new ConflictHttpException('Un vol similaire portant les mêmes informations de vol existent');
+        // Si le voyage dure au moins plus de 24heures, renvoyer une erreur
+        if ($durationFlight->m >= 1) {
+            throw new UnprocessableEntityHttpException('Ce vol direct dépasse anormalement 1 mois');
+        }
+        if ($durationFlight->d >= 1) {
+            throw new UnprocessableEntityHttpException('Ce vol direct dépasse anormalement 24 heures');
         }
 
         // Vérifier si le pilote existe
@@ -109,6 +104,31 @@ class FlightStateProcessor implements ProcessorInterface
         if (!$isExistCaptain) {
             throw new ConflictHttpException("Aucun commandant de bord trouvé avec les informations fournies");
         }
+
+        //Vérifier si le commandant de bord est disponible
+        $numberFleetsByCaptainInPeriod = $this->flightRepository->countOverlappingFlights($isExistCaptain->getId(), $data->dateDeparture, $data->dateArrival);
+
+        if ($numberFleetsByCaptainInPeriod > 1) {
+            throw new ConflictHttpException('Le commandant est occupé pendant la même période du vol');
+        };
+
+        // dd($numberFleetsByCaptainInPeriod);
+
+
+        // Rechercher s'il n'y pas de vol similaire
+        $isExistFlight = $this->flightRepository->findOneBy([
+            'dateDeparture' => $data->dateDeparture,
+            'dateArrival' => $data->dateArrival,
+            'cityDeparture' => $isExistCityDeparture,
+            'cityArrival' => $isExistCityArrival,
+            'airplane' => $isExistAirplane
+        ]);
+
+
+        if ($isExistFlight) {
+            throw new ConflictHttpException('Un vol similaire portant les mêmes informations de vol existent');
+        }
+        // dd($isExistFlight);
 
         // Ecrire la requête et envoyer au serveur le nouveau vol d'avion
         $flight = new Flight;
@@ -135,6 +155,7 @@ class FlightStateProcessor implements ProcessorInterface
 
 
         $flitghtDto = new FlightResponseDto;
+        $flitghtDto->id = $flight->getId();
         $flitghtDto->dateDeparture = $flight->getDateDeparture();
         $flitghtDto->dateArrival = $flight->getDateArrival();
         $flitghtDto->cityDeparture = $CityDepartureDto;

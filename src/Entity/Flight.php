@@ -112,7 +112,7 @@ class Flight
     private ?Airplane $airplane = null;
 
     #[ORM\ManyToOne(inversedBy: 'flights')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(name: 'captain_id', referencedColumnName: 'id', nullable: false)]
     private ?Captain $captain = null;
 
     public function __construct()
