@@ -115,9 +115,16 @@ class Flight
     #[ORM\JoinColumn(name: 'captain_id', referencedColumnName: 'id', nullable: false)]
     private ?Captain $captain = null;
 
+    /**
+     * @var Collection<int, Copilot>
+     */
+    #[ORM\ManyToMany(targetEntity: Copilot::class, inversedBy: 'flights')]
+    private Collection $copilots;
+
     public function __construct()
     {
         $this->reservations = new ArrayCollection();
+        $this->copilots = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -255,6 +262,30 @@ class Flight
     public function setCaptain(?Captain $captain): static
     {
         $this->captain = $captain;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Copilot>
+     */
+    public function getCopilots(): Collection
+    {
+        return $this->copilots;
+    }
+
+    public function addCopilot(Copilot $copilot): static
+    {
+        if (!$this->copilots->contains($copilot)) {
+            $this->copilots->add($copilot);
+        }
+
+        return $this;
+    }
+
+    public function removeCopilot(Copilot $copilot): static
+    {
+        $this->copilots->removeElement($copilot);
 
         return $this;
     }
