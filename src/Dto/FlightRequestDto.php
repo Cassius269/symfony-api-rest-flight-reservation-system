@@ -27,7 +27,7 @@ class FlightRequestDto
     public ?DateTime $dateArrival = null;
 
     public ?CaptainRequestDto $captain = null;
-
+    public ?array $copilots = null;
     /* Exceptionnement j'ai rajouté les accesseurs des villes de destination et de départ 
     pour manipuler facilement les données imbriquées des vols renseignés côtés cliens 
     */

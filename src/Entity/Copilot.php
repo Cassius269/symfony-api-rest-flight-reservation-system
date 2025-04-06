@@ -9,7 +9,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: CopilotRepository::class)]
-#[ApiResource]
+#[ApiResource] // Déclarer l'entité Copilot en tant que ressource de l'API
 class Copilot extends User
 {
     /**

@@ -14,6 +14,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use ApiPlatform\State\ProcessorInterface;
 use App\Repository\AirplaneRepository;
 use App\Repository\CaptainRepository;
+use App\Repository\CopilotRepository;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
@@ -26,6 +27,7 @@ class FlightStateProcessor implements ProcessorInterface
         private AirplaneRepository $airplaneRepository,
         private FlightRepository $flightRepository,
         private CaptainRepository $captainRepository,
+        private CopilotRepository $copilotRepository,
         private EntityManagerInterface $entityManager
     ) {}
 
@@ -106,14 +108,49 @@ class FlightStateProcessor implements ProcessorInterface
         }
 
         //Vérifier si le commandant de bord est disponible
-        $numberFleetsByCaptainInPeriod = $this->flightRepository->countOverlappingFlights($isExistCaptain->getId(), $data->dateDeparture, $data->dateArrival);
+        $numberFleetsByCaptainInPeriod = $this->flightRepository->countOverlappingFlightsForCaptain($isExistCaptain->getId(), $data->dateDeparture, $data->dateArrival);
 
         if ($numberFleetsByCaptainInPeriod > 1) {
             throw new ConflictHttpException('Le commandant est occupé pendant la même période du vol');
-        };
+        }
 
         // dd($numberFleetsByCaptainInPeriod);
 
+        // Enregistrement des copilotes dans le vol
+        // Vérifier si les copilotes existent
+        $copilots = [];
+
+        // Vérifier si max 2 copilotes maximums acceptés pour un vol n'est pas atteinte    
+        if (count($data->copilots) > 2) {
+            throw new ConflictHttpException('Maximum de copilots atteint');
+        }
+
+        // recueillir les informations des copilotes
+        foreach ($data->copilots as $copilot) {
+            // Rechercher l'existence de chacun d'eux
+            $isCopilotExist = $this->copilotRepository->findOneBy([
+                'firstname' => $copilot['firstname'],
+                'lastname' => $copilot['lastname'],
+                'email' => $copilot['email']
+            ]);
+
+
+
+            if ($isCopilotExist) { // Si le copilote existe, le joindre à la sous-équipe des copilotes
+                // Vérifier si le copilote est disponible pendant la période du vol
+                $numberFleetsByCopilotInPeriod = $this->flightRepository->countOverlappingFlightsForCopilot($isCopilotExist->getId(), $data->dateDeparture, $data->dateArrival);
+
+                if ($numberFleetsByCopilotInPeriod > 0) {
+                    throw new ConflictHttpException('Le copilote ' . $isCopilotExist->getFullname() . ' n\'est pas disponible pendant la période du vol');
+                }
+
+                $copilots[] = $isCopilotExist;
+            } else {
+                throw new ConflictHttpException('Un copilote renseigné du nom de ' .  $copilot['lastname'] . ' ' .  $copilot['firstname'] . ' n\'existe pas');
+            }
+        }
+
+        // dd($copilots);
 
         // Rechercher s'il n'y pas de vol similaire
         $isExistFlight = $this->flightRepository->findOneBy([
@@ -139,6 +176,11 @@ class FlightStateProcessor implements ProcessorInterface
             ->setDateDeparture($data->dateDeparture)
             ->setDateArrival($data->dateArrival)
             ->setCaptain($isExistCaptain);
+
+        // Si disponibilité de chaque copilote validée en amont, enregistrer chaque copilote au vol
+        foreach ($copilots as $copilot) {
+            $flight->addCopilot($copilot);
+        }
 
         // dd($flight);
         $this->entityManager->persist($flight);
