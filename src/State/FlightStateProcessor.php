@@ -110,8 +110,8 @@ class FlightStateProcessor implements ProcessorInterface
         //Vérifier si le commandant de bord est disponible
         $numberFleetsByCaptainInPeriod = $this->flightRepository->countOverlappingFlightsForCaptain($isExistCaptain->getId(), $data->dateDeparture, $data->dateArrival);
 
-        if ($numberFleetsByCaptainInPeriod > 1) {
-            throw new ConflictHttpException('Le commandant est occupé pendant la même période du vol');
+        if ($numberFleetsByCaptainInPeriod > 0) {
+            throw new ConflictHttpException('Le commandant de bord est occupé pendant la même période du vol');
         }
 
         // dd($numberFleetsByCaptainInPeriod);
