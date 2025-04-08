@@ -16,18 +16,18 @@ use ApiPlatform\Metadata\ApiResource;
 use App\Repository\CaptainRepository;
 use ApiPlatform\Metadata\GetCollection;
 use App\State\CustomCaptainsGetCollectionStateProvider;
+use App\State\UpdateCaptainStateProcessor;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
 
 #[ORM\Entity(repositoryClass: CaptainRepository::class)]
 #[ApiResource( // Déclarer Commandant de bord en tant que ressource de l'API
-    security: "is_granted('ROLE_ADMIN')", // par défaut un ADMIN à accès à tous les endpoints de la ressource Commandant de bord
-    securityMessage: 'Vous n\'êtes pas Admin',
     operations: [
         new Get( // rendre accessible une ressource grâce à son ID 
             provider: CaptainStateProvider::class, // traitement personnalisée de la réponse de l'endpoint
             output: CaptainResponseDto::class,
-            security: "is_granted('ROLE_ADMIN') or object.owner == user"
+            security: "is_granted('ROLE_ADMIN') or object.owner == user",
+            securityMessage: 'Vous n\'êtes ni Admin ni propriétaires des données personnelles'
         ),
         new GetCollection( // rendre accessible l'ensemble des ressources 
             provider: CustomCaptainsGetCollectionStateProvider::class // traitement personnalisé de l'endpoint de récupération de tous les commandants de bord
@@ -37,8 +37,7 @@ use Doctrine\Common\Collections\ArrayCollection;
             input: CaptainRequestDto::class,
         ),
         new Patch( // mettre à jour une ressource en particulier de façon partielle 
-            security: "is_granted('ROLE_ADMIN') or object.owner == user",
-            securityMessage: 'Vous n\'êtes ni Admin ni propriétaires des données personnelles'
+            processor: UpdateCaptainStateProcessor::class // traitement personnalisé de la mise d'une ressource de type commandant de bord
         ),
         new Delete( // supprimer une ressource Commandant de bord 
             security: "is_granted('ROLE_ADMIN') or object.owner == user",
