@@ -15,23 +15,35 @@ use App\State\CaptainStateProcessor;
 use ApiPlatform\Metadata\ApiResource;
 use App\Repository\CaptainRepository;
 use ApiPlatform\Metadata\GetCollection;
+use App\State\CustomCaptainsGetCollectionStateProvider;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
 
 #[ORM\Entity(repositoryClass: CaptainRepository::class)]
 #[ApiResource( // Déclarer Commandant de bord en tant que ressource de l'API
+    security: "is_granted('ROLE_ADMIN')", // par défaut un ADMIN à accès à tous les endpoints de la ressource Commandant de bord
+    securityMessage: 'Vous n\'êtes pas Admin',
     operations: [
         new Get( // rendre accessible une ressource grâce à son ID 
-            provider: CaptainStateProvider::class,
-            output: CaptainResponseDto::class
+            provider: CaptainStateProvider::class, // traitement personnalisée de la réponse de l'endpoint
+            output: CaptainResponseDto::class,
+            security: "is_granted('ROLE_ADMIN') or object.owner == user"
         ),
-        new GetCollection(), // rendre accessible l'ensemble des ressources 
+        new GetCollection( // rendre accessible l'ensemble des ressources 
+            provider: CustomCaptainsGetCollectionStateProvider::class // traitement personnalisé de l'endpoint de récupération de tous les commandants de bord
+        ),
         new Post( // créer une nouvelle ressource 
             processor: CaptainStateProcessor::class,
-            input: CaptainRequestDto::class
+            input: CaptainRequestDto::class,
         ),
-        new Patch(), // mettre à jour une ressource en particulier de façon partielle 
-        new Delete() // supprimer une ressource Commandant de bord 
+        new Patch( // mettre à jour une ressource en particulier de façon partielle 
+            security: "is_granted('ROLE_ADMIN') or object.owner == user",
+            securityMessage: 'Vous n\'êtes ni Admin ni propriétaires des données personnelles'
+        ),
+        new Delete( // supprimer une ressource Commandant de bord 
+            security: "is_granted('ROLE_ADMIN') or object.owner == user",
+            securityMessage: 'Vous n\'êtes ni Admin ni propriétaires des données personnelles'
+        )
     ]
 )]
 class Captain extends User

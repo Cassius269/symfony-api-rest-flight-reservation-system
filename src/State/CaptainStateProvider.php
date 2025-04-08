@@ -21,9 +21,7 @@ class CaptainStateProvider implements ProviderInterface
         $data = $this->itemProvider->provide($operation, $uriVariables, $context);
 
         if (!$data) {
-            throw  new NotFoundHttpException(json_encode([
-                'message' => 'aucun commandant de bord trouvé avec l\'id fourni'
-            ]));
+            throw  new NotFoundHttpException('aucun commandant de bord trouvé avec l\'id fourni');
         };
 
         // Préparer la réponse avec un DTO
@@ -31,6 +29,7 @@ class CaptainStateProvider implements ProviderInterface
         $captainDto->id = $data->getId();
         $captainDto->firstname = $data->getFirstname();
         $captainDto->lastname = $data->getLastname();
+        $captainDto->email = $data->getEmail();
         $captainDto->createdAt = $data->getCreatedAt();
         $captainDto->updatedAt = $data->getUpdatedAt();
 

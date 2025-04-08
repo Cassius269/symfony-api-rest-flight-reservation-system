@@ -36,7 +36,7 @@ use App\State\CustomGetCollectionAvailableFlightsProvider;
             paginationItemsPerPage: 15, // nbre d'items par page
             paginationClientEnabled: true, // donner la possibilité au client de choisir d'activer ou pas la pagination
             paginationClientItemsPerPage: true, // donner la possible au client de choisir le nombre de ressources par page
-            security: 'is_granted("ROLE_PASSENGER") or is_granted("ROLE_ADMIN")', // seuls des utilisateurs ayant le rôle Admin ou passager peut regarder l'ensemble des vols disponibles
+            security: 'is_granted("PUBLIC_ACCESS")', // les utilisateurs non connectés peuvent avoir accès à l'ensemble des vols disponibles
             // Injection de filtre personnalisé déclaré depuis le fichier "/config/packages/filters.yaml"
             filters: ['flight.search_filter'],
             // Paramètrage optionnel pour transformer les paramètres optionnelles de requêtes de majuscules en minuscule
@@ -56,13 +56,14 @@ use App\State\CustomGetCollectionAvailableFlightsProvider;
             uriTemplate: '/get-available-flights', // création d'une route personnalisée (endpoint)
             name: 'getAvailableFlights',
             provider: CustomGetCollectionAvailableFlightsProvider::class,
-            security: 'is_granted("ROLE_PASSENGER") or is_granted("ROLE_ADMIN")', // seuls des utilisateurs ayant le rôle Admin ou passager peut regarder l'ensemble des vols disponibles
+            security: 'is_granted("PUBLIC_ACCESS")', // les utilisateurs non connectés peuvent avoir accès à l'ensemble des vols disponibles
             filters: ['flight.search_filter'], // injection de filtre personnalisé crée sous forme de service
         ),
         new Post(
             // créer une nouvelle ressource vol d'avion
             processor: FlightStateProcessor::class,
-            input: FlightRequestDto::class
+            input: FlightRequestDto::class,
+            securityMessage: 'Vous n\'êtes pas Admin'
         ),
         new Patch(), // modifier une ressource vol d'avion à l'aide de son ID
         new Delete() // supprimer une ressource vol d'avion à l'aide de son ID
