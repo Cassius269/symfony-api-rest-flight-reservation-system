@@ -26,6 +26,7 @@ class UpdateCaptainStateProcessor implements ProcessorInterface
         }
 
         // Envoyer les modifications au serveur de l'API
+        $data->setUpdatedAt(new \DateTime());
         $this->entityManager->flush();
 
         // Préparer une réponse à renvoyer au client à l'aide de DTO
@@ -34,6 +35,8 @@ class UpdateCaptainStateProcessor implements ProcessorInterface
         $captainDto->firstname = $data->getFirstname();
         $captainDto->lastname = $data->getLastname();
         $captainDto->email = $data->getEmail();
+        $captainDto->createdAt = $data->getCreatedAt();
+        $captainDto->updatedAt = $data->getUpdatedAt();
 
         return $captainDto;
     }

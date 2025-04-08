@@ -2,16 +2,17 @@
 
 namespace App\Security\Voter;
 
-use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
-use Symfony\Component\Security\Core\Authorization\Voter\Voter;
+use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\Security\Core\Role\Role;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Core\Authorization\Voter\Voter;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 final class CaptainVoter extends Voter
 {
     public const EDIT = 'CAPTAIN_EDIT';
     public const VIEW = 'CAPTAIN_VIEW';
     public const DELETE = 'CAPTAIN_DELETE';
-
 
     protected function supports(string $attribute, mixed $subject): bool
     {
@@ -38,8 +39,10 @@ final class CaptainVoter extends Voter
                 }
                 break;
             case self::VIEW:
-                // logic to determine if the user can VIEW
-                // return true or false
+                // Vérifier si le mail de l'utilisateur connecté correspond à l'email de l'objet à modifier ou si c'est un ADMIN
+                if ($subject->getEmail() == $user->getEmail() || in_array('ROLE_ADMIN', $subject->getRoles())) {
+                    return true;
+                }
                 break;
             case self::DELETE:
                 // logic to determine if the user can VIEW
