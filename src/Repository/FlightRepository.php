@@ -110,4 +110,18 @@ class FlightRepository extends ServiceEntityRepository
             ->getQuery()
             ->getSingleScalarResult();
     }
+
+    // Compter le nombre de vols occupés à l'avenir par un commandant de bord
+    public function countNextFlightsForCaptain(int $captainId)
+    {
+        return $this->createQueryBuilder('f')
+            ->select('COUNT(f.id)')
+            ->join('f.captain', 'c')
+            ->where('c.id = :captainId')
+            ->andWhere('f.dateDeparture > :currentDate')
+            ->setParameter('captainId', $captainId)
+            ->setParameter('currentDate', (new DateTime())->format('Y-m-d H:i:s'))
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
 }

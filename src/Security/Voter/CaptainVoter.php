@@ -24,7 +24,7 @@ final class CaptainVoter extends Voter
 
     protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token): bool
     {
-        $user = $token->getUser();
+        $user = $token->getUser(); // utilisateur authentifié
         // if the user is anonymous, do not grant access
         if (!$user instanceof UserInterface) {
             return false;
@@ -34,19 +34,21 @@ final class CaptainVoter extends Voter
         switch ($attribute) {
             case self::EDIT:
                 // Vérifier si le mail de l'utilisateur connecté correspond à l'email de l'objet à modifier ou si c'est un ADMIN
-                if ($subject->getEmail() == $user->getEmail() || in_array('ROLE_ADMIN', $subject->getRoles())) {
+                if ($subject->getEmail() == $user->getEmail() || in_array('ROLE_ADMIN', $user->getRoles())) {
                     return true;
                 }
                 break;
             case self::VIEW:
                 // Vérifier si le mail de l'utilisateur connecté correspond à l'email de l'objet à modifier ou si c'est un ADMIN
-                if ($subject->getEmail() == $user->getEmail() || in_array('ROLE_ADMIN', $subject->getRoles())) {
+                if ($subject->getEmail() == $user->getEmail() || in_array('ROLE_ADMIN', $user->getRoles())) {
                     return true;
                 }
                 break;
             case self::DELETE:
-                // logic to determine if the user can VIEW
-                // return true or false
+                // Vérifier si le mail de l'utilisateur connecté correspond à l'email de l'objet à modifier ou si c'est un ADMIN
+                if ($subject->getEmail() == $user->getEmail() || in_array('ROLE_ADMIN', $user->getRoles())) {
+                    return true;
+                }
                 break;
         }
 

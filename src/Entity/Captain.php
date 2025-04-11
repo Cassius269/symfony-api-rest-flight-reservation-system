@@ -16,6 +16,7 @@ use ApiPlatform\Metadata\ApiResource;
 use App\Repository\CaptainRepository;
 use ApiPlatform\Metadata\GetCollection;
 use App\State\CustomCaptainsGetCollectionStateProvider;
+use App\State\DeleteCaptainStateProcessor;
 use App\State\UpdateCaptainStateProcessor;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -33,11 +34,14 @@ use Doctrine\Common\Collections\ArrayCollection;
         new Post( // créer une nouvelle ressource 
             processor: CaptainStateProcessor::class,
             input: CaptainRequestDto::class,
+            security: 'is_granted("ROLE_ADMIN")',
+            securityMessage: 'Accès réfusé. Vous n\'êtes pas admin'
         ),
         new Patch( // mettre à jour une ressource en particulier de façon partielle 
             processor: UpdateCaptainStateProcessor::class // traitement personnalisé de la mise d'une ressource de type commandant de bord
         ),
         new Delete( // supprimer une ressource Commandant de bord 
+            processor: DeleteCaptainStateProcessor::class
         )
     ]
 )]
