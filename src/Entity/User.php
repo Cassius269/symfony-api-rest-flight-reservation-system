@@ -2,10 +2,13 @@
 
 namespace App\Entity;
 
-use App\Entity\Trait\DateTrait;
+use ApiPlatform\Metadata\Get;
 use Doctrine\DBAL\Types\Types;
+use App\Entity\Trait\DateTrait;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\UserRepository;
+use ApiPlatform\Metadata\ApiResource;
+use App\State\UserMeStateProvider;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -16,6 +19,16 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
 #[UniqueEntity(fields: ['email'], message: 'Cet email est déjà utilisé.')] // Message d'erreur personnalisé pour éviter les emails en doublons
 #[ORM\InheritanceType('JOINED')]
+#[ApiResource( // Déclarer l'entité en tant que ressource
+    security: 'is_granted("IS_AUTHENTICATED_FULLY")',
+    securityMessage: 'Erreur. Vous n\'êtes pas authentifié(e)',
+    operations: [
+        new Get(
+            uriTemplate: '/me',
+            provider: UserMeStateProvider::class
+        )
+    ]
+)]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     use DateTrait; // intégrer le trait des dates de créations et de mise à jour
