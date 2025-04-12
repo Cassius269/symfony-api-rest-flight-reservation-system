@@ -9,8 +9,10 @@ use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Metadata\ApiResource;
 use App\Repository\CopilotRepository;
 use ApiPlatform\Metadata\GetCollection;
+use App\Dto\CopilotRequestDto;
 use App\State\CopilotStateProvider;
 use App\State\CustomCopilotsGetCollectionStateProvider;
+use App\State\InsertCopilotProcessor;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
 
@@ -27,8 +29,10 @@ use Doctrine\Common\Collections\ArrayCollection;
             provider: CustomCopilotsGetCollectionStateProvider::class
         ),
         new Post( // créer une nouvelle resource Copilote
-            // processor:,
-            // input:
+            processor: InsertCopilotProcessor::class,
+            input: CopilotRequestDto::class,
+            security: 'is_granted("ROLE_ADMIN")',
+            securityMessage: 'Vous devez être administrateur pour créer une nouvelle ressource Copilote'
         ),
         new Delete() // supprimer une ressource Copilote grâce à son ID
     ]

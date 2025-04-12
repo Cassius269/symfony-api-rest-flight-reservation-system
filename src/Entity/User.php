@@ -14,6 +14,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+use Symfony\Component\Validator\Constraints\Length;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
@@ -60,13 +61,21 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $password = null;
 
     #[ORM\Column(length: 30)]
-    #[Assert\NotBlank(message: 'Le prénom est obligatoire')]
     #[Groups(['passenger:read', 'passenger:write'])]
+    #[Assert\NotBlank(message: 'Le prénom est obligatoire')]
+    #[Length(
+        min: 3,
+        minMessage: 'Le nom de famille  est trop court'
+    )]
     private ?string $firstname = null;
 
     #[ORM\Column(length: 30)]
     #[Groups(['passenger:read', 'passenger:write'])]
     #[Assert\NotBlank(message: 'Le nom de famille est obligatoire')]
+    #[Length(
+        min: 3,
+        minMessage: 'Le nom de famille  est trop court'
+    )]
     private ?string $lastname = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
