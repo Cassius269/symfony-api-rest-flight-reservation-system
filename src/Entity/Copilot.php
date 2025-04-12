@@ -34,7 +34,10 @@ use Doctrine\Common\Collections\ArrayCollection;
             security: 'is_granted("ROLE_ADMIN")',
             securityMessage: 'Vous devez être administrateur pour créer une nouvelle ressource Copilote'
         ),
-        new Delete() // supprimer une ressource Copilote grâce à son ID
+        new Delete( // supprimer une ressource Copilote grâce à son ID
+            security: 'is_granted("COPILOT_DELETE", object)',
+            securityMessage: 'Vous devez être administrateur ou propriétaire des données personnelles pour supprimer une ressource Copilote'
+        )
     ]
 )]
 class Copilot extends User
