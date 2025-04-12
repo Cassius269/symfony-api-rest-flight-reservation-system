@@ -26,6 +26,7 @@ use App\State\CustomGetCollectionAvailableFlightsProvider;
 #[ORM\Entity(repositoryClass: FlightRepository::class)]
 #[ApiResource( // Déclaration de l'entité Flight comme ressource de l'API
     security: "is_granted('ROLE_ADMIN')", // seul un utilisateur au rôle Admin peut avoir accès à toutes les opérations d'une ressource
+    securityMessage: 'Accès refusé. Vous n\'êtes pas Admin',
     operations: [
         new Get(), // récuperer une ressource vol d'avion à l'aide de son ID
         new GetCollection(

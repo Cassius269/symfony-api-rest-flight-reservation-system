@@ -23,7 +23,8 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 #[ORM\Entity(repositoryClass: CityRepository::class)]
 #[ApiResource(
-    security: "is_granted('ROLE_ADMIN')", // seul un utilisateur au rôle Admin peut avoir accès à toutes les opérations d'une ressource
+    security: "is_granted('ROLE_ADMIN')", // seul un utilisateur au rôle Admin peut avoir accès à toutes les opérations d'une ressource de type City
+    securityMessage: 'Accès refusé. Vous n\'êtes pas Admin',
     operations: [
         new Post( // enregistrer une nouvelle ressource City sur le serveur 
             processor: CityStateProcessor::class, // liaison du processor (traitement) avec l'entité

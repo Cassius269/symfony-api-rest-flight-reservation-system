@@ -57,7 +57,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
         ),
         new Patch( // mettre à jour une ressource Réservation partiellement
             // security: "is_granted('RESERVATION_EDIT', object)", // utilisation de voter personnalisé pour gérer la permission de modification d'une réservation
-            securityMessage: 'Désolé, vous êtes ni admin ni le propriétaire de la réservation',
+            // securityMessage: 'Désolé, vous êtes ni admin ni le propriétaire de la réservation',
             processor: UpdateReservationProcessor::class,
             input: ReservationRequestDto::class
         ),

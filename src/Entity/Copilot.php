@@ -9,15 +9,27 @@ use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Metadata\ApiResource;
 use App\Repository\CopilotRepository;
 use ApiPlatform\Metadata\GetCollection;
+use App\State\CopilotStateProvider;
+use App\State\CustomCopilotsGetCollectionStateProvider;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
 
 #[ORM\Entity(repositoryClass: CopilotRepository::class)]
 #[ApiResource( // Déclarer l'entité Copilot en tant que ressource de l'API
     operations: [
-        new Get(), // rendre accessible une ressource grâce à son ID 
-        new GetCollection(), // rendre accessible l'ensemble des ressources de type Copilote
-        new Post(), // créer une nouvelle resource Copilote
+        new Get(
+            // rendre accessible une ressource grâce à son ID 
+            provider: CopilotStateProvider::class
+        ),
+        new GetCollection( // rendre accessible l'ensemble des ressources de type Copilote
+            security: 'is_granted("ROLE_ADMIN")',
+            securityMessage: 'Vous devez être administrateur pour accéder à l\'ensemble des ressources Copilotes',
+            provider: CustomCopilotsGetCollectionStateProvider::class
+        ),
+        new Post( // créer une nouvelle resource Copilote
+            // processor:,
+            // input:
+        ),
         new Delete() // supprimer une ressource Copilote grâce à son ID
     ]
 )]

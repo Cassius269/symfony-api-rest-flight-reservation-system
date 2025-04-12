@@ -32,6 +32,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 #[
     ApiResource( // Transformer l'entité Country en une ressource API, avec toutes les opérations CRUD
         security: "is_granted('ROLE_ADMIN')", // par défaut, seul un utilisateur au rôle Admin peut avoir accès à toutes les opérations d'une ressource
+        securityMessage: 'Accès refusé. Vous n\'êtes pas Admin',
         operations: [
             new Get(), // rendre accessible une ressource grâce à son ID 
             new GetCollection( // rendre accessible l'ensemble des ressources 
