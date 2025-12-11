@@ -2,10 +2,14 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
 use App\Entity\Trait\DateTrait;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\UserRepository;
+use App\State\ConnectedUserStateProvider;
+use Dba\Connection;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -16,6 +20,17 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
 #[UniqueEntity(fields: ['email'], message: 'Cet email est déjà utilisé.')] // Message d'erreur personnalisé pour éviter les emails en doublons
 #[ORM\InheritanceType('JOINED')]
+#[ApiResource(
+    operations:[
+        new Get(
+            uriTemplate: '/me', // url => /api/me
+            name: 'api_connected_user', 
+            provider: ConnectedUserStateProvider::class, // traitement personnalisé pour l'affichage de l'utilisateur connecté
+            security: "is_granted('IS_AUTHENTICATED_FULLY')", // seuls les utilisateurs authentifiés peuvent accédéer à l'endpoint "/api/me"
+            securityMessage: "Vous devez être authentifié(e) pour accéder à cet endpoint"
+        )
+    ]
+)]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     use DateTrait; // intégrer le trait des dates de créations et de mise à jour

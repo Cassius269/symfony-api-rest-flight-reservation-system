@@ -4,6 +4,8 @@ namespace App\Entity;
 
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Post;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use ApiPlatform\Metadata\Patch;
 use App\Entity\Trait\DateTrait;
@@ -109,6 +111,21 @@ class Reservation
     #[Assert\NotBlank(message: "Les informations sur le vol sont obligatoires")]
     private ?Flight $flight = null;
 
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Status $status = null;
+
+    /**
+     * @var Collection<int, Stop>
+     */
+    #[ORM\ManyToMany(targetEntity: Stop::class, mappedBy: 'reservation')]
+    private Collection $stops;
+
+    public function __construct()
+    {
+        $this->stops = new ArrayCollection();
+    }
+
     public function getId(): ?int
     {
         return $this->id;
@@ -170,6 +187,45 @@ class Reservation
     public function setPassengerNameRecord(string $passengerNameRecord): static
     {
         $this->passengerNameRecord = $passengerNameRecord;
+
+        return $this;
+    }
+
+    public function getStatus(): ?Status
+    {
+        return $this->status;
+    }
+
+    public function setStatus(?Status $status): static
+    {
+        $this->status = $status;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Stop>
+     */
+    public function getStops(): Collection
+    {
+        return $this->stops;
+    }
+
+    public function addStop(Stop $stop): static
+    {
+        if (!$this->stops->contains($stop)) {
+            $this->stops->add($stop);
+            $stop->addReservation($this);
+        }
+
+        return $this;
+    }
+
+    public function removeStop(Stop $stop): static
+    {
+        if ($this->stops->removeElement($stop)) {
+            $stop->removeReservation($this);
+        }
 
         return $this;
     }

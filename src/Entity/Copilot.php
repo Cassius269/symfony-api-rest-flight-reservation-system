@@ -3,13 +3,39 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
+use App\Dto\CopilotRequestDto;
 use App\Repository\CopilotRepository;
+use App\State\CopilotStateProvider;
+use App\State\CustomCopilotsGetCollectionProvider;
+use App\State\InsertCopilotProcessor;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Filesystem\Path;
 
 #[ORM\Entity(repositoryClass: CopilotRepository::class)]
-#[ApiResource] // Déclarer l'entité Copilot en tant que ressource de l'API
+#[ApiResource(// Déclarer l'entité Copilot en tant que ressource de l'API
+    operations: [
+        new Get(// récuperer un copilote à l'aide son Id
+            provider: CopilotStateProvider::class // traitement personnalisé de récupération d'un copilote
+        ),
+        new GetCollection(
+            provider: CustomCopilotsGetCollectionProvider::class // traitement personnalisé de récupération de tous les copilotes
+        ),
+        new Post( // enregistrer une nouvelle ressource utilisateur de type Copilote
+            input: CopilotRequestDto::class, // DTO de récupération des données fournies par le client
+            processor: InsertCopilotProcessor::class // traitement personnalisé de l'ajout d'un copilote
+        ),
+        new Patch(), // mettre à jour un copilote à l'aide de son ID
+        new Delete() // supprimer un copilote à l'aide de son ID
+    ]
+
+)] 
 class Copilot extends User
 {
     /**

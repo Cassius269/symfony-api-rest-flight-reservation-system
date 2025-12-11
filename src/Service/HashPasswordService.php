@@ -7,6 +7,7 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class HashPasswordService
 {
+    // Injection de dépendance
     public function __construct(
         private UserPasswordHasherInterface $passwordHasher,
     ) {}

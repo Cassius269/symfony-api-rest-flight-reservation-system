@@ -37,6 +37,10 @@ class Airplane
     #[ORM\OneToMany(targetEntity: Flight::class, mappedBy: 'airplane')]
     private Collection $flights;
 
+    #[ORM\ManyToOne(inversedBy: 'airplanes')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Company $company = null;
+
     public function __construct()
     {
         $this->flights = new ArrayCollection();
@@ -97,6 +101,18 @@ class Airplane
                 $flight->setAirplane(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getCompany(): ?Company
+    {
+        return $this->company;
+    }
+
+    public function setCompany(?Company $company): static
+    {
+        $this->company = $company;
 
         return $this;
     }

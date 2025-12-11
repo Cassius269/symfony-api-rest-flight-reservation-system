@@ -18,14 +18,13 @@ class PassengerStateProcessor implements ProcessorInterface
 {
     public function __construct(
         private EntityManagerInterface $entityManager,
-        private PassengerRepository $passengerRepository,
         private HashPasswordService $hashPasswordService,
         private ValidatorInterface $validator
     ) {}
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): object
     {
-
+        // dd($data);
 
         // Si aucun utilisateur n'utilise le mail
         if (!isset($data->firstname) || !isset($data->lastname) || !isset($data->email) || !isset($data->firstname)) {
@@ -59,7 +58,7 @@ class PassengerStateProcessor implements ProcessorInterface
         $this->entityManager->flush();
 
 
-        // Retourner au client le même DTO de requête car les informations à renvoyer sont les mêmes
+        // Retourner au client le  DTO de réponse
         $passengerResponseDto = new PassengerResponseDto;
         $passengerResponseDto->id = $passenger->getId();
         $passengerResponseDto->firstname = $passenger->getFirstname();

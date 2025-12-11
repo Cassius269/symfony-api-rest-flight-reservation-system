@@ -13,11 +13,11 @@ use Symfony\Component\Validator\Constraints as Assert;
 trait DateTrait
 {
     #[ORM\Column]
-    #[Assert\NotBlank(message: "La date de création de la donnée est obligatoire")]
-    #[Groups(['passenger:read', 'passenger:write'])]
+    // #[Assert\DateTime(message: "La date doit être au format Y-m-d H:i:s")]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+    #[Assert\DateTime(message: "La date doit être au format Y-m-d H:i:s")]
     private ?\DateTimeInterface $updatedAt = null;
 
     /**

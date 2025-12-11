@@ -10,66 +10,10 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 class FlightRequestDto
 {
-    #[Assert\NotBlank(message: "La ville de départ doit être renseignée")]
-    #[Assert\Valid] // Valide aussi les sous-objets (CityRequestDto)    
-    private ?CityRequestDto $cityDeparture = null; // ville de départ
-
-    #[Assert\NotBlank(message: "La ville d'arrivée doit être renseignée")]
-    #[Assert\Valid] // Valide aussi les sous-objets (CityRequestDto)  
-    private ?CityRequestDto $cityArrival = null; // ville d'arrivée
-
+    public ?int $id = null;
     public ?int $airplaneId = null;
-
-    #[Assert\NotBlank(message: "La date de départ doit être renseignée")]
+    public ?AirportResponseDto $airportArrival = null; // aéroport d'arrivée
+    public ?AirportResponseDto $airportDeparture = null; // aéroport de départ
     public ?DateTime $dateDeparture = null;
-
-    #[Assert\NotBlank(message: "La date d'arrivée doit être renseignée")]
     public ?DateTime $dateArrival = null;
-
-    public ?CaptainRequestDto $captain = null;
-    public ?array $copilots = null;
-    /* Exceptionnement j'ai rajouté les accesseurs des villes de destination et de départ 
-    pour manipuler facilement les données imbriquées des vols renseignés côtés cliens 
-    */
-
-
-    /**
-     * Get the value of cityDeparture
-     */
-    public function getCityDeparture()
-    {
-        return $this->cityDeparture;
-    }
-
-    /**
-     * Get the value of cityArrival
-     */
-    public function getCityArrival()
-    {
-        return $this->cityArrival;
-    }
-
-    /**
-     * Set the value of cityArrival
-     *
-     * @return  self
-     */
-    public function setCityArrival($cityArrival)
-    {
-        $this->cityArrival = $cityArrival;
-
-        return $this;
-    }
-
-    /**
-     * Set the value of cityDeparture
-     *
-     * @return  self
-     */
-    public function setCityDeparture($cityDeparture)
-    {
-        $this->cityDeparture = $cityDeparture;
-
-        return $this;
-    }
 }

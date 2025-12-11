@@ -27,7 +27,7 @@ class CaptainStateProcessor implements ProcessorInterface
         // dd($isExistCaptain);
 
         if ($isExistCaptain) {
-            throw new UnprocessableEntityHttpException('un commandant de bord avec le mail existe déjà');
+            throw new UnprocessableEntityHttpException('un commandant de bord avec une adresse email similaire existe déjà');
         };
 
         $captain = new Captain;

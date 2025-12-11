@@ -41,17 +41,4 @@ class CityRepository extends ServiceEntityRepository
     //            ->getOneOrNullResult()
     //        ;
     //    }
-
-    public function findDestinationByCityAndCountry(string $cityName, string $countryName): ?City
-    {
-        return $this->createQueryBuilder('c') // alias de la table City
-            // ->select('c.city', 'country.name')
-            ->innerJoin('c.country', 'country') // alias de la table Country
-            ->where('c.name = :cityName')
-            ->andWhere('country.name = :countryName')
-            ->setParameter('cityName', $cityName)
-            ->setParameter('countryName', $countryName)
-            ->getQuery()
-            ->getOneOrNullResult();
-    }
 }

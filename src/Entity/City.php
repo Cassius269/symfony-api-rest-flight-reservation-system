@@ -81,9 +81,16 @@ class City
     #[ORM\Column(length: 10, nullable: true)]
     private ?string $zipCode = null;
 
+    /**
+     * @var Collection<int, Airport>
+     */
+    #[ORM\OneToMany(targetEntity: Airport::class, mappedBy: 'city')]
+    private Collection $airports;
+
     public function __construct()
     {
         $this->flights = new ArrayCollection();
+        $this->airports = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -153,6 +160,36 @@ class City
     public function setZipCode(string $zipCode): static
     {
         $this->zipCode = $zipCode;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Airport>
+     */
+    public function getAirports(): Collection
+    {
+        return $this->airports;
+    }
+
+    public function addAirport(Airport $airport): static
+    {
+        if (!$this->airports->contains($airport)) {
+            $this->airports->add($airport);
+            $airport->setCity($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAirport(Airport $airport): static
+    {
+        if ($this->airports->removeElement($airport)) {
+            // set the owning side to null (unless already changed)
+            if ($airport->getCity() === $this) {
+                $airport->setCity(null);
+            }
+        }
 
         return $this;
     }

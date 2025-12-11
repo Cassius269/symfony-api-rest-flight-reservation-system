@@ -32,11 +32,12 @@ class CustomGetCollectionAvailableFlightsProvider implements ProviderInterface
             $flightDto = new AvailableFlightResponseDto();
             $flightDto->id = $flight['id'];
 
+            // dd($flight);
             $cityDepartureDto = new CityResponseDto();
-            $cityDepartureDto->name = $flight['cityDeparture'];
+            $cityDepartureDto->name = $flight["airportDeparture"];
 
             $cityArrivalDto = new CityResponseDto();
-            $cityArrivalDto->name = $flight['cityArrival'];
+            $cityArrivalDto->name = $flight["airportArrival"];
 
             $flightDto->cityDeparture = $cityDepartureDto;
             $flightDto->cityArrival = $cityArrivalDto;

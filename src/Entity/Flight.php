@@ -3,23 +3,21 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\Get;
-use App\Dto\FlightRequestDto;
 use ApiPlatform\Metadata\Post;
 use Doctrine\DBAL\Types\Types;
 use ApiPlatform\Metadata\Patch;
 use App\Entity\Trait\DateTrait;
 use ApiPlatform\Metadata\Delete;
 use Doctrine\ORM\Mapping as ORM;
-use ApiPlatform\Metadata\ApiFilter;
-use App\State\FlightStateProcessor;
 use App\Repository\FlightRepository;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
-use ApiPlatform\Metadata\QueryParameter;
+use App\Dto\FlightRequestDto;
+use App\Dto\FlightRequesteDto;
+use App\State\CustomFlightsGetCollection;
+use App\State\InsertFlightStateProcessor;
 use Doctrine\Common\Collections\Collection;
-use ApiPlatform\Doctrine\Orm\Filter\DateFilter;
 use Doctrine\Common\Collections\ArrayCollection;
-use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use App\State\CustomGetCollectionAvailableFlightsProvider;
 
@@ -29,23 +27,13 @@ use App\State\CustomGetCollectionAvailableFlightsProvider;
     operations: [
         new Get(), // récuperer une ressource vol d'avion à l'aide de son ID
         new GetCollection(
-            // Exposition des champs en phase de sérialisation et de déserialisation
-            normalizationContext: ['groups' => ['flight:read']],
-            // récuperer l'ensemble des ressources de type vol d'avion disponibles dans le serveur
+            // récuperer l'ensemble des ressources de type vol d'avion dans le serveur
+            provider: CustomFlightsGetCollection::class, // traitement personnalisé de récupération de tous les vols présents dans le serveur
             paginationEnabled: true, // activer la pagination
             paginationItemsPerPage: 15, // nbre d'items par page
             paginationClientEnabled: true, // donner la possibilité au client de choisir d'activer ou pas la pagination
             paginationClientItemsPerPage: true, // donner la possible au client de choisir le nombre de ressources par page
             security: 'is_granted("PUBLIC_ACCESS")', // les utilisateurs non connectés peuvent avoir accès à l'ensemble des vols disponibles
-            // Injection de filtre personnalisé déclaré depuis le fichier "/config/packages/filters.yaml"
-            filters: ['flight.search_filter'],
-            // Paramètrage optionnel pour transformer les paramètres optionnelles de requêtes de majuscules en minuscule
-            parameters: [
-                'datedeparture' => new QueryParameter(filter: 'flight.search_filter', property: 'dateDeparture'),
-                'datearrival' => new QueryParameter(filter: 'flight.search_filter', property: 'dateArrival'),
-                'citydeparture' => new QueryParameter(filter: 'flight.search_filter', property: 'cityDeparture.name'),
-                'cityarrival' => new QueryParameter(filter: 'flight.search_filter', property: 'cityArrival.name'),
-            ],
         ), // récuperer l'ensemble des ressources de type vol d'avion présent dans le serveur
         new GetCollection(
             // récuperer l'ensemble des ressources de type vol d'avion disponibles dans le serveur
@@ -57,11 +45,10 @@ use App\State\CustomGetCollectionAvailableFlightsProvider;
             name: 'getAvailableFlights',
             provider: CustomGetCollectionAvailableFlightsProvider::class,
             security: 'is_granted("PUBLIC_ACCESS")', // les utilisateurs non connectés peuvent avoir accès à l'ensemble des vols disponibles
-            filters: ['flight.search_filter'], // injection de filtre personnalisé crée sous forme de service
         ),
         new Post(
             // créer une nouvelle ressource vol d'avion
-            processor: FlightStateProcessor::class,
+            processor: InsertFlightStateProcessor::class,
             input: FlightRequestDto::class,
             securityMessage: 'Vous n\'êtes pas Admin'
         ),
@@ -69,7 +56,6 @@ use App\State\CustomGetCollectionAvailableFlightsProvider;
         new Delete() // supprimer une ressource vol d'avion à l'aide de son ID
     ]
 )]
-#[ApiFilter(DateFilter::class, properties: ['dateDeparture', 'dateArrival'])]
 class Flight
 {
     use DateTrait; // intégrer le trait des dates de créations et de mise à jour
@@ -77,30 +63,15 @@ class Flight
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['flight:read'])]
     private ?int $id = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     #[Assert\NotBlank(message: "Une date de départ doit être renseignée")]
-    #[Groups(['flight:read'])]
     private ?\DateTimeInterface $dateDeparture = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     #[Assert\NotBlank(message: "Une date d'arrivée doit être renseignée")]
-    #[Groups(['flight:read'])]
     private ?\DateTimeInterface $dateArrival = null;
-
-    #[ORM\ManyToOne(inversedBy: 'flights')]
-    #[ORM\JoinColumn(nullable: false)]
-    #[Assert\NotBlank(message: "Une ville de départ doit être renseignée")]
-    #[Groups(['flight:read'])]
-    private ?City $cityDeparture = null;
-
-    #[ORM\ManyToOne]
-    #[ORM\JoinColumn(nullable: false)]
-    #[Assert\NotBlank(message: "Une ville d'arrivée doit être renseignée")]
-    #[Groups(['flight:read'])]
-    private ?City $cityArrival = null;
 
     /**
      * @var Collection<int, Reservation>
@@ -110,10 +81,12 @@ class Flight
 
     #[ORM\ManyToOne(inversedBy: 'flights')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Assert\NotBlank(message: 'L\'avion utilisé pour le vol doit être renseigné')]
     private ?Airplane $airplane = null;
 
     #[ORM\ManyToOne(inversedBy: 'flights')]
     #[ORM\JoinColumn(name: 'captain_id', referencedColumnName: 'id', nullable: false)]
+    #[Assert\NotBlank(message: 'Le capitaine du vol doit être renseigné')]
     private ?Captain $captain = null;
 
     /**
@@ -122,10 +95,41 @@ class Flight
     #[ORM\ManyToMany(targetEntity: Copilot::class, inversedBy: 'flights')]
     private Collection $copilots;
 
+    #[ORM\Column]
+    #[Assert\NotBlank(message: "Il est obligatoire de renseigner si le vol est direct ou non")]
+    private ?bool $isDirect = null;
+
+    #[ORM\Column]
+    private ?bool $isCanceled = null;
+
+    #[ORM\Column]
+    private ?bool $isLate = null;
+
+    #[ORM\ManyToOne(inversedBy: 'flights')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Company $Company = null;
+
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: false)]
+    #[Assert\NotBlank(message: "L'aéroport de départ est obligatoire")]
+    private ?Airport $airportDeparture = null;
+
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: false)]
+    #[Assert\NotBlank(message: "L'aéroport d'arrivée est obligatoire")]
+    private ?Airport $airportArrival = null;
+
+    /**
+     * @var Collection<int, Stop>
+     */
+    #[ORM\OneToMany(targetEntity: Stop::class, mappedBy: 'flight')]
+    private Collection $stops;
+
     public function __construct()
     {
         $this->reservations = new ArrayCollection();
         $this->copilots = new ArrayCollection();
+        $this->stops = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -203,45 +207,6 @@ class Flight
         return $this;
     }
 
-    /**
-     * Get the value of cityDeparture
-     */
-    public function getCityDeparture(): City
-    {
-        return $this->cityDeparture;
-    }
-
-    /**
-     * Set the value of cityDeparture
-     *
-     * @return  self
-     */
-    public function setCityDeparture($cityDeparture)
-    {
-        $this->cityDeparture = $cityDeparture;
-
-        return $this;
-    }
-
-    /**
-     * Get the value of cityArrival
-     */
-    public function getCityArrival(): City
-    {
-        return $this->cityArrival;
-    }
-
-    /**
-     * Set the value of cityArrival
-     *
-     * @return  self
-     */
-    public function setCityArrival($cityArrival)
-    {
-        $this->cityArrival = $cityArrival;
-
-        return $this;
-    }
 
     public function getAirplane(): ?Airplane
     {
@@ -287,6 +252,108 @@ class Flight
     public function removeCopilot(Copilot $copilot): static
     {
         $this->copilots->removeElement($copilot);
+
+        return $this;
+    }
+
+    public function isDirect(): ?bool
+    {
+        return $this->isDirect;
+    }
+
+    public function setIsDirect(bool $isDirect): static
+    {
+        $this->isDirect = $isDirect;
+
+        return $this;
+    }
+
+    public function isCanceled(): ?bool
+    {
+        return $this->isCanceled;
+    }
+
+    public function setIsCanceled(bool $isCanceled): static
+    {
+        $this->isCanceled = $isCanceled;
+
+        return $this;
+    }
+
+    public function isLate(): ?bool
+    {
+        return $this->isLate;
+    }
+
+    public function setIsLate(bool $isLate): static
+    {
+        $this->isLate = $isLate;
+
+        return $this;
+    }
+
+    public function getCompany(): ?Company
+    {
+        return $this->Company;
+    }
+
+    public function setCompany(?Company $Company): static
+    {
+        $this->Company = $Company;
+
+        return $this;
+    }
+
+    public function getAirportDeparture(): ?Airport
+    {
+        return $this->airportDeparture;
+    }
+
+    public function setAirportDeparture(?Airport $airportDeparture): static
+    {
+        $this->airportDeparture = $airportDeparture;
+
+        return $this;
+    }
+
+    public function getAirportArrival(): ?Airport
+    {
+        return $this->airportArrival;
+    }
+
+    public function setAirportArrival(?Airport $airportArrival): static
+    {
+        $this->airportArrival = $airportArrival;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Stop>
+     */
+    public function getStops(): Collection
+    {
+        return $this->stops;
+    }
+
+    public function addStop(Stop $stop): static
+    {
+        if (!$this->stops->contains($stop)) {
+            $this->stops->add($stop);
+            $stop->setFlight($this);
+        }
+
+        return $this;
+    }
+
+    public function removeStop(Stop $stop): static
+    {
+        if ($this->stops->removeElement($stop)) {
+            // set the owning side to null (unless already changed)
+            if ($stop->getFlight() === $this) {
+                $stop->setFlight(null);
+            }
+        }
 
         return $this;
     }

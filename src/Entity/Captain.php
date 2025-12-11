@@ -38,7 +38,7 @@ use Doctrine\Common\Collections\ArrayCollection;
             securityMessage: 'Accès réfusé. Vous n\'êtes pas admin'
         ),
         new Patch( // mettre à jour une ressource en particulier de façon partielle 
-            processor: UpdateCaptainStateProcessor::class // traitement personnalisé de la mise d'une ressource de type commandant de bord
+            processor: UpdateCaptainStateProcessor::class // traitement personnalisé de la mise à jour d'une ressource de type commandant de bord
         ),
         new Delete( // supprimer une ressource Commandant de bord 
             processor: DeleteCaptainStateProcessor::class

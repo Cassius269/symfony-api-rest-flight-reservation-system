@@ -9,8 +9,8 @@ class FlightResponseDto
 {
     public ?int $id = null;
     public ?int $airplaneId = null;
-    public ?CityRequestDto $cityDeparture = null; // ville de départ
-    public ?CityRequestDto $cityArrival = null; // ville d'arrivée
+    public ?AirportResponseDto $airportArrival = null; // aéroport d'arrivée
+    public ?AirportResponseDto $airportDeparture = null; // aéroport de départ
     public ?DateTime $dateDeparture = null;
     public ?DateTime $dateArrival = null;
 }

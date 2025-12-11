@@ -84,6 +84,10 @@ class AirplaneModel
     #[ORM\OneToMany(targetEntity: Airplane::class, mappedBy: 'airplaneModel', orphanRemoval: true)]
     private Collection $airplanes;
 
+    #[ORM\ManyToOne(inversedBy: 'airplaneModels')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Constructor $constructor = null;
+
     public function __construct()
     {
         $this->airplanes = new ArrayCollection();
@@ -144,6 +148,18 @@ class AirplaneModel
                 $airplane->setAirplaneModel(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getConstructor(): ?Constructor
+    {
+        return $this->constructor;
+    }
+
+    public function setConstructor(?Constructor $constructor): static
+    {
+        $this->constructor = $constructor;
 
         return $this;
     }
