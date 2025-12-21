@@ -13,14 +13,13 @@ class CopilotStateProvider implements ProviderInterface
     public function __construct(
         #[Autowire(service: 'api_platform.doctrine.orm.state.item_provider')]
         private ProviderInterface $itemProvider
-    )
-    {
-    }
+    ) {}
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): ?object
     {
         // Récuperer le copilote
         $data = $this->itemProvider->provide($operation, $uriVariables, $context);
 
+        // dd($data);
         // Préparer la réponse à renvoyer au client
         $copilotDto = new CopilotResponseDto;
         $copilotDto->id = $data->getId();
@@ -29,6 +28,5 @@ class CopilotStateProvider implements ProviderInterface
         $copilotDto->email = $data->getEmail();
 
         return $copilotDto;
-        // dd($data);
     }
 }

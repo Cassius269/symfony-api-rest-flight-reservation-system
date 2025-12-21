@@ -18,34 +18,37 @@ use App\State\UpdateCopilotProcessor;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Bundle\SecurityBundle\Security;
-use Symfony\Component\Filesystem\Path;
+
 
 #[ORM\Entity(repositoryClass: CopilotRepository::class)]
-#[ApiResource(// Déclarer l'entité Copilot en tant que ressource de l'API
+#[ApiResource( // Déclarer l'entité Copilot en tant que ressource de l'API
     operations: [
-        new Get(// récuperer un copilote à l'aide son Id
-            provider: CopilotStateProvider::class // traitement personnalisé de récupération d'un copilote
+        new Get( // récuperer un copilote à l'aide son Id
+            provider: CopilotStateProvider::class, // traitement personnalisé de récupération d'un copilote
+            security: "is_granted('ROLE_ADMIN')", // vérifier la permission de l'utilisateur
+            securityMessage: 'Vous devez avoir un rôle Admin pour accéder à cet endpoint'
         ),
         new GetCollection(
-            provider: CustomCopilotsGetCollectionProvider::class // traitement personnalisé de récupération de tous les copilotes
+            provider: CustomCopilotsGetCollectionProvider::class, // traitement personnalisé de récupération de tous les copilotes
+            security: "is_granted('ROLE_ADMIN')", // vérifier la permission de l'utilisateur
+            securityMessage: 'Vous devez avoir un rôle Admin pour accéder à cet endpoint'
         ),
         new Post( // enregistrer une nouvelle ressource utilisateur de type Copilote
             input: CopilotRequestDto::class, // DTO de récupération des données fournies par le client
             processor: InsertCopilotProcessor::class, // traitement personnalisé de l'ajout d'un copilote,
-            security:"is_granted('ROLE_ADMIN')",
+            security: "is_granted('COPILOT_CREATE, object)", // vérifier la permission de l'utilisateur sur la création de nouvel
             securityMessage: 'Vous devez avoir un rôle Admin pour accéder à cet endpoint'
         ),
-        new Patch(// mettre à jour un copilote à l'aide de son ID
-            input: CopilotRequestDto::class, 
+        new Patch( // mettre à jour un copilote à l'aide de son ID
+            input: CopilotRequestDto::class,
             processor: UpdateCopilotProcessor::class, // traitement personnalisé de la mise à jour d'un copilote à l'aide de son ID
             security: "is_granted('COPILOT_EDIT', object)",
             securityMessage: 'Vous \'êtes pas autorisé à modifier la ressource'
-        ), 
+        ),
         new Delete() // supprimer un copilote à l'aide de son ID
     ]
 
-)] 
+)]
 class Copilot extends User
 {
     /**
