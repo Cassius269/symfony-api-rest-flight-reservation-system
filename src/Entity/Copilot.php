@@ -9,13 +9,16 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use App\Dto\CopilotRequestDto;
+use App\Dto\CopilotResponseDto;
 use App\Repository\CopilotRepository;
 use App\State\CopilotStateProvider;
 use App\State\CustomCopilotsGetCollectionProvider;
 use App\State\InsertCopilotProcessor;
+use App\State\UpdateCopilotProcessor;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Filesystem\Path;
 
 #[ORM\Entity(repositoryClass: CopilotRepository::class)]
@@ -29,9 +32,16 @@ use Symfony\Component\Filesystem\Path;
         ),
         new Post( // enregistrer une nouvelle ressource utilisateur de type Copilote
             input: CopilotRequestDto::class, // DTO de récupération des données fournies par le client
-            processor: InsertCopilotProcessor::class // traitement personnalisé de l'ajout d'un copilote
+            processor: InsertCopilotProcessor::class, // traitement personnalisé de l'ajout d'un copilote,
+            security:"is_granted('ROLE_ADMIN')",
+            securityMessage: 'Vous devez avoir un rôle Admin pour accéder à cet endpoint'
         ),
-        new Patch(), // mettre à jour un copilote à l'aide de son ID
+        new Patch(// mettre à jour un copilote à l'aide de son ID
+            input: CopilotRequestDto::class, 
+            processor: UpdateCopilotProcessor::class, // traitement personnalisé de la mise à jour d'un copilote à l'aide de son ID
+            security: "is_granted('COPILOT_EDIT', object)",
+            securityMessage: 'Vous \'êtes pas autorisé à modifier la ressource'
+        ), 
         new Delete() // supprimer un copilote à l'aide de son ID
     ]
 
