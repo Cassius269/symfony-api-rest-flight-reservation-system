@@ -9,8 +9,10 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use App\Dto\AirportRequestDto;
+use App\Dto\AirportResponseDto;
 use App\Entity\Trait\DateTrait;
 use App\Repository\AirportRepository;
+use App\State\AirportStateProvider;
 use App\State\InsertAirportStateProcessor;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
@@ -28,13 +30,17 @@ use Symfony\Component\Validator\Constraints as Assert;
 )]
 #[ApiResource(
     operations: [
-        new Get(), // endpoint pour récuperer un aéroport depuis son ID
+        new Get( // endpoint pour récuperer un aéroport depuis son ID
+            provider: AirportStateProvider::class
+        ),
         new GetCollection(), // endpoint pour récuperer toutes les ressources de type aéroport
         new Post( // endpoint pour créer un nouvel aéroport
             input: AirportRequestDto::class, // support des données envoyés côtés clients
             processor: InsertAirportStateProcessor::class // traitement personnalisé pour la création d'un nouvel aéroport
         ),
-        new Patch(), // endpoint pour mettre à jour un aéroport 
+        new Patch( // endpoint pour mettre à jour un aéroport 
+
+        ),
         new Delete() // endpoint pour supprimer une ressource aéroport à l'aide de son ID
     ]
 )]
