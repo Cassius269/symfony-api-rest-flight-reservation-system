@@ -9,7 +9,6 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use App\Dto\CopilotRequestDto;
-use App\Dto\CopilotResponseDto;
 use App\Repository\CopilotRepository;
 use App\State\CopilotStateProvider;
 use App\State\CustomCopilotsGetCollectionProvider;

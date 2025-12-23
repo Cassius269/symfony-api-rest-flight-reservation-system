@@ -2,12 +2,42 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
+use App\Dto\AirportRequestDto;
 use App\Entity\Trait\DateTrait;
 use App\Repository\AirportRepository;
+use App\State\InsertAirportStateProcessor;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: AirportRepository::class)]
+#[UniqueEntity(
+    fields: ['name', 'city'],
+    message: 'Le nom de l\'aéroport doit unique dans une ville',
+    errorPath: 'name' // lier le message d'erreur au champs name de l'aéroport
+)]
+#[UniqueEntity(
+    fields: ['iataCode'],
+    message: 'Le code IATA doit être unique'
+)]
+#[ApiResource(
+    operations: [
+        new Get(), // endpoint pour récuperer un aéroport depuis son ID
+        new GetCollection(), // endpoint pour récuperer toutes les ressources de type aéroport
+        new Post( // endpoint pour créer un nouvel aéroport
+            input: AirportRequestDto::class, // support des données envoyés côtés clients
+            processor: InsertAirportStateProcessor::class // traitement personnalisé pour la création d'un nouvel aéroport
+        ),
+        new Patch(), // endpoint pour mettre à jour un aéroport 
+        new Delete() // endpoint pour supprimer une ressource aéroport à l'aide de son ID
+    ]
+)]
 class Airport
 {
     // Importer le trait des dates de création et mise à jour
@@ -21,7 +51,7 @@ class Airport
     #[ORM\Column(length: 40)]
     #[Assert\NotBlank(message: 'Le nom de l\'aéroport est obligatoire')]
     #[Assert\Length(
-        min: 10, 
+        min: 10,
         max: 40,
         minMessage: 'Le nom de l\'aéroport doit être composé de plus de 10 caractères minimum',
         maxMessage: 'Le nom de l\'aéroport doit avoir moins de 40 caractères'

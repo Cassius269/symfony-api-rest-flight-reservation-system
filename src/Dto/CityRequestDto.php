@@ -16,4 +16,5 @@ class CityRequestDto
 
     // #[Assert\NotBlank(message: "Le code postal est obligatoire")]
     public ?string $zipCode = null;
+    public ?string $timeZone = null;
 }

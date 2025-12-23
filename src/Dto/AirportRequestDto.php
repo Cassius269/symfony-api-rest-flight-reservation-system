@@ -4,9 +4,10 @@ namespace App\Dto;
 
 use Symfony\Component\Validator\Constraints as Assert;
 
-// Création d'un DTO pour le recueille des données de création d'une nouvelle ville
+// Création d'un DTO pour le recueille des données de création d'un nouvel aéroport
 class AirportRequestDto
 {
-    public ?string $name = null;
-    public ?string $country = null;
+    public string $name;
+    public string $codeIata;
+    public CityRequestDto $city;
 }
