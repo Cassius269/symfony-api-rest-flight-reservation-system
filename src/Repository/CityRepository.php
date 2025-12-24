@@ -3,7 +3,6 @@
 namespace App\Repository;
 
 use App\Entity\City;
-use App\Entity\Country;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -41,4 +40,16 @@ class CityRepository extends ServiceEntityRepository
     //            ->getOneOrNullResult()
     //        ;
     //    }
+
+    public function findCityByName(string $cityName, string $countryName): ?City
+    {
+        return $this->createQueryBuilder('c')
+            ->innerJoin('c.country', 'country') // jointure avec la table des pays
+            ->where('c.name = :cityName')
+            ->andWhere('country.name = :countryName')
+            ->setParameter('cityName', trim($cityName))
+            ->setParameter('countryName', trim($countryName))
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
 }

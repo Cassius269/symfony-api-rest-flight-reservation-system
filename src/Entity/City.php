@@ -72,11 +72,6 @@ class City
     #[Groups(['flight:read'])]
     private ?Country $country = null;
 
-    /**
-     * @var Collection<int, Flight>
-     */
-    #[ORM\OneToMany(targetEntity: Flight::class, mappedBy: 'cityDeparture')]
-    private Collection $flights;
 
     #[ORM\Column(length: 10, nullable: true)]
     private ?string $zipCode = null;
@@ -89,7 +84,6 @@ class City
 
     public function __construct()
     {
-        $this->flights = new ArrayCollection();
         $this->airports = new ArrayCollection();
     }
 
@@ -122,35 +116,6 @@ class City
         return $this;
     }
 
-    /**
-     * @return Collection<int, Flight>
-     */
-    public function getFlights(): Collection
-    {
-        return $this->flights;
-    }
-
-    public function addFlight(Flight $flight): static
-    {
-        if (!$this->flights->contains($flight)) {
-            $this->flights->add($flight);
-            $flight->setCityDeparture($this);
-        }
-
-        return $this;
-    }
-
-    public function removeFlight(Flight $flight): static
-    {
-        if ($this->flights->removeElement($flight)) {
-            // set the owning side to null (unless already changed)
-            if ($flight->getCityDeparture() === $this) {
-                $flight->setCityDeparture(null);
-            }
-        }
-
-        return $this;
-    }
 
     public function getZipCode(): ?string
     {

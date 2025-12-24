@@ -9,11 +9,12 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use App\Dto\AirportRequestDto;
-use App\Dto\AirportResponseDto;
 use App\Entity\Trait\DateTrait;
 use App\Repository\AirportRepository;
 use App\State\AirportStateProvider;
+use App\State\CustomAirportsGetCollectionProvider;
 use App\State\InsertAirportStateProcessor;
+use App\State\UpdateAirportProcessor;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -29,17 +30,21 @@ use Symfony\Component\Validator\Constraints as Assert;
     message: 'Le code IATA doit être unique'
 )]
 #[ApiResource(
+    security: "is_granted('ROLE_ADMIN')",
     operations: [
         new Get( // endpoint pour récuperer un aéroport depuis son ID
-            provider: AirportStateProvider::class
+            provider: AirportStateProvider::class // traitement personnalisé de récupération d'un aéroport
         ),
-        new GetCollection(), // endpoint pour récuperer toutes les ressources de type aéroport
+        new GetCollection( // endpoint pour récuperer toutes les ressources de type aéroport
+            provider: CustomAirportsGetCollectionProvider::class // traitement personnalisé de récupération des aéroports
+        ),
         new Post( // endpoint pour créer un nouvel aéroport
             input: AirportRequestDto::class, // support des données envoyés côtés clients
             processor: InsertAirportStateProcessor::class // traitement personnalisé pour la création d'un nouvel aéroport
         ),
         new Patch( // endpoint pour mettre à jour un aéroport 
-
+            input: AirportRequestDto::class,
+            processor: UpdateAirportProcessor::class
         ),
         new Delete() // endpoint pour supprimer une ressource aéroport à l'aide de son ID
     ]
