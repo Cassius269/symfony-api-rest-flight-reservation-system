@@ -16,37 +16,38 @@ class AirportRepository extends ServiceEntityRepository
         parent::__construct($registry, Airport::class);
     }
 
-//    /**
-//     * @return Airport[] Returns an array of Airport objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('a')
-//            ->andWhere('a.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('a.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
+    //    /**
+    //     * @return Airport[] Returns an array of Airport objects
+    //     */
+    //    public function findByExampleField($value): array
+    //    {
+    //        return $this->createQueryBuilder('a')
+    //            ->andWhere('a.exampleField = :val')
+    //            ->setParameter('val', $value)
+    //            ->orderBy('a.id', 'ASC')
+    //            ->setMaxResults(10)
+    //            ->getQuery()
+    //            ->getResult()
+    //        ;
+    //    }
 
-//    public function findOneBySomeField($value): ?Airport
-//    {
-//        return $this->createQueryBuilder('a')
-//            ->andWhere('a.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+    //    public function findOneBySomeField($value): ?Airport
+    //    {
+    //        return $this->createQueryBuilder('a')
+    //            ->andWhere('a.exampleField = :val')
+    //            ->setParameter('val', $value)
+    //            ->getQuery()
+    //            ->getOneOrNullResult()
+    //        ;
+    //    }
 
-    public function findDestinationByCityAndCountry(string $airportName, string $countryName): ?Airport
+    public function findDestination(string $airportName, string $countryName): ?Airport
     {
         return $this->createQueryBuilder('a') // alias de la table City
             // ->select('c.city', 'country.name')
-            ->innerJoin('c.city', 'city') // alias de la table city
-            ->where('c.name = :cityName')
+            ->innerJoin('a.city', 'c')
+            ->innerJoin('c.country', 'country')
+            ->where('a.name = :airportName')
             ->andWhere('country.name = :countryName')
             ->setParameter('airportName', $airportName)
             ->setParameter('countryName', $countryName)

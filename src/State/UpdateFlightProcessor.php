@@ -2,25 +2,25 @@
 
 namespace App\State;
 
-use DateTime;
 use App\Entity\Flight;
-use App\Dto\FlightResponseDto;
+use App\Dto\CityResponseDto;
+use App\Dto\AirportResponseDto;
 use ApiPlatform\Metadata\Operation;
 use App\Repository\FlightRepository;
-use Doctrine\ORM\EntityManagerInterface;
-use ApiPlatform\State\ProcessorInterface;
-use App\Dto\AirportResponseDto;
-use App\Dto\CityResponseDto;
-use App\Repository\AirplaneRepository;
 use App\Repository\AirportRepository;
 use App\Repository\CaptainRepository;
 use App\Repository\CompanyRepository;
 use App\Repository\CopilotRepository;
+use App\Repository\AirplaneRepository;
+use Doctrine\ORM\EntityManagerInterface;
+use ApiPlatform\State\ProcessorInterface;
+use App\Dto\FlightResponseDto;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 
-class InsertFlightStateProcessor implements ProcessorInterface
+
+class UpdateFlightProcessor implements ProcessorInterface
 {
     public function __construct(
         private AirplaneRepository $airplaneRepository,
@@ -85,7 +85,7 @@ class InsertFlightStateProcessor implements ProcessorInterface
             throw new UnprocessableEntityHttpException('La date d\'arrivée doit être supérieure à la date de départ');
         }
 
-        if ($data->dateDeparture <= new DateTime()) {
+        if ($data->dateDeparture <= new \DateTime()) {
             // renvoyer un code d'erreur 422 car problème logique des données
             throw new UnprocessableEntityHttpException('La date date départ ne doit pas être inférieure à la date du jour');
         }
@@ -113,12 +113,12 @@ class InsertFlightStateProcessor implements ProcessorInterface
                 throw new ConflictHttpException("Aucun commandant de bord trouvé avec les informations fournies");
             }
 
-            //Vérifier si le commandant de bord est disponible
-            $numberFleetsByCaptainInPeriod = $this->flightRepository->countOverlappingFlightsForCaptain($isExistCaptain->getId(), $data->dateDeparture, $data->dateArrival);
+            // //Vérifier si le commandant de bord est disponible
+            // $numberFleetsByCaptainInPeriod = $this->flightRepository->countOverlappingFlightsForCaptain($isExistCaptain->getId(), $data->dateDeparture, $data->dateArrival);
 
-            if ($numberFleetsByCaptainInPeriod > 0) {
-                throw new ConflictHttpException('Le commandant de bord est occupé pendant la même période du vol');
-            }
+            // if ($numberFleetsByCaptainInPeriod > 0) {
+            //     throw new ConflictHttpException('Le commandant de bord est occupé pendant la même période du vol');
+            // }
         }
 
 
@@ -250,6 +250,8 @@ class InsertFlightStateProcessor implements ProcessorInterface
         $flitghtDto->dateArrival = $flight->getDateArrival();
         $flitghtDto->airportDeparture = $airportDepartureDto;
         $flitghtDto->airportArrival = $airportArrivalDto;
+        $flitghtDto->createdAt = $flight->getCreatedAt();
+        $flitghtDto->updatedAt = $flight->getUpdatedAt();
 
         return $flitghtDto; // retourner le DTO contenant les informations du vol
     }

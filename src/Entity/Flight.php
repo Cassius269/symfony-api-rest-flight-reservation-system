@@ -13,34 +13,30 @@ use App\Repository\FlightRepository;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
 use App\Dto\FlightRequestDto;
-use App\Dto\FlightRequesteDto;
 use App\State\CustomFlightsGetCollection;
 use App\State\InsertFlightStateProcessor;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Validator\Constraints as Assert;
 use App\State\CustomGetCollectionAvailableFlightsProvider;
+use App\State\FlightStateProvider;
+use App\State\UpdateFlightProcessor;
 
 #[ORM\Entity(repositoryClass: FlightRepository::class)]
 #[ApiResource( // Déclaration de l'entité Flight comme ressource de l'API
-    security: "is_granted('ROLE_ADMIN')", // seul un utilisateur au rôle Admin peut avoir accès à toutes les opérations d'une ressource
+    security: "is_granted('ROLE_ADMIN')", // seul un utilisateur au rôle Admin peut avoir accès à toutes les opérations d'une ressource de type Flight
+    securityMessage: 'Accès interdit car vous n\'êtes pas admin',
     operations: [
-        new Get(), // récuperer une ressource vol d'avion à l'aide de son ID
-        new GetCollection(
-            // récuperer l'ensemble des ressources de type vol d'avion dans le serveur
-            provider: CustomFlightsGetCollection::class, // traitement personnalisé de récupération de tous les vols présents dans le serveur
-            paginationEnabled: true, // activer la pagination
-            paginationItemsPerPage: 15, // nbre d'items par page
-            paginationClientEnabled: true, // donner la possibilité au client de choisir d'activer ou pas la pagination
-            paginationClientItemsPerPage: true, // donner la possible au client de choisir le nombre de ressources par page
+        new Get( // récuperer une ressource vol d'avion à l'aide de son ID
+            provider: FlightStateProvider::class // traitement personnalisé pour récupérer un vol
+        ),
+        new GetCollection( // récuperer l'ensemble des ressources de type vol d'avion dans le serveur
             security: 'is_granted("PUBLIC_ACCESS")', // les utilisateurs non connectés peuvent avoir accès à l'ensemble des vols disponibles
+            provider: CustomFlightsGetCollection::class // traitement personnalisé pour récupérer tous les vols
+
         ), // récuperer l'ensemble des ressources de type vol d'avion présent dans le serveur
         new GetCollection(
             // récuperer l'ensemble des ressources de type vol d'avion disponibles dans le serveur
-            paginationEnabled: true, // activer la pagination
-            paginationItemsPerPage: 15, // nbre d'items par page
-            paginationClientEnabled: true, // donner la possibilité au client de choisir d'activer ou pas la pagination
-            paginationClientItemsPerPage: true, // donner la possible au client de choisir le nombre de ressources par page
             uriTemplate: '/get-available-flights', // création d'une route personnalisée (endpoint)
             name: 'getAvailableFlights',
             provider: CustomGetCollectionAvailableFlightsProvider::class,
@@ -50,9 +46,11 @@ use App\State\CustomGetCollectionAvailableFlightsProvider;
             // créer une nouvelle ressource vol d'avion
             processor: InsertFlightStateProcessor::class,
             input: FlightRequestDto::class,
-            securityMessage: 'Vous n\'êtes pas Admin'
         ),
-        new Patch(), // modifier une ressource vol d'avion à l'aide de son ID
+        new Patch( // modifier une ressource vol d'avion à l'aide de son ID
+            input: FlightRequestDto::class,
+            processor: UpdateFlightProcessor::class // traitement personnalisé de mise à jour de vol à l'aide de son ID
+        ),
         new Delete() // supprimer une ressource vol d'avion à l'aide de son ID
     ]
 )]
