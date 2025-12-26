@@ -7,19 +7,24 @@ use App\Dto\FlightResponseDto;
 use App\Dto\PassengerResponseDto;
 use ApiPlatform\Metadata\Operation;
 use App\Dto\ReservationResponseDto;
+use App\Repository\StatusRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use ApiPlatform\State\ProcessorInterface;
 use App\Repository\ReservationRepository;
 use Symfony\Bundle\SecurityBundle\Security;
+use ApiPlatform\Validator\Exception\ValidationException;
 use ApiPlatform\Symfony\Security\Exception\AccessDeniedException;
+use ApiPlatform\Validator\ValidatorInterface;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class UpdateReservationProcessor implements ProcessorInterface
 {
     // Injection de dépendance
     public function __construct(
         private ReservationRepository $reservationRepository,
+        private StatusRepository $statusRepository,
         private EntityManagerInterface $entityManager,
-        private Security $security
+        private ValidatorInterface $validator
     ) {}
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): object
@@ -27,69 +32,55 @@ class UpdateReservationProcessor implements ProcessorInterface
         // Vérifier l’existence de la ressource dans le serveur 
         $isExistReservation = $this->reservationRepository->findOneById($uriVariables['id']);
 
-        // Vérifier la permission d'accès à la ressource via un voter
-        if (!$this->security->isGranted('RESERVATION_EDIT', $isExistReservation)) {
-            throw new AccessDeniedException(
-                json_encode([
-                    'message' => 'désolé vous êtes ni Admin ni propriétaire de la réservation'
-                ])
-            );
-        };
+
         // Mettre à jour la réservation
-        if ($data->price) {
-            $isExistReservation->setPrice($data->price);
+        $isExistStatus = $this->statusRepository->findOneBy(['name' => $data->status]);
+
+        if (!$isExistStatus) {
+            throw new NotFoundHttpException('Le status n\'a pas a été trouvé dans le serveur');
         }
 
-        if ($data->passenger->firstname) {
-            $isExistReservation->getPassenger()->setFirstname($data->passenger->firstname);
-        }
-
-        if ($data->passenger->lastname) {
-            $isExistReservation->getPassenger()->setLastname($data->passenger->lastname);
-        }
-
-        if ($data->passenger->email) {
-            $isExistReservation->getPassenger()->setEmail($data->passenger->email);
-        }
-
+        $isExistReservation->setStatus($isExistStatus);
         $isExistReservation->setUpdatedAt(new \DateTime());
 
-        // Envoyer la ressource à jour au serveur
+
+        // Préparer la réponse à envoyer au client
+
+        // Vérifier les contraintes de validation d'envoyer la ressource au serveur
+        $errors = $this->validator->validate($isExistReservation);
+
+        if (count($errors ?? []) > 0) {
+            throw new ValidationException((string) $errors);
+        }
+
+        // Enregistrer et envoyer en base de données le nouveau passager (si création) et la réservation
         $this->entityManager->persist($isExistReservation);
         $this->entityManager->flush();
 
-        // Préparer la réponse à envoyer au client
-        $reservationResponseDto = new ReservationResponseDto;
-        $reservationResponseDto->id = $isExistReservation->getId();
-        $reservationResponseDto->numberFlightSeat = $isExistReservation->getNumberFlightSeat();
-        $reservationResponseDto->price = $isExistReservation->getPrice();
+        // dd($passenger);
 
-        $passengerResponseDto = new PassengerResponseDto;
-        $passengerResponseDto->firstname = $isExistReservation->getPassenger()->getFirstname();
-        $passengerResponseDto->lastname = $isExistReservation->getPassenger()->getLastname();
-        $passengerResponseDto->email = $isExistReservation->getPassenger()->getEmail();
+        // Préparer la réponse à retourner au client
+        $reservationDto = new ReservationResponseDto;
+        $reservationDto->id = $isExistReservation->getId();
+        $reservationDto->numberFlightSeat = $isExistReservation->getNumberFlightSeat();
+        $reservationDto->price = $isExistReservation->getPrice();
+        $reservationDto->passengerNameRecord = $isExistReservation->getPassengerNameRecord();
+        $reservationDto->status = $isExistReservation->getStatus()->getName();
+        $reservationDto->createdAt = $isExistReservation->getCreatedAt();
+        $reservationDto->updatedAt = $isExistReservation->getUpdatedAt();
 
+        $passengerDto = new PassengerResponseDto;
+        $passengerDto->firstname = $isExistReservation->getPassenger()->getFirstname();
+        $passengerDto->lastname = $isExistReservation->getPassenger()->getLastname();
+        $passengerDto->email = $isExistReservation->getPassenger()->getEmail();
 
-        $flightResponseDto = new FlightResponseDto;
-        $flightResponseDto->dateDeparture = $isExistReservation->getFlight()->getDateDeparture();
-        $flightResponseDto->dateArrival = $isExistReservation->getFlight()->getDateArrival();
+        $reservationDto->passenger = $passengerDto;
 
-        $cityDepartureDto = new CityRequestDto;
-        $cityDepartureDto->name = $isExistReservation->getFlight()->getcityDeparture()->getName();
-        $cityDepartureDto->country = $isExistReservation->getFlight()->getcityDeparture()->getCountry()->getName();
+        $flightDto = new FlightResponseDto;
+        $flightDto->company = $isExistReservation->getFlight()->getCompany()->getName();
 
-        $cityArrivalDto = new CityRequestDto;
-        $cityArrivalDto->name = $isExistReservation->getFlight()->getcityArrival()->getName();
-        $cityArrivalDto->country = $isExistReservation->getFlight()->getCityArrival()->getCountry()->getName();
+        $reservationDto->flight = $flightDto;
 
-
-        $flightResponseDto->cityDeparture = $cityDepartureDto;
-        $flightResponseDto->cityArrival = $cityArrivalDto;
-
-        $reservationResponseDto->passenger = $passengerResponseDto;
-        $reservationResponseDto->flight = $flightResponseDto;
-
-        // Retourner la réponse au client avec un DTO contenant les informations de la réservation du passager
-        return $reservationResponseDto;
+        return $reservationDto; // retouner les valeurs entrée si pas de traitement particulier en sortie
     }
 }

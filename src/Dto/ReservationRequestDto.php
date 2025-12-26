@@ -10,4 +10,5 @@ class ReservationRequestDto
     public ?string $price = null;
     public ?PassengerRequestDto $passenger = null;
     public ?FlightRequestDto $flight = null;
+    public ?string $status = null;
 }

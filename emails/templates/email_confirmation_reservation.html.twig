@@ -26,10 +26,10 @@
 			{{ reservation.flight.dateDeparture|date('d/m/Y H:i') }}</li>
 		<li>
 			<b>Ville de départ</b>:
-			{{ reservation.flight.cityDeparture.name|escape }}</li>
+			{{ reservation.flight.airportDeparture.name|escape }}</li>
 		<li>
 			<b>Ville d'arrivée</b>:
-			{{ reservation.flight.cityArrival.name|escape }}</li>
+			{{ reservation.flight.airportArrival.name|escape }}</li>
 		<li>
 			<b>Siège</b>:
 			{{ reservation.numberFlightSeat|escape }}

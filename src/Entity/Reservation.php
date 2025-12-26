@@ -53,8 +53,8 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
         ),
         new Post(
             // envoyer une nouvelle ressource Réservation au serveur
-            processor: ReservationStateProcessor::class, // traitement des données entrantes pour création de nouvelle ressource
             input: ReservationRequestDto::class,
+            processor: ReservationStateProcessor::class, // traitement des données entrantes pour création de nouvelle ressource
             security: "is_granted('ROLE_ADMIN') or is_granted('ROLE_PASSENGER')", // seul un utilisateur au rôle Admin  ou passager peut avoir accès à l'endpoint de création d'une nouvelle réservation
         ),
         new Patch( // mettre à jour une ressource Réservation partiellement

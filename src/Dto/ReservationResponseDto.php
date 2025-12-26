@@ -2,7 +2,7 @@
 
 namespace App\Dto;
 
-use App\Dto\FlightRequestDto;
+use DateTimeImmutable;
 
 // Création d'un DTO pour le transfert de données lors de la récupération de ressource de type Réservation
 class ReservationResponseDto
@@ -12,5 +12,8 @@ class ReservationResponseDto
     public ?float $price = null;
     public ?PassengerResponseDto $passenger = null;
     public ?FlightResponseDto $flight = null;
+    public ?string $status = null;
     public ?string $passengerNameRecord = null;
+    public ?\DateTimeImmutable $createdAt = null;
+    public ?\DateTime $updatedAt = null;
 }

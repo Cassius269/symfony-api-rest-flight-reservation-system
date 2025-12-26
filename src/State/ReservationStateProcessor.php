@@ -14,6 +14,11 @@ use Doctrine\ORM\EntityManagerInterface;
 use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\Validator\ValidatorInterface;
 use ApiPlatform\Validator\Exception\ValidationException;
+use App\Dto\CompanyResponseDto;
+use App\Dto\FlightResponseDto;
+use App\Dto\PassengerResponseDto;
+use App\Dto\ReservationResponseDto;
+use App\Repository\StatusRepository;
 use App\Service\PNRGenerationService;
 use App\Service\SeatReservationService;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -26,12 +31,10 @@ class ReservationStateProcessor implements ProcessorInterface
     public function __construct(
         private PassengerRepository $passengerRepository,
         private EntityManagerInterface $entityManager,
-        private UserPasswordHasherInterface $passwordHasher,
         private FlightRepository $flightRepository,
-        private CityRepository $cityRepository,
+        private StatusRepository $statusRepository,
         // private AirplaneModelRepository $airplaneModelRepository,
         private ValidatorInterface $validator,
-        private HashPasswordService $hashPasswordService,
         private SeatReservationService $seatReservationService,
         private EmailService $emailService,
         private PNRGenerationService $pnrGenerationService // injection de la dépendance de génération de PNR
@@ -53,70 +56,16 @@ class ReservationStateProcessor implements ProcessorInterface
             ]
         );
 
-        // dd($isExistPassenger);
-
-        // Si le passager n'existe pas, le créer
         if (!$isExistPassenger) {
-            $newPassenger = new Passenger();
-            $newPassenger->setCreatedAt(new \DateTimeImmutable())
-                ->setFirstname($passenger->firstname)
-                ->setLastname($passenger->lastname)
-                ->setEmail($passenger->email)
-                ->setRoles(["ROLE_PASSENGER"]);
-
-            // Hasher le mot de passe à l'aide d'un service personnalisé de hashage de mot de passage
-            $this->hashPasswordService->hashPassword("123456789", $newPassenger);
-
-            // Préparer la requête avant d'envoyer en base de données
-            $this->entityManager->persist($newPassenger);
+            throw new NotFoundHttpException('Le passager avec le mail ' . $data->passenger->email . ' n\'existe pas');
         }
-
+        // dd($isExistPassenger);
         // Ajouter un passager à un vol
-        // Rechercher les villes de départ et de destination à l'aide du nom de la ville et du pays
-
-        $isExistCityDeparture = $this->cityRepository->findDestinationByCityAndCountry($data->flight->getCityDeparture()->name, $data->flight->getCityDeparture()->country);
-
-        $isExistCityArrival = $this->cityRepository->findDestinationByCityAndCountry($data->flight->getCityArrival()->name, $data->flight->getCityArrival()->country);
-
-        // Rechercher l'avion à assigner
-        // Vérifier si les villes de départ et d'arrivée ainsi que l'avion pour le vol existent dans le serveur
-        if (!$isExistCityArrival || !$isExistCityDeparture) {
-
-            if (!$isExistCityArrival) {
-                throw new NotFoundHttpException(json_encode([ // renvoyer un code d'erreur 404 car ressource non trouvée
-                    'message' => 'La ville d\'arrivée choisie est introuvable dans le système'
-                ]));
-            }
-
-            if (!$isExistCityDeparture) {
-                throw new NotFoundHttpException(json_encode([ // renvoyer un code d'erreur 404 car ressource non trouvée
-                    'message' => 'La ville de départ choisie est introuvable dans le système'
-                ]));
-            }
-        }
-
-        // Vérifier si les villes de destination et d'arrivée sont bien differentes
-        if ($isExistCityDeparture == $isExistCityArrival) {
-            throw new UnprocessableEntityHttpException(json_encode([ // renvoyer un code d'erreur 422 car problème logique des données
-                'message' => 'Les villes de départ et de destination doivent être differentes'
-            ]));
-        }
-
-        // Vérifier si la date d'arrivée est supérieure à la date de départ
-        if ($data->flight->dateArrival <= $data->flight->dateDeparture) {
-            throw new UnprocessableEntityHttpException(json_encode([
-                'message' => 'La date d\'arrivée doit être supérieure à la date de départ'
-            ]));
-        }
 
         // recherche de vol
-        $isExistFlight = $this->flightRepository->findOneBy([
-            'dateDeparture' => $data->flight->dateDeparture,
-            'dateArrival' => $data->flight->dateArrival,
-            'cityDeparture' => $isExistCityDeparture,
-            'cityArrival' => $isExistCityArrival,
-        ]);
+        $isExistFlight = $this->flightRepository->find($data->flight->id);
 
+        // dd($isExistFlight);
 
         // Si le vol n'existe pas, renvoyer une erreur 404 au client
         if (!$isExistFlight) {
@@ -138,11 +87,16 @@ class ReservationStateProcessor implements ProcessorInterface
             ]));
         }
 
+        // Chercher le status par défaut "En cours"
+        $status = $this->statusRepository->findOneBy(['name' => 'En cours']);
+        // dd($status);
+
         $reservation = new Reservation();
         $reservation->setCreatedAt(new \DateTimeImmutable())
             ->setPrice(800) // prix par défaut 800euros
             ->setFlight($isExistFlight)
-            ->setPassenger($isExistPassenger ?? $newPassenger)
+            ->setPassenger($isExistPassenger)
+            ->setStatus($status)
             ->setPassengerNameRecord($this->pnrGenerationService->attributePNRNumber());
 
         $this->seatReservationService->attributeASeat($isExistFlight, $reservation); // attribuer un siège au passager de la réservation
@@ -162,7 +116,27 @@ class ReservationStateProcessor implements ProcessorInterface
         // Envoyer un mail de confirmation au passage
         $this->emailService->confirmReservation($reservation); // récuperer les informations depuis le nouvel objet de réservation nouvellement créé 
 
-        // Renvoyer une réponse JSON au client en cas de réussite de la création de la réservation pour un passager
-        return $data; // retouner les valeurs entrée si pas de traitement particulier en sortie
+        // Préparer la réponse à retourner au client
+        $reservationDto = new ReservationResponseDto;
+        $reservationDto->id = $reservation->getId();
+        $reservationDto->numberFlightSeat = $reservation->getNumberFlightSeat();
+        $reservationDto->price = $reservation->getPrice();
+        $reservationDto->passengerNameRecord = $reservation->getPassengerNameRecord();
+        $reservationDto->createdAt = $reservation->getCreatedAt();
+        $reservationDto->updatedAt = $reservation->getUpdatedAt();
+
+        $passengerDto = new PassengerResponseDto;
+        $passengerDto->firstname = $reservation->getPassenger()->getFirstname();
+        $passengerDto->lastname = $reservation->getPassenger()->getLastname();
+        $passengerDto->email = $reservation->getPassenger()->getEmail();
+
+        $reservationDto->passenger = $passengerDto;
+
+        $flightDto = new FlightResponseDto;
+        $flightDto->company = $reservation->getFlight()->getCompany()->getName();
+
+        $reservationDto->flight = $flightDto;
+
+        return $reservationDto; // retouner les valeurs entrée si pas de traitement particulier en sortie
     }
 }
