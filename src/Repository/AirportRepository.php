@@ -52,6 +52,7 @@ class AirportRepository extends ServiceEntityRepository
             ->setParameter('airportName', $airportName)
             ->setParameter('countryName', $countryName)
             ->getQuery()
+            ->setMaxResults(1)
             ->getOneOrNullResult();
     }
 }

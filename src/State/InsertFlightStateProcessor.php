@@ -109,6 +109,8 @@ class InsertFlightStateProcessor implements ProcessorInterface
                 'email' => $data->captain->email
             ]);
 
+            // dd($isExistCaptain);
+
             if (!$isExistCaptain) {
                 throw new ConflictHttpException("Aucun commandant de bord trouvé avec les informations fournies");
             }
@@ -226,7 +228,7 @@ class InsertFlightStateProcessor implements ProcessorInterface
 
         // Retourner une réponse au client (exemple navigateur ou Postman)
         $airportDepartureDto = new AirportResponseDto; // Exceptionnellement j'ai utilisé ce DTO de requête car la structure de données n'est pas pareille qu'avec le DTO CityResponseDto
-        $airportDepartureDto->name = $flight->getAirportDeparture()->getCity()->getCountry()->getName();
+        $airportDepartureDto->name = $flight->getAirportDeparture()->getName();
 
         $cityDepartureDto = new CityResponseDto;
         $cityDepartureDto->name = $flight->getAirportDeparture()->getCity()->getName();
@@ -234,7 +236,7 @@ class InsertFlightStateProcessor implements ProcessorInterface
         $airportDepartureDto->city = $cityDepartureDto;
 
         $airportArrivalDto = new AirportResponseDto; // Exceptionnellement j'ai utilisé ce DTO de requête car la structure de données n'est pas pareille qu'avec le DTO CityResponseDto
-        $airportArrivalDto->name = $flight->getAirportArrival()->getCity()->getCountry()->getName();
+        $airportArrivalDto->name = $flight->getAirportArrival()->getName();
 
 
         $cityArrivalDto = new CityResponseDto;
