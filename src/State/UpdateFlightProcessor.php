@@ -4,6 +4,7 @@ namespace App\State;
 
 use App\Entity\Flight;
 use App\Dto\CityResponseDto;
+use App\Dto\FlightResponseDto;
 use App\Dto\AirportResponseDto;
 use ApiPlatform\Metadata\Operation;
 use App\Repository\FlightRepository;
@@ -14,7 +15,6 @@ use App\Repository\CopilotRepository;
 use App\Repository\AirplaneRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use ApiPlatform\State\ProcessorInterface;
-use App\Dto\FlightResponseDto;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
@@ -34,13 +34,18 @@ class UpdateFlightProcessor implements ProcessorInterface
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): object
     {
+        // Récuperer l'objet Passager présent en BDD avant mise à jour
+        $flight = $this->flightRepository->findOneById($uriVariables['id']);
+
+        if (!$flight) {
+            throw new NotFoundHttpException('Aucun vol avec l\'id renseigné');
+        }
+
         // Rechercher les villes de départ et de destination à l'aide du nom de la ville et du pays
         $isExistAirportDeparture = $this->airportRepository->findDestination($data->airportDeparture->name, $data->airportDeparture->city->countryName);
 
         $isExistAirportArrival = $this->airportRepository->findDestination($data->airportArrival->name, $data->airportArrival->city->countryName);
 
-        // dd($isExistAirportDeparture);
-        // dd($isExistAirportArrival);
         // Rechercher l'avion à assigner
         $isExistAirplane = $this->airplaneRepository->findOneBy(
             [
@@ -170,7 +175,8 @@ class UpdateFlightProcessor implements ProcessorInterface
             'dateArrival' => $data->dateArrival,
             'airportDeparture' => $isExistAirportDeparture,
             'airportArrival' => $isExistAirportArrival,
-            'airplane' => $isExistAirplane
+            'airplane' => $isExistAirplane,
+            'price' => $data->price ?? $flight->getPrice()
         ]);
 
 
@@ -187,14 +193,14 @@ class UpdateFlightProcessor implements ProcessorInterface
         }
 
         // Ecrire la requête et envoyer au serveur le nouveau vol d'avion
-        $flight = new Flight;
         $flight->setCreatedAt(new \DateTimeImmutable())
             ->setAirportDeparture($isExistAirportDeparture)
             ->setAirportArrival($isExistAirportArrival)
             ->setAirplane($isExistAirplane)
-            ->setIsDirect(true)
-            ->setIsCanceled(false)
-            ->setIsLate(false)
+            ->setPrice($data->price ?? $flight->getPrice())
+            ->setIsDirect($data->isDirect ?? $flight->isDirect())
+            ->setIsCanceled($data->isCanceled ?? $flight->isCanceled())
+            ->setIsLate($data->isLate ?? $flight->isLate())
             ->setDateDeparture($data->dateDeparture)
             ->setDateArrival($data->dateArrival)
             ->setCompany($isCompanyExist);
@@ -250,6 +256,10 @@ class UpdateFlightProcessor implements ProcessorInterface
         $flitghtDto->dateArrival = $flight->getDateArrival();
         $flitghtDto->airportDeparture = $airportDepartureDto;
         $flitghtDto->airportArrival = $airportArrivalDto;
+        $flitghtDto->price = $flight->getPrice();
+        $flitghtDto->isDirect = $flight->isDirect();
+        $flitghtDto->isLate = $flight->isLate();
+        $flitghtDto->isCanceled = $flight->isCanceled();
         $flitghtDto->createdAt = $flight->getCreatedAt();
         $flitghtDto->updatedAt = $flight->getUpdatedAt();
 

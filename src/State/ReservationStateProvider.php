@@ -2,7 +2,6 @@
 
 namespace App\State;
 
-use App\Dto\CityRequestDto;
 use App\Dto\FlightResponseDto;
 use App\Dto\PassengerResponseDto;
 use ApiPlatform\Metadata\Operation;
@@ -11,6 +10,8 @@ use ApiPlatform\State\ProviderInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use ApiPlatform\Symfony\Security\Exception\AccessDeniedException;
+use App\Dto\AirportResponseDto;
+use App\Dto\CityResponseDto;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class ReservationStateProvider implements ProviderInterface
@@ -32,9 +33,8 @@ class ReservationStateProvider implements ProviderInterface
 
         // Refuser l'accès si l'utilasateur n'est pas Admin ou propriétaire de la réservation
         if (!$this->security->isGranted('RESERVATION_VIEW', $reservation)) {
-            throw new AccessDeniedException(json_encode([ // renvoyer un code d'erreur 403 car accès ressource interdit
-                'message' => 'accès refusé'
-            ]));
+            // renvoyer un code d'erreur 403 car accès ressource interdit
+            throw new AccessDeniedException('accès refusé');
         };
 
         // Préparer un DTO à retourner au client
@@ -42,6 +42,10 @@ class ReservationStateProvider implements ProviderInterface
         $reservationDto->id = $reservation->getId();
         $reservationDto->numberFlightSeat = $reservation->getNumberFlightSeat();
         $reservationDto->price = $reservation->getPrice();
+        $reservationDto->status = $reservation->getStatus()->getName();
+        $reservationDto->passengerNameRecord = $reservation->getPassengerNameRecord();
+        $reservationDto->createdAt = $reservation->getCreatedAt();
+        $reservationDto->updatedAt = $reservation->getUpdatedAt();
 
         $passengerDto = new PassengerResponseDto;
         $passengerDto->firstname = $reservation->getPassenger()->getFirstname();
@@ -53,16 +57,28 @@ class ReservationStateProvider implements ProviderInterface
         $reservationDto->passenger = $passengerDto;
         $reservationDto->flight = $flightDto;
 
-        $cityDeparture = new CityRequestDto;
-        $cityDeparture->name = $reservation->getFlight()->getCityDeparture()->getName();
-        $cityDeparture->country = $reservation->getFlight()->getCityDeparture()->getCountry()->getName();
+        $cityDeparture = new CityResponseDto;
+        $cityDeparture->name = $reservation->getFlight()->getAirportDeparture()->getCity()->getName();
+        $cityDeparture->countryName = $reservation->getFlight()->getAirportDeparture()->getCity()->getCountry()->getName();
 
-        $cityArrival = new CityRequestDto;
-        $cityArrival->name = $reservation->getFlight()->getCityArrival()->getName();
-        $cityArrival->country = $reservation->getFlight()->getCityArrival()->getCountry()->getName();
 
-        $flightDto->cityDeparture = $cityDeparture;
-        $flightDto->cityArrival = $cityArrival;
+        $cityArrival = new CityResponseDto;
+        $cityArrival->name = $reservation->getFlight()->getAirportArrival()->getCity()->getName();
+        $cityArrival->countryName = $reservation->getFlight()->getAirportArrival()->getCity()->getCountry()->getName();
+
+        $airportDeparture = new AirportResponseDto();
+        $airportArrival = new AirportResponseDto();
+        $airportDeparture->city = $cityDeparture;
+        $airportArrival->city = $cityArrival;
+
+        $flightDto->airportDeparture = $airportDeparture;
+        $flightDto->airportArrival = $airportArrival;
+
+        if ($reservation->getFlight()->isDirect()) {
+            // dd('vol direct');
+            $flightDto->dateDeparture = $reservation->getFlight()->getDateDeparture();
+            $flightDto->dateArrival = $reservation->getFlight()->getDateArrival();
+        }
 
         return $reservationDto;
     }

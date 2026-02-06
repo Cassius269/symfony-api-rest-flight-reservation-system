@@ -2,19 +2,15 @@
 
 namespace App\State;
 
-use App\Entity\Passenger;
 use App\Entity\Reservation;
 use App\Service\EmailService;
-use App\Repository\CityRepository;
 use ApiPlatform\Metadata\Operation;
 use App\Repository\FlightRepository;
-use App\Service\HashPasswordService;
 use App\Repository\PassengerRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\Validator\ValidatorInterface;
 use ApiPlatform\Validator\Exception\ValidationException;
-use App\Dto\CompanyResponseDto;
 use App\Dto\FlightResponseDto;
 use App\Dto\PassengerResponseDto;
 use App\Dto\ReservationResponseDto;

@@ -20,6 +20,7 @@ use App\State\ReservationStateProcessor;
 use App\Repository\ReservationRepository;
 use App\State\UpdateReservationProcessor;
 use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use App\Dto\ReservationResponseDto;
 use App\State\CustomReservationGetCollectionStateProvider;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;

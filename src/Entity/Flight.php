@@ -71,6 +71,12 @@ class Flight
     #[Assert\NotBlank(message: "Une date d'arrivée doit être renseignée")]
     private ?\DateTimeInterface $dateArrival = null;
 
+    #[ORM\Column(type: Types::DECIMAL, precision: 6, scale: 2)]
+    #[Assert\NotBlank(message: "Le prix d'une réservation est obligatoire")]
+    #[Assert\PositiveOrZero(message: 'Le prix doit être supérieur ou égal à zéro')] // le prix peut être égal à zéro dans certains cas par exemple après un avoir ou une promo
+    private ?string $price = null;
+
+
     /**
      * @var Collection<int, Reservation>
      */
@@ -122,6 +128,10 @@ class Flight
      */
     #[ORM\OneToMany(targetEntity: Stop::class, mappedBy: 'flight')]
     private Collection $stops;
+
+    #[ORM\ManyToOne(inversedBy: 'flights')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Status $status = null;
 
     public function __construct()
     {
@@ -352,6 +362,30 @@ class Flight
                 $stop->setFlight(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getPrice(): ?string
+    {
+        return $this->price;
+    }
+
+    public function setPrice(string $price): static
+    {
+        $this->price = $price;
+
+        return $this;
+    }
+
+    public function getStatus(): ?Status
+    {
+        return $this->status;
+    }
+
+    public function setStatus(?Status $status): static
+    {
+        $this->status = $status;
 
         return $this;
     }

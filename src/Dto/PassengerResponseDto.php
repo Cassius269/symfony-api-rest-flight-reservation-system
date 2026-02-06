@@ -10,4 +10,5 @@ class PassengerResponseDto
     public ?string $firstname = null;
     public ?string $lastname = null;
     public ?string $email = null;
+    public ?string $passengerNameRecord = null;
 }

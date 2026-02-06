@@ -9,6 +9,8 @@ use ApiPlatform\Metadata\Operation;
 use App\Dto\ReservationResponseDto;
 use ApiPlatform\State\ProviderInterface;
 use ApiPlatform\Symfony\Security\Exception\AccessDeniedException;
+use App\Dto\AirportResponseDto;
+use App\Dto\CityResponseDto;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
@@ -34,35 +36,41 @@ class CustomReservationGetCollectionStateProvider implements ProviderInterface
             $reservationDto->id = $reservation->getId();
             $reservationDto->numberFlightSeat = $reservation->getNumberFlightSeat();
             $reservationDto->price = $reservation->getPrice();
-            $reservationDto->passengerNameRecord = $reservation->getPassengerNameRecord();
+            $reservationDto->status = $reservation->getStatus()->getName();
 
-            // création de Dto imbriqué du passager
+            // Création d'un Dto imbriqué de passager
             $passengerDto = new PassengerResponseDto;
             $passengerDto->firstname = $reservation->getPassenger()->getFirstname();
             $passengerDto->lastname = $reservation->getPassenger()->getLastname();
             $passengerDto->email = $reservation->getPassenger()->getEmail();
 
-            // création de Dto imbriqué du vol
             $flightDto = new FlightResponseDto;
-            $flightDto->dateDeparture = $reservation->getFlight()->getDateDeparture();
-            $flightDto->dateArrival = $reservation->getFlight()->getDateArrival();
 
-            // Création d'un Dto imbriqué de la ville de départ
-            $cityDepartureDto = new CityRequestDto;
-            $cityDepartureDto->name = $reservation->getFlight()->getCityDeparture()->getName();
-            $cityDepartureDto->country = $reservation->getFlight()->getCityDeparture()->getCountry()->getName();
-
-            // Création d'un Dto imbriqué de la ville d'arrivée
-            $cityArrivalDto = new CityRequestDto;
-            $cityArrivalDto->name = $reservation->getFlight()->getCityArrival()->getName();
-            $cityArrivalDto->country = $reservation->getFlight()->getCityArrival()->getCountry()->getName();
-
-            // Compléter les informations du DTO de la réservation
             $reservationDto->passenger = $passengerDto;
-            $reservationDto->flight =  $flightDto;
-            $flightDto->cityDeparture = $cityDepartureDto;
-            $flightDto->cityArrival = $cityArrivalDto;
+            $reservationDto->flight = $flightDto;
 
+            // Création d'un Dto imbriqué de la ville de départ pour chaque érservation
+            $cityDeparture = new CityResponseDto;
+            $cityDeparture->name = $reservation->getFlight()->getAirportDeparture()->getCity()->getName();
+            $cityDeparture->countryName = $reservation->getFlight()->getAirportDeparture()->getCity()->getCountry()->getName();
+
+
+            $cityArrival = new CityResponseDto;
+            $cityArrival->name = $reservation->getFlight()->getAirportArrival()->getCity()->getName();
+            $cityArrival->countryName = $reservation->getFlight()->getAirportArrival()->getCity()->getCountry()->getName();
+
+            $airportDeparture = new AirportResponseDto();
+            $airportArrival = new AirportResponseDto();
+            $airportDeparture->city = $cityDeparture;
+            $airportArrival->city = $cityArrival;
+
+            $flightDto->airportDeparture = $airportDeparture;
+            $flightDto->airportArrival = $airportArrival;
+
+            if ($reservation->getFlight()->isDirect()) {
+                $flightDto->dateDeparture = $reservation->getFlight()->getDateDeparture();
+                $flightDto->dateArrival = $reservation->getFlight()->getDateArrival();
+            }
             // Ajouter chaque réservation trouvée à la liste des résultats sous forme de tableau
             $results[] = $reservationDto;
         };

@@ -15,6 +15,8 @@ class FlightResponseDto
     public ?AirportResponseDto $airportDeparture = null; // aéroport de départ
     public ?DateTime $dateDeparture = null;
     public ?DateTime $dateArrival = null;
+    public ?float $price = null;
+    public ?string $status = null;
     public ?bool $isDirect = null;
     public ?bool $isCanceled = null;
     public ?bool $isLate = null;

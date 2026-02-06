@@ -32,9 +32,9 @@ class PassengerStateProvider implements ProviderInterface
         // Vérifier la permission d'accès à la ressource
         if (!$this->security->isGranted('PASSENGER_VIEW', $passenger)) {
             throw new AccessDeniedException(
-                json_encode([
-                    'message' => 'désolé vous êtes ni Admin ou auteur des informations personnelles'
-                ])
+                json_encode(
+                    'désolé vous êtes ni Admin ou auteur des informations personnelles'
+                )
             );
         };
 

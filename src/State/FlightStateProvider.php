@@ -8,6 +8,7 @@ use App\Dto\AirportResponseDto;
 use App\Dto\CityResponseDto;
 use App\Dto\FlightResponseDto;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class FlightStateProvider implements ProviderInterface
 {
@@ -20,9 +21,12 @@ class FlightStateProvider implements ProviderInterface
 
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): ?FlightResponseDto
     {
+        // Récupérer le vol
         $data = $this->itemProvider->provide($operation, $uriVariables, $context);
 
-        // dd($data->isDirect());
+        if (!$data) { // s'il n'ya pas de réservation trouvée envoyer un message d'erreur avec le code 404
+            throw new NotFoundHttpException('Aucun vol trouvé avec l\'id fourni');
+        }
 
         // Préparer la réponse à retourner au client
         $flightResponseDto = new FlightResponseDto;

@@ -16,6 +16,7 @@ use App\Repository\AirportRepository;
 use App\Repository\CaptainRepository;
 use App\Repository\CompanyRepository;
 use App\Repository\CopilotRepository;
+use App\Repository\StatusRepository;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
@@ -29,11 +30,14 @@ class InsertFlightStateProcessor implements ProcessorInterface
         private CopilotRepository $copilotRepository,
         private EntityManagerInterface $entityManager,
         private AirportRepository $airportRepository,
-        private CompanyRepository $companyRepository
+        private CompanyRepository $companyRepository,
+        private StatusRepository $statusRepository
     ) {}
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): object
     {
+        // dd($this->statusRepository->findOneBy(["name" => "Confirmé"]));
+
         // Rechercher les villes de départ et de destination à l'aide du nom de la ville et du pays
         $isExistAirportDeparture = $this->airportRepository->findDestination($data->airportDeparture->name, $data->airportDeparture->city->countryName);
 
@@ -194,6 +198,8 @@ class InsertFlightStateProcessor implements ProcessorInterface
             ->setAirportDeparture($isExistAirportDeparture)
             ->setAirportArrival($isExistAirportArrival)
             ->setAirplane($isExistAirplane)
+            ->setStatus($this->statusRepository->findOneBy(["name" => "Confirmé"]))
+            ->setPrice($data->price)
             ->setIsDirect(true)
             ->setIsCanceled(false)
             ->setIsLate(false)
@@ -252,6 +258,7 @@ class InsertFlightStateProcessor implements ProcessorInterface
         $flitghtDto->dateArrival = $flight->getDateArrival();
         $flitghtDto->airportDeparture = $airportDepartureDto;
         $flitghtDto->airportArrival = $airportArrivalDto;
+        $flitghtDto->status = $flight->getStatus()->getName();
 
         return $flitghtDto; // retourner le DTO contenant les informations du vol
     }

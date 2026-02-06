@@ -14,6 +14,8 @@ use App\Entity\Trait\DateTrait;
 use App\Repository\StatusRepository;
 use App\State\InsertStatusProcessor;
 use App\State\StatusStateProvider;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -61,6 +63,17 @@ class Status
     )]
     private ?string $name = null;
 
+    /**
+     * @var Collection<int, Flight>
+     */
+    #[ORM\OneToMany(targetEntity: Flight::class, mappedBy: 'status')]
+    private Collection $flights;
+
+    public function __construct()
+    {
+        $this->flights = new ArrayCollection();
+    }
+
     public function getId(): ?int
     {
         return $this->id;
@@ -74,6 +87,36 @@ class Status
     public function setName(string $name): static
     {
         $this->name = $name;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Flight>
+     */
+    public function getFlights(): Collection
+    {
+        return $this->flights;
+    }
+
+    public function addFlight(Flight $flight): static
+    {
+        if (!$this->flights->contains($flight)) {
+            $this->flights->add($flight);
+            $flight->setStatus($this);
+        }
+
+        return $this;
+    }
+
+    public function removeFlight(Flight $flight): static
+    {
+        if ($this->flights->removeElement($flight)) {
+            // set the owning side to null (unless already changed)
+            if ($flight->getStatus() === $this) {
+                $flight->setStatus(null);
+            }
+        }
 
         return $this;
     }
