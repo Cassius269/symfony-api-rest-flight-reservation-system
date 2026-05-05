@@ -5,8 +5,8 @@ controllers:
   type: attribute
 
 auth: # route de génération de token JWT
-  path: "/auth"
+  path: "/api/auth"
   methods: ["POST"]
 
 api_refresh_token: # route de rafraichissement de token
-  path: /token/refresh
+  path: /api/token/refresh

@@ -27,7 +27,7 @@ class PassengerStateProcessor implements ProcessorInterface
         // dd($data);
 
         // Si aucun utilisateur n'utilise le mail
-        if (!isset($data->firstname) || !isset($data->lastname) || !isset($data->email) || !isset($data->firstname)) {
+        if (!isset($data->firstname) || !isset($data->lastname) || !isset($data->email)) {
             throw new UnprocessableEntityHttpException(json_encode(
                 [
                     'message' => 'réponse mal formatée'

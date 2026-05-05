@@ -18,14 +18,14 @@ security:
       #   provider: app_user_provider
       stateless: true # l'application ne s'appuie pas sur les sesssions pour fonctionner
       json_login:
-        check_path: /auth # The name in routes.yaml is enough for mapping
+        check_path: /api/auth # The name in routes.yaml is enough for mapping
         username_path: email
         password_path: password
         success_handler: lexik_jwt_authentication.handler.authentication_success
         failure_handler: lexik_jwt_authentication.handler.authentication_failure
       jwt: ~ # cette ligne est essentielle pour indiquer à l'application d'intercepter les token et les vérifier
       refresh_jwt: # désignation de la route de rafraîchissement de token JWT dans le système de parefeu
-        check_path: /token/refresh
+        check_path: /api/token/refresh
       entry_point: jwt # le pare-feu par défaut est le jwt
 
       # activate different ways to authenticate
@@ -40,8 +40,8 @@ security:
     # - { path: ^/admin, roles: ROLE_ADMIN }
     # - { path: ^/profile, roles: ROLE_USER }
     - { path: ^/api/$, roles: PUBLIC_ACCESS } # la page de Swagger UI ne necessite pas d'authentication de l'utilisateur
-    - { path: ^/auth, roles: PUBLIC_ACCESS } # la page "/auth" ne necessite pas d'authentication pour permettre la génération de token aux utilisateurs qui s'authentifient
-    - { path: ^/token/refresh, roles: PUBLIC_ACCESS } # la route de rafraichissement est accessible pour tous les utilisateurs pour permettre la régenération de token d'authentification
+    - { path: ^/api/auth$, roles: PUBLIC_ACCESS } # la page "/auth" ne necessite pas d'authentication pour permettre la génération de token aux utilisateurs qui s'authentifient
+    - { path: ^/api/token/refresh$, roles: PUBLIC_ACCESS } # la route de rafraichissement est accessible pour tous les utilisateurs pour permettre la régenération de token d'authentification
     - { path: ^/api/, roles: IS_AUTHENTICATED_FULLY } # toutes les routes commençant par "/api/ doivent être accédés avec un token valide à chaque fois
 
 when@test:

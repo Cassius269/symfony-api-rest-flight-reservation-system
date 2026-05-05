@@ -3,3 +3,19 @@ lexik_jwt_authentication:
   public_key: "%env(resolve:JWT_PUBLIC_KEY)%"
   pass_phrase: "%env(JWT_PASSPHRASE)%"
   token_ttl: 3600 #   token_ttl: 3600 #durée de vies d'une heure du token d'accès
+
+  # remove_token_from_body_when_cookies_used: false # ← false = garder le token dans la réponse JSON
+
+  token_extractors:
+    cookie:
+      enabled: true
+      name: token # ← nom A
+
+  set_cookies:
+    token: # ← doit être identique au nom A
+      lifetime: null
+      samesite: lax
+      path: /
+      domain: null # ← mettre null ou retirer cette ligne en dev
+      secure: false # ← false obligatoire si tu es en HTTP (proxy Vite)
+      httpOnly: true

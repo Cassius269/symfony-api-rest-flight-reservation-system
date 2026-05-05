@@ -3,3 +3,11 @@ gesdinet_jwt_refresh_token:
   return_expiration: true # retourner un token expirable par défaut
   ttl: 2678400 # token de rafraichissement valide pendant 31 jours
   single_use: false # rendre les refresh token à usage multiple
+
+  #Passer en mode cookie des informations du refresh token
+  cookie:
+    enabled: true
+    same_site: lax
+    secure: false # false en dev HTTP
+    http_only: true # ← inaccessible en JS
+    path: /api/token/refresh # limité à la route refresh uniquement

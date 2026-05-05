@@ -37,8 +37,8 @@ use App\State\PassengerStateProcessor;
         ),
         new Post( // envoyer une nouvelle ressource passager au serveur
             processor: PassengerStateProcessor::class, // liaison du processeur à l'endpoint de création de ressource passagers, 
-            input: PassengerRequestDto::class, 
-            security: 'is_granted("ROLE_ADMIN")' // seuls les admins peuvent enregistrer un nouveau passager
+            input: PassengerRequestDto::class,
+            // security: 'is_granted("ROLE_ADMIN")' // seuls les admins peuvent enregistrer un nouveau passager
         ),
         new Patch( // modifier partiellement une ressource passager présente dans le serveur à l'aide de son ID,
             security: 'is_granted("PASSENGER_EDIT", object)', // syntaxe applicable si endpoint sans processor
