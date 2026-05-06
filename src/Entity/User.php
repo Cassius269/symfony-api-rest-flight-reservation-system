@@ -3,12 +3,14 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use App\Entity\Trait\DateTrait;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use App\Repository\UserRepository;
 use App\State\ConnectedUserStateProvider;
+use App\State\DeleteTokenProcessor;
 use Dba\Connection;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -21,13 +23,17 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 #[UniqueEntity(fields: ['email'], message: 'Cet email est déjà utilisé.')] // Message d'erreur personnalisé pour éviter les emails en doublons
 #[ORM\InheritanceType('JOINED')]
 #[ApiResource(
-    operations:[
+    operations: [
         new Get(
             uriTemplate: '/me', // url => /api/me
-            name: 'api_connected_user', 
+            name: 'api_connected_user',
             provider: ConnectedUserStateProvider::class, // traitement personnalisé pour l'affichage de l'utilisateur connecté
             security: "is_granted('IS_AUTHENTICATED_FULLY')", // seuls les utilisateurs authentifiés peuvent accédéer à l'endpoint "/api/me"
             securityMessage: "Vous devez être authentifié(e) pour accéder à cet endpoint"
+        ),
+        new Delete(
+            uriTemplate: '/logout', // url => /api/logout
+            processor: DeleteTokenProcessor::class // traitement personnalisé pour la suppression du cookie d'authentification front-end
         )
     ]
 )]
