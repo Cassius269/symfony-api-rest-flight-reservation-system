@@ -23,7 +23,7 @@ class Company
     #[ORM\Column(length: 35)]
     #[Assert\NotBlank(message: 'Le nom de la compagnie est obligatoire')]
     #[Assert\Length(
-        min: 4, 
+        min: 4,
         minMessage: 'Le nom de la compagnie doit avoir au moins 4 caractères',
         max: 35,
         maxMessage: 'Le nom de la compagnie ne doit pas dépasser 35 caractères'
@@ -33,7 +33,7 @@ class Company
     /**
      * @var Collection<int, Flight>
      */
-    #[ORM\OneToMany(targetEntity: Flight::class, mappedBy: 'Company')]
+    #[ORM\OneToMany(targetEntity: Flight::class, mappedBy: 'company')]
     private Collection $flights;
 
     /**

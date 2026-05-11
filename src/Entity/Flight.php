@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use ApiPlatform\Doctrine\Orm\Filter\DateFilter;
+use ApiPlatform\Doctrine\Orm\Filter\ExactFilter;
 use ApiPlatform\Doctrine\Orm\Filter\PartialSearchFilter;
 use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Metadata\ApiFilter;
@@ -37,9 +38,36 @@ use App\State\UpdateFlightProcessor;
         ),
         new GetCollection( // récuperer l'ensemble des ressources de type vol d'avion dans le serveur
             security: 'is_granted("PUBLIC_ACCESS")', // les utilisateurs non connectés peuvent avoir accès à l'ensemble des vols disponibles
-            provider: CustomFlightsGetCollection::class // traitement personnalisé pour récupérer tous les vols
-
-        ), // récuperer l'ensemble des ressources de type vol d'avion présent dans le serveur
+            provider: CustomFlightsGetCollection::class, // traitement personnalisé pour récupérer tous les vols
+            // Ajout de filtres personnalisés sur l'endpoint /api/flight
+            parameters: [
+                'company.name' => new QueryParameter(
+                    property: 'company.name',
+                    filter: new PartialSearchFilter()
+                ),
+                'airportDeparture.city.name' => new QueryParameter(
+                    property: 'airportDeparture.city.name',
+                    filter: new PartialSearchFilter()
+                ),
+                'airportArrival.city.name' => new QueryParameter(
+                    property: 'airportArrival.city.name',
+                    filter: new PartialSearchFilter()
+                ),
+                'status.name' => new QueryParameter(
+                    property: 'status.name',
+                    filter: new ExactFilter()
+                ),
+                'dateDeparture' => new QueryParameter(
+                    filter: new DateFilter(),
+                    property: 'dateDeparture'
+                ),
+                'dateArrival' => new QueryParameter(
+                    filter: new DateFilter(),
+                    property: 'dateArrival'
+                )
+            ]
+        ),
+        // récuperer l'ensemble des ressources de type vol d'avion présent dans le serveur
         new GetCollection(
             // récuperer l'ensemble des ressources de type vol d'avion disponibles dans le serveur
             uriTemplate: '/get-available-flights', // création d'une route personnalisée (endpoint)
@@ -59,23 +87,22 @@ use App\State\UpdateFlightProcessor;
         new Delete() // supprimer une ressource vol d'avion à l'aide de son ID
     ]
 )]
-#[ApiFilter( // mise en place de filtre de recherche d'occurences avec une stratégie partielle 
-    SearchFilter::class,
-    properties: [
-        'company.name' => 'partial',
-        'airportDeparture.city.name' => 'partial'
-    ]
-)]
-#[ApiFilter( // mise en place de filtre de dates
-    DateFilter::class,
-    properties: ['dateDeparture', 'dateArrival']
-)]
-#[ApiFilter(
-    SearchFilter::class,
-    properties: [
-        'status.name' => 'exact'
-    ]
-)]
+// #[ApiFilter( // mise en place de filtre de recherche d'occurences avec une stratégie partielle 
+//     SearchFilter::class,
+//     properties: [
+//         'company' => 'partial'
+//     ]
+// )]
+// #[ApiFilter( // mise en place de filtre de dates
+//     DateFilter::class,
+//     properties: ['dateDeparture', 'dateArrival']
+// )]
+// #[ApiFilter(
+//     SearchFilter::class,
+//     properties: [
+//         'status.name' => 'exact'
+//     ]
+// )]
 class Flight
 {
     use DateTrait; // intégrer le trait des dates de créations et de mise à jour
@@ -210,7 +237,7 @@ class Flight
      *
      * @return  self
      */
-    public function setDateDeparture($dateDeparture)
+    public function setDateDeparture(\DateTimeInterface $dateDeparture)
     {
         $this->dateDeparture = $dateDeparture;
 
@@ -230,7 +257,7 @@ class Flight
      *
      * @return  self
      */
-    public function setDateArrival($dateArrival)
+    public function setDateArrival(\DateTimeInterface $dateArrival)
     {
         $this->dateArrival = $dateArrival;
 

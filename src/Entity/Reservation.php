@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Doctrine\Orm\Filter\ExactFilter;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Post;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -20,6 +21,7 @@ use App\State\ReservationStateProcessor;
 use App\Repository\ReservationRepository;
 use App\State\UpdateReservationProcessor;
 use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Metadata\QueryParameter;
 use App\State\CustomReservationGetCollectionStateProvider;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
@@ -45,7 +47,22 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
         new GetCollection( // récupérer l'ensemble des ressources de type Réservation
             provider: CustomReservationGetCollectionStateProvider::class,
             security: "is_granted('ROLE_ADMIN')", // seul un utilisateur au rôle Admin peut avoir accès aux réservations
-            securityMessage: 'Vous n\'êtes pas Admin, Vous n\'êtes pas autorisé à accéder à ces ressources'
+            securityMessage: 'Vous n\'êtes pas Admin, Vous n\'êtes pas autorisé à accéder à ces ressources',
+            // Filtres personnalisés sur l'endpoint /api/reservations
+            parameters: [
+                'passengerNameRecord' => new QueryParameter(
+                    property: 'passengerNameRecord',
+                    filter: new ExactFilter()
+                ),
+                'passenger.email' => new QueryParameter(
+                    property: 'passenger.email',
+                    filter: new ExactFilter(),
+                ),
+                'status.name' => new QueryParameter(
+                    property: 'status.name',
+                    filter: new ExactFilter(),
+                ),
+            ]
         ),
         new Post(
             // envoyer une nouvelle ressource Réservation au serveur
@@ -65,24 +82,24 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
         )
     ]
 )]
-#[ApiFilter(
-    SearchFilter::class,
-    properties: [
-        'passengerNameRecord' => 'exact'
-    ]
-)]
-#[ApiFilter(
-    SearchFilter::class,
-    properties: [
-        'passenger.email' => 'exact'
-    ]
-)]
-#[ApiFilter(
-    SearchFilter::class,
-    properties: [
-        'status.name' => 'exact'
-    ]
-)]
+// #[ApiFilter(
+//     SearchFilter::class,
+//     properties: [
+//         'passengerNameRecord' => 'exact'
+//     ]
+// )]
+// #[ApiFilter(
+//     SearchFilter::class,
+//     properties: [
+//         'passenger.email' => 'exact'
+//     ]
+// )]
+// #[ApiFilter(
+//     SearchFilter::class,
+//     properties: [
+//         'status.name' => 'exact'
+//     ]
+// )]
 class Reservation
 {
     use DateTrait; // intégrer le trait des dates de créations et de mise à jour
