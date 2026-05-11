@@ -2,6 +2,10 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Doctrine\Orm\Filter\DateFilter;
+use ApiPlatform\Doctrine\Orm\Filter\PartialSearchFilter;
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Post;
 use Doctrine\DBAL\Types\Types;
@@ -12,6 +16,7 @@ use Doctrine\ORM\Mapping as ORM;
 use App\Repository\FlightRepository;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\QueryParameter;
 use App\Dto\FlightRequestDto;
 use App\State\CustomFlightsGetCollection;
 use App\State\InsertFlightStateProcessor;
@@ -52,6 +57,23 @@ use App\State\UpdateFlightProcessor;
             processor: UpdateFlightProcessor::class // traitement personnalisé de mise à jour de vol à l'aide de son ID
         ),
         new Delete() // supprimer une ressource vol d'avion à l'aide de son ID
+    ]
+)]
+#[ApiFilter( // mise en place de filtre de recherche d'occurences avec une stratégie partielle 
+    SearchFilter::class,
+    properties: [
+        'company.name' => 'partial',
+        'airportDeparture.city.name' => 'partial'
+    ]
+)]
+#[ApiFilter( // mise en place de filtre de dates
+    DateFilter::class,
+    properties: ['dateDeparture', 'dateArrival']
+)]
+#[ApiFilter(
+    SearchFilter::class,
+    properties: [
+        'status.name' => 'exact'
     ]
 )]
 class Flight
@@ -111,7 +133,7 @@ class Flight
 
     #[ORM\ManyToOne(inversedBy: 'flights')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?Company $Company = null;
+    private ?Company $company = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
@@ -302,12 +324,12 @@ class Flight
 
     public function getCompany(): ?Company
     {
-        return $this->Company;
+        return $this->company;
     }
 
-    public function setCompany(?Company $Company): static
+    public function setCompany(?Company $company): static
     {
-        $this->Company = $Company;
+        $this->company = $company;
 
         return $this;
     }

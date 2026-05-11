@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Doctrine\Orm\Filter\PartialSearchFilter;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Patch;
@@ -10,9 +11,9 @@ use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Metadata\ApiResource;
 use App\State\PassengerStateProvider;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\QueryParameter;
 use App\Dto\PassengerRequestDto;
 use App\Repository\PassengerRepository;
-use App\State\InsertPassengerProcessor;
 use App\State\UpdatePassengerProcessor;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -25,11 +26,12 @@ use App\State\PassengerStateProcessor;
     securityMessage: 'Desolé, vous n\'avez pas le rôle Admin ou ce ne sont pas vos informations personnelles',
     operations: [
         new GetCollection( // récupérer toutes les ressources passagers
-            paginationEnabled: true, // pagination de la data activée par défaut
-            paginationItemsPerPage: 10,  // définir le nombre de ressources Passagers à afficher par page, 
-            paginationClientEnabled: true, // donner la possibilité au client de choisir l'activation de la pagination
-            paginationClientItemsPerPage: true, // donner la possibilité au client de choisir le nombre d'objets ressources par page, 
-            provider: CustomPassengerGetCollectionStateProvider::class
+            // paginationEnabled: true, // pagination de la data activée par défaut
+            // paginationItemsPerPage: 5,  // définir le nombre de ressources Passagers à afficher par page, 
+            // paginationClientEnabled: true, // donner la possibilité au client de choisir l'activation de la pagination
+            // paginationClientItemsPerPage: true, // donner la possibilité au client de choisir le nombre d'objets ressources par page, 
+            provider: CustomPassengerGetCollectionStateProvider::class,
+
         ),
         new Get( // récuperer une ressource passager à l'aide de son ID
             // security: 'is_granted("PASSENGER_VIEW", object)', // syntaxe applicable si endpoint sans provider

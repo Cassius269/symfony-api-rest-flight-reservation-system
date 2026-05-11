@@ -20,7 +20,6 @@ use App\State\ReservationStateProcessor;
 use App\Repository\ReservationRepository;
 use App\State\UpdateReservationProcessor;
 use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
-use App\Dto\ReservationResponseDto;
 use App\State\CustomReservationGetCollectionStateProvider;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
@@ -44,10 +43,6 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
             provider: ReservationStateProvider::class,
         ),
         new GetCollection( // récupérer l'ensemble des ressources de type Réservation
-            paginationEnabled: true, // pagination de la data activée par défaut
-            paginationItemsPerPage: 20,  // définir le nombre de ressources réservation à afficher par page, 
-            paginationClientEnabled: true, // donner la possibilité au client de choisir l'activation de la pagination
-            paginationClientItemsPerPage: true, // donner la possibilité au client de choisir le nombre d'objets ressources par page, 
             provider: CustomReservationGetCollectionStateProvider::class,
             security: "is_granted('ROLE_ADMIN')", // seul un utilisateur au rôle Admin peut avoir accès aux réservations
             securityMessage: 'Vous n\'êtes pas Admin, Vous n\'êtes pas autorisé à accéder à ces ressources'
@@ -74,6 +69,18 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
     SearchFilter::class,
     properties: [
         'passengerNameRecord' => 'exact'
+    ]
+)]
+#[ApiFilter(
+    SearchFilter::class,
+    properties: [
+        'passenger.email' => 'exact'
+    ]
+)]
+#[ApiFilter(
+    SearchFilter::class,
+    properties: [
+        'status.name' => 'exact'
     ]
 )]
 class Reservation

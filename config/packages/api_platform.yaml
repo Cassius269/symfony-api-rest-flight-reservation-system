@@ -12,6 +12,7 @@ api_platform:
     pagination_client_enabled: true # le client peut choisir d'activer la pagination
     pagination_maximum_items_per_page: 40 # nombre de ressources maximum à récupérer par page
     pagination_items_per_page: 10 # nombre de ressources à récupérer par page
+    pagination_fetch_collection: true
     stateless: true
     cache_headers:
       vary: ["Content-Type", "Authorization", "Origin"]
@@ -23,4 +24,4 @@ api_platform:
 
   collection:
     pagination:
-      page_parameter_name: _page # le paramètre des pages s'appelera page
+      page_parameter_name: page # le paramètre des pages s'appelera page

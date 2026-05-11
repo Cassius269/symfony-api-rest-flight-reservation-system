@@ -11,7 +11,6 @@ use Doctrine\ORM\Mapping as ORM;
 use App\Repository\UserRepository;
 use App\State\ConnectedUserStateProvider;
 use App\State\DeleteTokenProcessor;
-use Dba\Connection;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -20,8 +19,11 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
-#[UniqueEntity(fields: ['email'], message: 'Cet email est déjà utilisé.')] // Message d'erreur personnalisé pour éviter les emails en doublons
-#[ORM\InheritanceType('JOINED')]
+#[UniqueEntity(
+    fields: ['email'],
+    message: 'Cet email est déjà utilisé.',
+    entityClass: User::class
+)] #[ORM\InheritanceType('JOINED')]
 #[ApiResource(
     operations: [
         new Get(

@@ -42,6 +42,7 @@ security:
     - { path: ^/api/$, roles: PUBLIC_ACCESS } # la page de Swagger UI ne necessite pas d'authentication de l'utilisateur
     - { path: ^/api/auth$, roles: PUBLIC_ACCESS } # la page "/auth" ne necessite pas d'authentication pour permettre la génération de token aux utilisateurs qui s'authentifient
     - { path: ^/api/token/refresh$, roles: PUBLIC_ACCESS } # la route de rafraichissement est accessible pour tous les utilisateurs pour permettre la régenération de token d'authentification
+    - { path: ^/api/passengers$, roles: PUBLIC_ACCESS, methods: [POST] } # rendre la route "/api/passengers" public pour la méthode POST afin d'accepter les inscriptions
     - { path: ^/api/, roles: IS_AUTHENTICATED_FULLY } # toutes les routes commençant par "/api/ doivent être accédés avec un token valide à chaque fois
 
 when@test:
