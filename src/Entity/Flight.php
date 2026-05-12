@@ -41,19 +41,19 @@ use App\State\UpdateFlightProcessor;
             provider: CustomFlightsGetCollection::class, // traitement personnalisé pour récupérer tous les vols
             // Ajout de filtres personnalisés sur l'endpoint /api/flight
             parameters: [
-                'company.name' => new QueryParameter(
+                'companyName' => new QueryParameter(
                     property: 'company.name',
                     filter: new PartialSearchFilter()
                 ),
-                'airportDeparture.city.name' => new QueryParameter(
+                'cityArrival' => new QueryParameter(
                     property: 'airportDeparture.city.name',
                     filter: new PartialSearchFilter()
                 ),
-                'airportArrival.city.name' => new QueryParameter(
+                'cityDeparture' => new QueryParameter(
                     property: 'airportArrival.city.name',
                     filter: new PartialSearchFilter()
                 ),
-                'status.name' => new QueryParameter(
+                'status' => new QueryParameter(
                     property: 'status.name',
                     filter: new ExactFilter()
                 ),

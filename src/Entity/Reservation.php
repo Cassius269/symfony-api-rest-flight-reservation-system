@@ -50,15 +50,15 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
             securityMessage: 'Vous n\'êtes pas Admin, Vous n\'êtes pas autorisé à accéder à ces ressources',
             // Filtres personnalisés sur l'endpoint /api/reservations
             parameters: [
-                'passengerNameRecord' => new QueryParameter(
+                'pnr' => new QueryParameter(
                     property: 'passengerNameRecord',
                     filter: new ExactFilter()
                 ),
-                'passenger.email' => new QueryParameter(
+                'email' => new QueryParameter(
                     property: 'passenger.email',
                     filter: new ExactFilter(),
                 ),
-                'status.name' => new QueryParameter(
+                'status' => new QueryParameter(
                     property: 'status.name',
                     filter: new ExactFilter(),
                 ),
