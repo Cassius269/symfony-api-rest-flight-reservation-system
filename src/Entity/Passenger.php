@@ -39,7 +39,7 @@ use App\State\PassengerStateProcessor;
         ),
         new Post( // envoyer une nouvelle ressource passager au serveur
             processor: PassengerStateProcessor::class, // liaison du processeur à l'endpoint de création de ressource passagers, 
-            input: PassengerRequestDto::class,
+            input: PassengerRequestDto::class, // le contenu de la charge utile doit respecter la structure de la DTO
             // security: 'is_granted("ROLE_ADMIN")' // seuls les admins peuvent enregistrer un nouveau passager
         ),
         new Patch( // modifier partiellement une ressource passager présente dans le serveur à l'aide de son ID,
