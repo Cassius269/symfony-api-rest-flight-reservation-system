@@ -8,6 +8,7 @@ use DateTime;
 
 class FlightRequestDto
 {
+    public ?int $id = null;
     public ?AirplaneRequestDto $airplane = null;
     public ?AirportResponseDto $airportDeparture = null; // aéroport de départ
     public ?AirportResponseDto $airportArrival = null; // aéroport d'arrivée

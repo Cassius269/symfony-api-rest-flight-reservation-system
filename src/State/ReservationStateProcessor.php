@@ -51,6 +51,7 @@ class ReservationStateProcessor implements ProcessorInterface
                 "email" => $passenger->email
             ]
         );
+        // dd($isExistPassenger);
 
         if (!$isExistPassenger) {
             throw new NotFoundHttpException('Le passager avec le mail ' . $data->passenger->email . ' n\'existe pas');
