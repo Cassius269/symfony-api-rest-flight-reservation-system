@@ -111,8 +111,6 @@ class InsertFlightStateProcessor implements ProcessorInterface
         // Vérifier si le pilote existe
         if (isset($data->captain)) {
             $isExistCaptain = $this->captainRepository->findOneBy([
-                'firstname' => $data->captain->firstname,
-                'lastname' => $data->captain->lastname,
                 'email' => $data->captain->email
             ]);
 
@@ -240,12 +238,12 @@ class InsertFlightStateProcessor implements ProcessorInterface
             $this->entityManager->flush();
         }
 
-        if (count($errors) > 0) { // s'il y a des erreurs trouvées 
+        if (count($errors ?? []) > 0) { // s'il y a des erreurs trouvées 
             $errorMessages = [];
 
             // Générer une erreur 400 (= "bad request") avec les messages d'erreur détaillés 
             foreach ($errors as $error) {
-                if ($error->getPropertyPath() != "createdAt") {
+                if ($error->getPropertyPath() !== "createdAt") {
                     $errorMessages[$error->getPropertyPath()][] = $error->getMessage();
                 }
             }
