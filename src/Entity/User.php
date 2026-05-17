@@ -23,7 +23,8 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
     fields: ['email'],
     message: 'Cet email est déjà utilisé.',
     entityClass: User::class
-)] #[ORM\InheritanceType('JOINED')]
+)]
+#[ORM\InheritanceType('JOINED')]
 #[ApiResource(
     operations: [
         new Get(

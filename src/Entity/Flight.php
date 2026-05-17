@@ -123,6 +123,10 @@ class Flight
     #[ORM\Column(type: Types::DECIMAL, precision: 6, scale: 2)]
     #[Assert\NotBlank(message: "Le prix d'une réservation est obligatoire")]
     #[Assert\PositiveOrZero(message: 'Le prix doit être supérieur ou égal à zéro')] // le prix peut être égal à zéro dans certains cas par exemple après un avoir ou une promo
+    #[Assert\LessThan(
+        value: 10000,
+        message: 'Le prix doit être inférieur à 10 000€'
+    )]
     private ?string $price = null;
 
 

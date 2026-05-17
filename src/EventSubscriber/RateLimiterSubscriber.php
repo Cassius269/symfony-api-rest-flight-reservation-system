@@ -6,7 +6,6 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\RateLimiter\RateLimiterFactory;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\HttpKernel\Exception\TooManyRequestsHttpException;
 
 class RateLimiterSubscriber implements EventSubscriberInterface
 {

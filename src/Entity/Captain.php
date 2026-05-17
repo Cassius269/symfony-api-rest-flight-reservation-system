@@ -2,24 +2,26 @@
 
 namespace App\Entity;
 
-use App\Entity\User;
-use ApiPlatform\Metadata\Get;
-use ApiPlatform\Metadata\Post;
-use App\Dto\CaptainRequestDto;
-use ApiPlatform\Metadata\Patch;
-use App\Dto\CaptainResponseDto;
-use ApiPlatform\Metadata\Delete;
-use Doctrine\ORM\Mapping as ORM;
-use App\State\CaptainStateProvider;
-use App\State\CaptainStateProcessor;
+use ApiPlatform\Doctrine\Orm\Filter\ExactFilter;
 use ApiPlatform\Metadata\ApiResource;
-use App\Repository\CaptainRepository;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\QueryParameter;
+use App\Dto\CaptainRequestDto;
+use App\Dto\CaptainResponseDto;
+use App\Entity\User;
+use App\Repository\CaptainRepository;
+use App\State\CaptainStateProcessor;
+use App\State\CaptainStateProvider;
 use App\State\CustomCaptainsGetCollectionStateProvider;
 use App\State\DeleteCaptainStateProcessor;
 use App\State\UpdateCaptainStateProcessor;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: CaptainRepository::class)]
 #[ApiResource( // Déclarer Commandant de bord en tant que ressource de l'API
@@ -29,7 +31,7 @@ use Doctrine\Common\Collections\ArrayCollection;
             output: CaptainResponseDto::class,
         ),
         new GetCollection( // rendre accessible l'ensemble des ressources 
-            provider: CustomCaptainsGetCollectionStateProvider::class // traitement personnalisé de l'endpoint de récupération de tous les commandants de bord
+            provider: CustomCaptainsGetCollectionStateProvider::class, // traitement personnalisé de l'endpoint de récupération de tous les commandants de bord
         ),
         new Post( // créer une nouvelle ressource 
             processor: CaptainStateProcessor::class,
@@ -53,9 +55,16 @@ class Captain extends User
     #[ORM\OneToMany(targetEntity: Flight::class, mappedBy: 'captain')]
     private Collection $flights;
 
+    /**
+     * @var Collection<int, CompanyCaptain>
+     */
+    #[ORM\OneToMany(targetEntity: CompanyCaptain::class, mappedBy: 'captain')]
+    private Collection $companyCaptains;
+
     public function __construct()
     {
         $this->flights = new ArrayCollection();
+        $this->companyCaptains = new ArrayCollection();
     }
 
     /**
@@ -82,6 +91,36 @@ class Captain extends User
             // set the owning side to null (unless already changed)
             if ($flight->getCaptain() === $this) {
                 $flight->setCaptain(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, CompanyCaptain>
+     */
+    public function getCompanyCaptains(): Collection
+    {
+        return $this->companyCaptains;
+    }
+
+    public function addCompanyCaptain(CompanyCaptain $companyCaptain): static
+    {
+        if (!$this->companyCaptains->contains($companyCaptain)) {
+            $this->companyCaptains->add($companyCaptain);
+            $companyCaptain->setCaptain($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCompanyCaptain(CompanyCaptain $companyCaptain): static
+    {
+        if ($this->companyCaptains->removeElement($companyCaptain)) {
+            // set the owning side to null (unless already changed)
+            if ($companyCaptain->getCaptain() === $this) {
+                $companyCaptain->setCaptain(null);
             }
         }
 

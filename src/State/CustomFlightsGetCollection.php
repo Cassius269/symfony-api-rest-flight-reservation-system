@@ -37,6 +37,7 @@ class CustomFlightsGetCollection implements ProviderInterface
                 $flightResponseDto->dateDeparture = $flight->getDateDeparture();
                 $flightResponseDto->dateArrival = $flight->getdateArrival();
                 $flightResponseDto->isDirect = $flight->isDirect();
+                $flightResponseDto->status = $flight->getStatus()->getName();
                 $flightResponseDto->createdAt = $flight->getCreatedAt();
                 $flightResponseDto->updatedAt = $flight->getUpdatedAt();
 

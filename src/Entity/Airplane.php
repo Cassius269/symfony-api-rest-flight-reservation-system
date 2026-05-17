@@ -2,17 +2,36 @@
 
 namespace App\Entity;
 
-use App\Entity\Trait\DateTrait;
-use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\Post;
+use App\Entity\Trait\DateTrait;
 use App\Repository\AirplaneRepository;
-use Doctrine\Common\Collections\Collection;
+use App\State\AirplaneStateProvider;
+use App\State\CustomAirplanesGetCollectionStateProvider;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: AirplaneRepository::class)]
 #[ApiResource( // Déclarer l'entité Airplane en tant que ressource avec tous les verbes HTTP autorisés
     security: "is_granted('ROLE_ADMIN')", // par défaut seul un utilisateur au rôle Admin peut avoir accès à toutes les opérations d'une ressource de type Avion
+    operations: [
+        new Get(
+            provider: AirplaneStateProvider::class // traitement personnalisé de la récupération d'un avion
+        ),
+        new GetCollection(
+            provider: CustomAirplanesGetCollectionStateProvider::class // traitement personnalisé de la récupération des avions
+        ),
+        // new Post(),
+        // new Patch(),
+        new Delete()
+    ]
+
 )]
 class Airplane
 {

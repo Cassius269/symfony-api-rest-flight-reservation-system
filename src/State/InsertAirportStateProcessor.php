@@ -2,9 +2,7 @@
 
 namespace App\State;
 
-use App\Entity\City;
 use App\Entity\Airport;
-use App\Entity\Country;
 use App\Dto\CityResponseDto;
 use App\Dto\AirportResponseDto;
 use App\Repository\CityRepository;
@@ -16,7 +14,6 @@ use ApiPlatform\State\ProcessorInterface;
 use ApiPlatform\Validator\ValidatorInterface;
 use ApiPlatform\Validator\Exception\ValidationException;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
-use Symfony\Component\Mime\Message;
 
 class InsertAirportStateProcessor implements ProcessorInterface
 {
