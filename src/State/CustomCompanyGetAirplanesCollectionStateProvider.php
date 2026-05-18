@@ -6,6 +6,7 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\Pagination\PaginatorInterface;
 use ApiPlatform\State\Pagination\TraversablePaginator;
 use ApiPlatform\State\ProviderInterface;
+use App\Dto\AirplaneModelResponseDto;
 use App\Dto\AirplaneResponseDto;
 use App\Dto\CompanyResponseDto;
 use ArrayIterator;
@@ -36,8 +37,11 @@ class CustomCompanyGetAirplanesCollectionStateProvider implements ProviderInterf
 
                 $companyResponseDto = new CompanyResponseDto;
                 $companyResponseDto->name = $airplane->getCompany()->getName();
-
                 $airplaneResponseDto->company = $companyResponseDto;
+
+                $airplaneModelResponeDto = new AirplaneModelResponseDto;
+                $airplaneModelResponeDto->capacity = $airplane->getAirplaneModel()->getCapacity();
+                $airplaneResponseDto->model = $airplaneModelResponeDto;
 
                 $results[] = $airplaneResponseDto;
             }
