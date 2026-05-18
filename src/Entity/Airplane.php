@@ -6,12 +6,14 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use App\Entity\Trait\DateTrait;
 use App\Repository\AirplaneRepository;
 use App\State\AirplaneStateProvider;
 use App\State\CustomAirplanesGetCollectionStateProvider;
+use App\State\CustomCompanyGetAirplanesCollectionStateProvider;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -26,6 +28,16 @@ use Symfony\Component\Validator\Constraints as Assert;
         ),
         new GetCollection(
             provider: CustomAirplanesGetCollectionStateProvider::class // traitement personnalisé de la récupération des avions
+        ),
+        new GetCollection(
+            uriTemplate: '/companies/{companyId}/airplanes',
+            uriVariables: [
+                "companyId" => new Link(
+                    fromClass: Company::class,
+                    fromProperty: 'airplanes'
+                )
+            ],
+            provider: CustomCompanyGetAirplanesCollectionStateProvider::class
         ),
         // new Post(),
         // new Patch(),
