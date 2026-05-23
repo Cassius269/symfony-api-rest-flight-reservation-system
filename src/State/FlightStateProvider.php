@@ -5,7 +5,9 @@ namespace App\State;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
 use App\Dto\AirportResponseDto;
+use App\Dto\CaptainResponseDto;
 use App\Dto\CityResponseDto;
+use App\Dto\CompanyResponseDto;
 use App\Dto\FlightResponseDto;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -32,14 +34,19 @@ class FlightStateProvider implements ProviderInterface
         $flightResponseDto = new FlightResponseDto;
         $flightResponseDto->id = $data->getId();
         $flightResponseDto->airplaneModel = $data->getAirplane()->getAirplaneModel()->getModel();
-        $flightResponseDto->company = $data->getCompany()->getName();
         $flightResponseDto->dateDeparture = $data->getDateDeparture();
         $flightResponseDto->dateArrival = $data->getdateArrival();
         $flightResponseDto->isCanceled = $data->isCanceled();
+        $flightResponseDto->price = $data->getPrice();
         $flightResponseDto->isLate = $data->isLate();
         $flightResponseDto->isDirect = $data->isDirect();
         $flightResponseDto->createdAt = $data->getCreatedAt();
         $flightResponseDto->updatedAt = $data->getUpdatedAt();
+
+        $companyResponseDto = new CompanyResponseDto;
+        $companyResponseDto->id = $data->getCompany()->getId();
+        $companyResponseDto->name = $data->getCompany()->getName();
+        $flightResponseDto->company = $companyResponseDto;
 
         $airportDepartureDto = new AirportResponseDto;
         $cityDeparture = new CityResponseDto;
@@ -60,6 +67,13 @@ class FlightStateProvider implements ProviderInterface
 
         $flightResponseDto->airportDeparture = $airportDepartureDto;
         $flightResponseDto->airportArrival = $airportArrivalDto;
+
+        $captainResponseDto = new CaptainResponseDto;
+        $captainResponseDto->firstname = $data->getCaptain()->getFirstname();
+        $captainResponseDto->lastname = $data->getCaptain()->getLastname();
+        $captainResponseDto->email = $data->getCaptain()->getEmail();
+
+        $flightResponseDto->captain = $captainResponseDto;
 
         return $flightResponseDto;
     }

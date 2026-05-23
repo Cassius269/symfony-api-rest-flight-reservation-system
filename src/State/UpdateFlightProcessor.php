@@ -109,8 +109,6 @@ class UpdateFlightProcessor implements ProcessorInterface
         // Vérifier si le pilote existe
         if (isset($data->captain)) {
             $isExistCaptain = $this->captainRepository->findOneBy([
-                'firstname' => $data->captain->firstname,
-                'lastname' => $data->captain->lastname,
                 'email' => $data->captain->email
             ]);
 
@@ -176,7 +174,8 @@ class UpdateFlightProcessor implements ProcessorInterface
             'airportDeparture' => $isExistAirportDeparture,
             'airportArrival' => $isExistAirportArrival,
             'airplane' => $isExistAirplane,
-            'price' => $data->price ?? $flight->getPrice()
+            'price' => $data->price ?? $flight->getPrice(),
+            'captain' => $isExistCaptain
         ]);
 
 
@@ -192,8 +191,9 @@ class UpdateFlightProcessor implements ProcessorInterface
             throw new NotFoundHttpException('Aucune compagnie trouvée avec le nom fourni');
         }
 
-        // Ecrire la requête et envoyer au serveur le nouveau vol d'avion
-        $flight->setCreatedAt(new \DateTimeImmutable())
+        // chercher le vol et le mettre à jour dans le serveur API
+
+        $flight->setUpdatedAt(new \DateTime)
             ->setAirportDeparture($isExistAirportDeparture)
             ->setAirportArrival($isExistAirportArrival)
             ->setAirplane($isExistAirplane)

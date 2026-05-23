@@ -2,13 +2,14 @@
 
 namespace App\State;
 
-use App\Dto\CityResponseDto;
-use App\Dto\FlightResponseDto;
-use App\Dto\AirportResponseDto;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\Pagination\PaginatorInterface;
 use ApiPlatform\State\Pagination\TraversablePaginator;
 use ApiPlatform\State\ProviderInterface;
+use App\Dto\AirportResponseDto;
+use App\Dto\CityResponseDto;
+use App\Dto\CompanyResponseDto;
+use App\Dto\FlightResponseDto;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 class CustomFlightsGetCollection implements ProviderInterface
@@ -33,13 +34,18 @@ class CustomFlightsGetCollection implements ProviderInterface
                 $flightResponseDto = new FlightResponseDto;
                 $flightResponseDto->id = $flight->getId();
                 $flightResponseDto->airplaneModel = $flight->getAirplane()->getAirplaneModel()->getModel();
-                $flightResponseDto->company = $flight->getCompany()->getName();
                 $flightResponseDto->dateDeparture = $flight->getDateDeparture();
                 $flightResponseDto->dateArrival = $flight->getdateArrival();
+                $flightResponseDto->price = $flight->getPrice();
                 $flightResponseDto->isDirect = $flight->isDirect();
                 $flightResponseDto->status = $flight->getStatus()->getName();
                 $flightResponseDto->createdAt = $flight->getCreatedAt();
                 $flightResponseDto->updatedAt = $flight->getUpdatedAt();
+
+                $companyResponseDto = new CompanyResponseDto;
+                $companyResponseDto->id = $flight->getCompany()->getId();
+                $companyResponseDto->name = $flight->getCompany()->getName();
+                $flightResponseDto->company = $companyResponseDto;
 
                 $airportDepartureDto = new AirportResponseDto;
                 $cityDeparture = new CityResponseDto;
