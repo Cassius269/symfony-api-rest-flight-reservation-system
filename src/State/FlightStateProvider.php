@@ -4,6 +4,7 @@ namespace App\State;
 
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
+use App\Dto\AirplaneResponseDto;
 use App\Dto\AirportResponseDto;
 use App\Dto\CaptainResponseDto;
 use App\Dto\CityResponseDto;
@@ -33,7 +34,6 @@ class FlightStateProvider implements ProviderInterface
         // Préparer la réponse à retourner au client
         $flightResponseDto = new FlightResponseDto;
         $flightResponseDto->id = $data->getId();
-        $flightResponseDto->airplaneModel = $data->getAirplane()->getAirplaneModel()->getModel();
         $flightResponseDto->dateDeparture = $data->getDateDeparture();
         $flightResponseDto->dateArrival = $data->getdateArrival();
         $flightResponseDto->isCanceled = $data->isCanceled();
@@ -53,6 +53,7 @@ class FlightStateProvider implements ProviderInterface
         $cityDeparture->name = $data->getAirportDeparture()->getCity()->getName();
         $cityDeparture->countryName = $data->getAirportDeparture()->getCity()->getCountry()->getName();
 
+        $airportDepartureDto->id = $data->getAirportDeparture()->getId();
         $airportDepartureDto->name = $data->getAirportDeparture()->getName();
         $airportDepartureDto->city = $cityDeparture;
 
@@ -62,6 +63,7 @@ class FlightStateProvider implements ProviderInterface
         $cityArrival->name = $data->getAirportArrival()->getCity()->getName();
         $cityArrival->countryName = $data->getAirportArrival()->getCity()->getCountry()->getName();
 
+        $airportArrivalDto->id = $data->getAirportArrival()->getId();
         $airportArrivalDto->name = $data->getAirportArrival()->getName();
         $airportArrivalDto->city = $cityArrival;
 
@@ -69,11 +71,20 @@ class FlightStateProvider implements ProviderInterface
         $flightResponseDto->airportArrival = $airportArrivalDto;
 
         $captainResponseDto = new CaptainResponseDto;
+        $captainResponseDto->id = $data->getCaptain()->getId();
         $captainResponseDto->firstname = $data->getCaptain()->getFirstname();
         $captainResponseDto->lastname = $data->getCaptain()->getLastname();
         $captainResponseDto->email = $data->getCaptain()->getEmail();
 
         $flightResponseDto->captain = $captainResponseDto;
+
+
+        $airplaneResponseDto = new AirplaneResponseDto;
+        $airplaneResponseDto->id = $data->getAirplane()->getId();
+        $airplaneResponseDto->reference = $data->getAirplane()->getReference();
+        $airplaneResponseDto->airplaneModel = $data->getAirplane()->getAirplaneModel()->getModel();
+
+        $flightResponseDto->airplane = $airplaneResponseDto;
 
         return $flightResponseDto;
     }

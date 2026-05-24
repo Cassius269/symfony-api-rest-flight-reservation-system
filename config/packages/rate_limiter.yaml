@@ -2,5 +2,5 @@ framework:
   rate_limiter:
     authenticated_api: # nom du limiteur
       policy: "token_bucket" # stratégie algorithmique utilisée
-      limit: 50 # Capacité maximale du bucket (nombre de jetons attribués initialement)
-      rate: { interval: "1 minute", amount: 15 } # Taux de réapprovisionnement des jetons à chaque intervalle
+      limit: 100 # Capacité maximale du bucket (nombre de jetons attribués initialement)
+      rate: { interval: "1 minute", amount: 20 } # Taux de réapprovisionnement des jetons à chaque intervalle

@@ -180,7 +180,7 @@ class UpdateFlightProcessor implements ProcessorInterface
 
 
         if ($isExistFlight) {
-            throw new ConflictHttpException('Un vol similaire portant les mêmes informations de vol existent');
+            throw new ConflictHttpException('Un vol similaire portant les mêmes informations de vol existe');
         }
         // dd($isExistFlight);
 

@@ -6,7 +6,9 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\Pagination\PaginatorInterface;
 use ApiPlatform\State\Pagination\TraversablePaginator;
 use ApiPlatform\State\ProviderInterface;
+use App\Dto\AirplaneResponseDto;
 use App\Dto\AirportResponseDto;
+use App\Dto\CaptainResponseDto;
 use App\Dto\CityResponseDto;
 use App\Dto\CompanyResponseDto;
 use App\Dto\FlightResponseDto;
@@ -33,7 +35,6 @@ class CustomFlightsGetCollection implements ProviderInterface
             foreach ($data as $flight) {
                 $flightResponseDto = new FlightResponseDto;
                 $flightResponseDto->id = $flight->getId();
-                $flightResponseDto->airplaneModel = $flight->getAirplane()->getAirplaneModel()->getModel();
                 $flightResponseDto->dateDeparture = $flight->getDateDeparture();
                 $flightResponseDto->dateArrival = $flight->getdateArrival();
                 $flightResponseDto->price = $flight->getPrice();
@@ -66,6 +67,21 @@ class CustomFlightsGetCollection implements ProviderInterface
 
                 $flightResponseDto->airportDeparture = $airportDepartureDto;
                 $flightResponseDto->airportArrival = $airportArrivalDto;
+
+                $airplaneResponseDto = new AirplaneResponseDto;
+                // $airplaneResponseDto->id = $flight->getAirplane()->getId();
+                // $airplaneResponseDto->reference = $flight->getAirplane()->getReference();
+                $airplaneResponseDto->airplaneModel = $flight->getAirplane()->getAirplaneModel()->getModel();
+
+                $flightResponseDto->airplane = $airplaneResponseDto;
+
+                $captainResponseDto = new CaptainResponseDto;
+                $captainResponseDto->id = $flight->getCaptain()->getId();
+                $captainResponseDto->firstname = $flight->getCaptain()->getFirstname();
+                $captainResponseDto->lastname = $flight->getCaptain()->getLastname();
+                $captainResponseDto->email = $flight->getCaptain()->getEmail();
+
+                $flightResponseDto->captain = $captainResponseDto;
 
                 $results[] = $flightResponseDto;
             }
