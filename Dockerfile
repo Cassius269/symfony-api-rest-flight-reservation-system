@@ -13,7 +13,7 @@ COPY . .
 
 RUN composer install --no-dev --optimize-autoloader --no-scripts
 
-RUN php bin/console cache:clear --env=prod --no-debug
+# RUN php bin/console cache:clear --env=prod --no-debug
 
 ENV APP_ENV=prod
 ENV APP_DEBUG=0
