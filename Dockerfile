@@ -38,3 +38,5 @@ EXPOSE 10000
 
 # IMPORTANT: start PHP-FPM + nginx
 CMD php-fpm -D && nginx -g "daemon off;"
+
+RUN php bin/console cache:warmup --env=prod
