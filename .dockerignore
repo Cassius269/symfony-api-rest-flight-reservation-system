@@ -17,6 +17,5 @@ yarn-error.log*
 *.swp
 *.swo
 docker-compose*.yml
-docker/
 Dockerfile.prod
 nginx.prod.conf
