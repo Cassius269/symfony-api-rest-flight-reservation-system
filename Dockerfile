@@ -1,4 +1,4 @@
-FROM php:8.2-fpm
+FROM php:8.4-fpm
 
 WORKDIR /var/www/html
 
@@ -9,7 +9,7 @@ RUN apt-get update && apt-get install -y \
     zip \
     libpq-dev \
     libzip-dev \
-    && docker-php-ext-install pdo pdo_pgsql zip
+    && docker-php-ext-install pdo pdo_pgsql zip xsl
 
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
