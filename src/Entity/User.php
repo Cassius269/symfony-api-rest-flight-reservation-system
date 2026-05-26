@@ -31,7 +31,8 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
     'passenger' => Passenger::class,
     'flight_operation_officer' => FlightOperationOfficer::class,
     'captain' => Captain::class,
-    'copilot' => Copilot::class
+    'copilot' => Copilot::class,
+    'manager' => Manager::class
 ])]
 #[ApiResource(
     operations: [
