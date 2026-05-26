@@ -32,7 +32,9 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
     'flight_operation_officer' => FlightOperationOfficer::class,
     'captain' => Captain::class,
     'copilot' => Copilot::class,
-    'manager' => Manager::class
+    'manager' => Manager::class,
+    'agent' => Agent::class,
+    'admin' => Admin::class
 ])]
 #[ApiResource(
     operations: [
