@@ -42,4 +42,8 @@ EXPOSE 10000
 
 # Start both services correctly
 CMD sh -c "php-fpm -D && nginx -g 'daemon off;'"
+
+ARG DATABASE_URL
+ENV DATABASE_URL=${DATABASE_URL}
+
 RUN APP_ENV=prod APP_DEBUG=0 php bin/console cache:warmup
