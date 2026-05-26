@@ -25,6 +25,12 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
     entityClass: User::class
 )]
 #[ORM\InheritanceType('JOINED')]
+#[ORM\DiscriminatorColumn(name: 'dtype', type: 'string')]
+#[ORM\DiscriminatorMap([
+    'user' => User::class,
+    'passenger' => Passenger::class,
+    'flight_operation_officer' => FlightOperationOfficer::class
+])]
 #[ApiResource(
     operations: [
         new Get(
