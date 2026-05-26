@@ -13,32 +13,28 @@ RUN apt-get update && apt-get install -y \
 # Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# App code
+# App
 COPY . .
 
-# Install dependencies (prod safe)
+# Composer install (prod safe)
 RUN composer install --no-dev --optimize-autoloader --no-scripts
 
-# Permissions FIX (important)
+# Permissions Symfony
 RUN mkdir -p var/cache var/log var/sessions \
+    && mkdir -p /tmp/client_body /tmp/proxy /tmp/fastcgi \
     && chown -R www-data:www-data /var/www/html
 
 # Nginx config
 COPY docker/nginx/default.conf /etc/nginx/conf.d/default.conf
 
-# Env
+# Env prod
 ENV APP_ENV=prod
 ENV APP_DEBUG=0
 ENV PORT=10000
 
 EXPOSE 10000
 
-# Switch user BEFORE runtime
+# IMPORTANT: non-root
 USER www-data
-
-RUN mkdir -p /tmp/nginx \
-    /tmp/nginx/client_body \
-    /tmp/nginx/proxy \
-    /tmp/nginx/fastcgi
 
 CMD sh -c "php-fpm -D && nginx -g 'daemon off;'"
