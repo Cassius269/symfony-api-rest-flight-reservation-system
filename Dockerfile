@@ -36,4 +36,9 @@ EXPOSE 10000
 # Switch user BEFORE runtime
 USER www-data
 
+RUN mkdir -p /tmp/nginx \
+    /tmp/nginx/client_body \
+    /tmp/nginx/proxy \
+    /tmp/nginx/fastcgi
+
 CMD sh -c "php-fpm -D && nginx -g 'daemon off;'"
