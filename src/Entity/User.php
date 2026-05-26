@@ -29,7 +29,9 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 #[ORM\DiscriminatorMap([
     'user' => User::class,
     'passenger' => Passenger::class,
-    'flight_operation_officer' => FlightOperationOfficer::class
+    'flight_operation_officer' => FlightOperationOfficer::class,
+    'captain' => Captain::class,
+    'copilot' => Copilot::class
 ])]
 #[ApiResource(
     operations: [
