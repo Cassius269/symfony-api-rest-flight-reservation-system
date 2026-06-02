@@ -1,21 +1,45 @@
-# Image PHP 8.3 FPM basée sur Alpine (OS léger)
-FROM php:8.4-fpm-alpine 
+# Image officielle PHP 8.4 avec PHP-FPM sur Alpine Linux
+FROM php:8.4-fpm-alpine
 
-#installer les dépendances
-RUN apk --no-cache add curl git wget bash dpkg
+# Installation des dépendances système nécessaires aux extensions PHP
+RUN apk --no-cache add \
+    curl \
+    git \
+    wget \
+    bash \
+    dpkg \
+    unzip \
+    icu-dev \
+    libzip-dev \
+    oniguruma-dev \
+    freetype-dev \
+    libjpeg-turbo-dev \
+    libpng-dev \
+    libxml2-dev
 
+# Téléchargement de l'outil d'installation des extensions PHP
 ADD https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions /usr/local/bin/
-# Autoriser la modification du fichier des extensions
+
+# Rendre le script exécutable
 RUN chmod +x /usr/local/bin/install-php-extensions
 
-# Installer les extensions PHP
-RUN install-php-extensions opcache iconv soap
-RUN install-php-extensions zip intl fileinfo
-RUN install-php-extensions pdo redis mysqli pdo_mysql
-RUN install-php-extensions gd
+# Installation des extensions PHP requises
+RUN install-php-extensions \
+    opcache \
+    iconv \
+    soap \
+    zip \
+    intl \
+    fileinfo \
+    pdo_mysql \
+    mysqli \
+    gd \
+    redis
 
-# Installer composer (gestionnaire de bundles sur Symfony)
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/bin/ --filename=composer
+# Installation de Composer
+RUN curl -sS https://getcomposer.org/installer | php -- \
+    --install-dir=/usr/bin/ \
+    --filename=composer
 
-# Définir le dossier de travail où se seront executées les commandes de ce Dockerfile
+# Répertoire de travail de l'application
 WORKDIR /var/www
