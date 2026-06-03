@@ -2,19 +2,16 @@ FROM php:8.4-fpm
 
 WORKDIR /var/www/html
 
-RUN apk add --no-cache \
-    bash curl git unzip icu-dev libzip-dev \
-    libpng-dev libjpeg-turbo-dev freetype-dev \
-    libxml2-dev mariadb-dev
-
-RUN docker-php-ext-install \
-    pdo_mysql \
-    mysqli
+RUN apt-get update && apt-get install -y \
+    git unzip zip curl \
+    libpq-dev libzip-dev libxslt1-dev libicu-dev \
+    nginx \
+    && docker-php-ext-install \
+    pdo pdo_pgsql zip xsl intl
 
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Copier tous les fichiers du projet dans le conteneur  
-COPY . . 
+COPY . .
 
 RUN composer install --no-dev --optimize-autoloader --no-scripts
 
