@@ -37,7 +37,7 @@ final class StatusFactory extends PersistentObjectFactory
     {
         return [
             'createdAt' => \DateTimeImmutable::createFromMutable(self::faker()->dateTime()),
-            'name' => self::faker()->unique()->text(5),
+            'name' => self::faker()->text(5),
         ];
     }
 

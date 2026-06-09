@@ -37,9 +37,10 @@ final class AirplaneModelFactory extends PersistentObjectFactory
     {
         return [
             'capacity' => self::faker()->randomNumber(),
-            'constructor' => ConstructorFactory::random(),
+            'constructor' => ConstructorFactory::new(),
             'createdAt' => \DateTimeImmutable::createFromMutable(self::faker()->dateTime()),
             'model' => self::faker()->text(7),
+            'createdAt' => \DateTimeImmutable::createFromMutable(self::faker()->dateTime()),
         ];
     }
 

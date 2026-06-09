@@ -37,7 +37,7 @@ final class AirplaneFactory extends PersistentObjectFactory
     {
         return [
             'airplaneModel' => AirplaneModelFactory::new(),
-            'company' => CompanyFactory::random(),
+            'company' => CompanyFactory::new(),
             'createdAt' => \DateTimeImmutable::createFromMutable(self::faker()->dateTime()),
             'reference' => self::faker()->unique()->text(6),
         ];

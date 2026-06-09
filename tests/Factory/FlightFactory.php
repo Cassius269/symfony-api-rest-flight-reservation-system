@@ -36,11 +36,11 @@ final class FlightFactory extends PersistentObjectFactory
     protected function defaults(): array|callable
     {
         return [
-            'airplane' => AirplaneFactory::random(),
-            'airportArrival' => AirportFactory::random(),
-            'airportDeparture' => AirportFactory::random(),
-            'captain' => CaptainFactory::random(), // TODO add App\Entity\Captain type manually
-            'company' => CompanyFactory::random(),
+            'airplane' => AirplaneFactory::new(),
+            'airportArrival' => AirportFactory::new(),
+            'airportDeparture' => AirportFactory::new(),
+            'captain' => CaptainFactory::new(), // TODO add App\\Entity\\Captain type manually
+            'company' => CompanyFactory::new(),
             'createdAt' => \DateTimeImmutable::createFromMutable(self::faker()->dateTime()),
             'dateArrival' => self::faker()->dateTime(),
             'dateDeparture' => self::faker()->dateTime(),
@@ -48,7 +48,7 @@ final class FlightFactory extends PersistentObjectFactory
             'isDirect' => self::faker()->boolean(),
             'isLate' => self::faker()->boolean(),
             'price' => self::faker()->randomFloat(2, 100, 1000), // génère un prix décimal aléatoire entre 100 et 1000euros
-            'status' => StatusFactory::random(),
+            'status' => StatusFactory::new(),
         ];
     }
 

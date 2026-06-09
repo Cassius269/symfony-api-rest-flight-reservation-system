@@ -32,7 +32,7 @@ final class AirportFactory extends PersistentObjectFactory
     protected function defaults(): array|callable
     {
         return [
-            'city' => CityFactory::random(),
+            'city' => CityFactory::new(),
             'createdAt' => \DateTimeImmutable::createFromMutable(self::faker()->dateTime()),
             'iataCode' => strtoupper(self::faker()->lexify('???')),
             'name' => self::faker()->text(10),

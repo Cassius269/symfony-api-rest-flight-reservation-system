@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Tests\Story;
+namespace App\Story;
 
 use App\Tests\Factory\AirplaneFactory;
 use App\Tests\Factory\AirplaneModelFactory;
