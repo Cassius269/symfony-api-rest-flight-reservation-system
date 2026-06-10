@@ -3,8 +3,8 @@
 namespace App\Story;
 
 use App\Story\DefaultCompanyStory;
+use App\Story\DefaultFlightStory;
 use App\Story\DefaultStatusStory;
-use App\Tests\Story\DefaultFlightStory;
 use Zenstruck\Foundry\Attribute\AsFixture;
 use Zenstruck\Foundry\Story;
 

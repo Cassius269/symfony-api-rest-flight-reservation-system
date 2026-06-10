@@ -1,47 +1,46 @@
 <?php
-// api/tests/AbstractTest.php
+
 namespace App\Tests;
 
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
 use ApiPlatform\Symfony\Bundle\Test\Client;
-use Hautelook\AliceBundle\PhpUnit\RefreshDatabaseTrait;
+use App\Tests\Factory\AdminFactory;
 
 abstract class AbstractTest extends ApiTestCase
 {
     private ?string $token = null;
 
-    use RefreshDatabaseTrait;
-
-    public function setUp(): void
+    protected function createClientWithCredentials(?string $token = null): Client
     {
-        self::bootKernel();
+        $token ??= $this->getToken();
+
+        return static::createClient([], [
+            'extra_headers' => [
+                'Authorization' => 'Bearer ' . $token,
+            ],
+        ]);
     }
 
-    protected function createClientWithCredentials($token = null): Client
-    {
-        $token = $token ?: $this->getToken();
-
-        return static::createClient([], ['headers' => ['authorization' => 'Bearer ' . $token]]);
-    }
-
-    /**
-     * Use other credentials if needed.
-     */
-    protected function getToken($body = []): string
+    protected function getToken(array $body = []): string
     {
         if ($this->token) {
             return $this->token;
         }
 
-        $response = static::createClient()->request('POST', '/api/auth', ['json' => $body ?: [
-            'username' => 'admin@example.com',
-            'password' => '$3cr3t',
-        ]]);
+        $email = $body['email'] ?? 'admin@example.com';
+        $password = $body['password'] ?? '$3cr3t';
 
-        $this->assertResponseIsSuccessful();
-        $data = $response->toArray();
-        $this->token = $data['token'];
+        if ($email === 'admin@example.com') {
+            AdminFactory::createOne([
+                'email' => $email,
+                'password' => $password,
+                'roles' => ['ROLE_ADMIN'],
+            ]);
+        }
 
-        return $data['token'];
+        return $this->token = $this->createClient()->request('POST', '/api/auth', ['json' => [
+            'email' => $email,
+            'password' => $password,
+        ]])->toArray()['token'];
     }
 }

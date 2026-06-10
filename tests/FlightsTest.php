@@ -58,7 +58,7 @@ final class FlightsTest extends AbstractTest
         $this->assertResponseStatusCodeSame(201);
     }
 
-    public function testUpdateBook(): void
+    public function testUpdateFlight(): void
     {
         $flight = FlightFactory::createOne();
 
@@ -82,7 +82,7 @@ final class FlightsTest extends AbstractTest
         ]);
     }
 
-    public function testDeleteBook(): void
+    public function testDeleteFlight(): void
     {
         $flight = FlightFactory::createOne();
 
