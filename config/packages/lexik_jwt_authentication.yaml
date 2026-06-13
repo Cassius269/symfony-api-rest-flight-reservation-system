@@ -4,7 +4,7 @@ lexik_jwt_authentication:
   pass_phrase: "%env(JWT_PASSPHRASE)%"
   token_ttl: 3600 #   token_ttl: 3600 #durée de vies d'une heure du token d'accès
 
-  # remove_token_from_body_when_cookies_used: false # ← false = garder le token dans la réponse JSON
+  remove_token_from_body_when_cookies_used: false # ← false = garder le token dans la réponse JSON
 
   token_extractors:
     cookie:

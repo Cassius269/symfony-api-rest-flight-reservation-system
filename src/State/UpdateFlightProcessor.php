@@ -41,17 +41,27 @@ class UpdateFlightProcessor implements ProcessorInterface
             throw new NotFoundHttpException('Aucun vol avec l\'id renseigné');
         }
 
-        // Rechercher les villes de départ et de destination à l'aide du nom de la ville et du pays
-        $isExistAirportDeparture = $this->airportRepository->findDestination($data->airportDeparture->name, $data->airportDeparture->city->countryName);
+        $airportDeparture = $data->airportDeparture ?? null;
+        $airportArrival = $data->airportArrival ?? null;
+        $airplane = $data->airplane ?? null;
+        $company = $data->company ?? null;
+        $captain = $data->captain ?? null;
+        $dateDeparture = $data->dateDeparture ?? $flight->getDateDeparture();
+        $dateArrival = $data->dateArrival ?? $flight->getDateArrival();
 
-        $isExistAirportArrival = $this->airportRepository->findDestination($data->airportArrival->name, $data->airportArrival->city->countryName);
+        // Rechercher les villes de départ et de destination à l'aide du nom de la ville et du pays
+        $isExistAirportDeparture = $airportDeparture
+            ? $this->airportRepository->findDestination($airportDeparture->name, $airportDeparture->city->countryName)
+            : $flight->getAirportDeparture();
+
+        $isExistAirportArrival = $airportArrival
+            ? $this->airportRepository->findDestination($airportArrival->name, $airportArrival->city->countryName)
+            : $flight->getAirportArrival();
 
         // Rechercher l'avion à assigner
-        $isExistAirplane = $this->airplaneRepository->findOneBy(
-            [
-                "reference" => $data->airplane->reference
-            ]
-        );
+        $isExistAirplane = $airplane
+            ? $this->airplaneRepository->findOneBy(["reference" => $airplane->reference])
+            : $flight->getAirplane();
 
         // dd($isExistAirplane);
 
@@ -85,18 +95,18 @@ class UpdateFlightProcessor implements ProcessorInterface
         }
 
         // Vérifier si la date d'arrivée est superieure à la date de départ
-        if ($data->dateDeparture >= $data->dateArrival) {
+        if ($dateDeparture >= $dateArrival) {
             // renvoyer un code d'erreur 422 car problème logique des données
             throw new UnprocessableEntityHttpException('La date d\'arrivée doit être supérieure à la date de départ');
         }
 
-        if ($data->dateDeparture <= new \DateTime()) {
+        if ($dateDeparture <= new \DateTime()) {
             // renvoyer un code d'erreur 422 car problème logique des données
             throw new UnprocessableEntityHttpException('La date date départ ne doit pas être inférieure à la date du jour');
         }
 
         // Déterminer la durée du voyage
-        $durationFlight = date_diff($data->dateDeparture, $data->dateArrival);
+        $durationFlight = date_diff($dateDeparture, $dateArrival);
 
         // Si le voyage dure au moins plus de 24heures, renvoyer une erreur
         if ($durationFlight->m >= 1) {
@@ -107,9 +117,11 @@ class UpdateFlightProcessor implements ProcessorInterface
         }
 
         // Vérifier si le pilote existe
-        if (isset($data->captain)) {
+        $isExistCaptain = $flight->getCaptain();
+
+        if ($captain) {
             $isExistCaptain = $this->captainRepository->findOneBy([
-                'email' => $data->captain->email
+                'email' => $captain->email
             ]);
 
             if (!$isExistCaptain) {
@@ -150,7 +162,7 @@ class UpdateFlightProcessor implements ProcessorInterface
 
                 if ($isCopilotExist) { // Si le copilote existe, le joindre à la sous-équipe des copilotes
                     // Vérifier si le copilote est disponible pendant la période du vol
-                    $numberFleetsByCopilotInPeriod = $this->flightRepository->countOverlappingFlightsForCopilot($isCopilotExist->getId(), $data->dateDeparture, $data->dateArrival);
+                    $numberFleetsByCopilotInPeriod = $this->flightRepository->countOverlappingFlightsForCopilot($isCopilotExist->getId(), $dateDeparture, $dateArrival);
 
                     if ($numberFleetsByCopilotInPeriod > 0) {
                         throw new ConflictHttpException('Le copilote ' . $isCopilotExist->getFullname() . ' n\'est pas disponible pendant la période du vol');
@@ -169,8 +181,8 @@ class UpdateFlightProcessor implements ProcessorInterface
 
         // Rechercher s'il n'y pas de vol similaire
         $isExistFlight = $this->flightRepository->findOneBy([
-            'dateDeparture' => $data->dateDeparture,
-            'dateArrival' => $data->dateArrival,
+            'dateDeparture' => $dateDeparture,
+            'dateArrival' => $dateArrival,
             'airportDeparture' => $isExistAirportDeparture,
             'airportArrival' => $isExistAirportArrival,
             'airplane' => $isExistAirplane,
@@ -185,7 +197,9 @@ class UpdateFlightProcessor implements ProcessorInterface
         // dd($isExistFlight);
 
         // Vérifier si la comapgnie existe
-        $isCompanyExist = $this->companyRepository->findOneBy(["name" => $data->company->name]);
+        $isCompanyExist = $company
+            ? $this->companyRepository->findOneBy(["name" => $company->name])
+            : $flight->getCompany();
 
         if (!$isCompanyExist) {
             throw new NotFoundHttpException('Aucune compagnie trouvée avec le nom fourni');
@@ -201,15 +215,15 @@ class UpdateFlightProcessor implements ProcessorInterface
             ->setIsDirect($data->isDirect ?? $flight->isDirect())
             ->setIsCanceled($data->isCanceled ?? $flight->isCanceled())
             ->setIsLate($data->isLate ?? $flight->isLate())
-            ->setDateDeparture($data->dateDeparture)
-            ->setDateArrival($data->dateArrival)
+            ->setDateDeparture($dateDeparture)
+            ->setDateArrival($dateArrival)
             ->setCompany($isCompanyExist);
 
-        if (isset($data->captain)) {
+        if ($captain) {
             $flight->setCaptain($isExistCaptain);
         }
 
-        if (isset($data->company)) {
+        if ($company) {
             $flight->setCompany($isCompanyExist);
         }
 

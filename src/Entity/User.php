@@ -152,6 +152,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @see UserInterface
      */
+    // #[\Deprecated('eraseCredentials est dépréciée')]
     public function eraseCredentials(): void
     {
         // If you store any temporary, sensitive data on the user, clear it here

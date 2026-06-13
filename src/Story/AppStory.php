@@ -2,8 +2,8 @@
 
 namespace App\Story;
 
-use App\Story\DefaultCompanyStory;
-use App\Story\DefaultFlightStory;
+use App\Story\DefaultCompaniesStory;
+use App\Story\DefaultFlightsStory;
 use App\Story\DefaultStatusStory;
 use Zenstruck\Foundry\Attribute\AsFixture;
 use Zenstruck\Foundry\Story;
@@ -14,9 +14,9 @@ final class AppStory extends Story
     public function build(): void
     {
         DefaultCaptainsStory::load();
-        DefaultConstructorStory::load();
-        DefaultCompanyStory::load();
+        DefaultConstructorsStory::load();
+        DefaultCompaniesStory::load();
         DefaultStatusStory::load();
-        DefaultFlightStory::load();
+        DefaultFlightsStory::load();
     }
 }

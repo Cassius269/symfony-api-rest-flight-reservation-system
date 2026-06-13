@@ -22,7 +22,8 @@ class SuccessAuthenticationSubscriber implements EventSubscriberInterface
 
         // dd($user);
 
-        $data = $event->getData();
+        $data = $event->getData(); // le token et le refresh_token sont stockés dans les données de la réponse
+        // dd($data);
 
         $data = [
             'id' => $user instanceof User ? $user->getId() : null,

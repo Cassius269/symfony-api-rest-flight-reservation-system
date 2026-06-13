@@ -11,7 +11,7 @@ use App\Tests\Factory\CountryFactory;
 use App\Tests\Factory\FlightFactory;
 use Zenstruck\Foundry\Story;
 
-final class DefaultFlightStory extends Story
+final class DefaultFlightsStory extends Story
 {
     public function build(): void
     {

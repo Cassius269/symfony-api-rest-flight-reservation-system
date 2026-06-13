@@ -36,7 +36,7 @@ final class CityFactory extends PersistentObjectFactory
     protected function defaults(): array|callable
     {
         return [
-            'country' => CountryFactory::new(),
+            'country' => CountryFactory::randomOrCreate(), // lier une ville à un pays existant ou en créer au hasard
             'createdAt' => \DateTimeImmutable::createFromMutable(self::faker()->dateTime()),
             'name' => self::faker()->unique()->city(),
         ];

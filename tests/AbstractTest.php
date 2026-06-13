@@ -10,37 +10,48 @@ abstract class AbstractTest extends ApiTestCase
 {
     private ?string $token = null;
 
-    protected function createClientWithCredentials(?string $token = null): Client
-    {
-        $token ??= $this->getToken();
 
-        return static::createClient([], [
-            'extra_headers' => [
-                'Authorization' => 'Bearer ' . $token,
-            ],
+    protected function setUp(): void
+    {
+        parent::setUp();
+        AdminFactory::createOne([
+            'email' => 'admin@example.com',
+            'password' => '$3cr3t',
+            'roles' => ['ROLE_ADMIN'],
         ]);
     }
 
-    protected function getToken(array $body = []): string
+    // Envoyer une requête avec le token JWT
+    protected function createClientWithCredentials(?string $token = null): Client
     {
-        if ($this->token) {
+        $token ??= $this->getToken();
+        return static::createClient([], [
+            'auth_bearer' => $token,
+        ]);
+    }
+
+    // Générer le token JWT d'authentification
+    protected function getToken(array $credentials = []): string
+    {
+        if ($this->token && empty($credentials)) {
             return $this->token;
         }
 
-        $email = $body['email'] ?? 'admin@example.com';
-        $password = $body['password'] ?? '$3cr3t';
+        $client = static::createClient();
 
-        if ($email === 'admin@example.com') {
-            AdminFactory::createOne([
-                'email' => $email,
-                'password' => $password,
-                'roles' => ['ROLE_ADMIN'],
-            ]);
+        $client->request('POST', '/api/auth', [
+            'json' => $credentials ?: [
+                'email' => 'admin@example.com',
+                'password' => '$3cr3t',
+            ],
+        ]);
+
+        $token = $client->getCookieJar()->get('token')->getvalue(); // récupérer le token
+
+        if (empty($credentials)) {
+            $this->token = $token;
         }
 
-        return $this->token = $this->createClient()->request('POST', '/api/auth', ['json' => [
-            'email' => $email,
-            'password' => $password,
-        ]])->toArray()['token'];
+        return $token;
     }
 }

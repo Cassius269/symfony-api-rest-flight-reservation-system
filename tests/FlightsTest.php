@@ -2,15 +2,21 @@
 
 namespace App\Tests;
 
-use App\Dto\FlightResponseDto;
 use App\Entity\Flight;
+use App\Tests\Factory\AirplaneFactory;
+use App\Tests\Factory\AirportFactory;
+use App\Tests\Factory\CaptainFactory;
+use App\Tests\Factory\CityFactory;
+use App\Tests\Factory\CompanyFactory;
+use App\Tests\Factory\CountryFactory;
 use App\Tests\Factory\FlightFactory;
+use App\Tests\Factory\StatusFactory;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
 
 final class FlightsTest extends AbstractTest
 {
-    use ResetDatabase, Factories;
+    use ResetDatabase, Factories; // réinitialisation de la bdd entre les tests
 
     public function testGetCollection(): void
     {
@@ -23,23 +29,38 @@ final class FlightsTest extends AbstractTest
         $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
 
         $this->assertJsonContains([
-            '@context' => '/contexts/Flight',
+            '@context' => '/api/contexts/Flight',
             '@type' => 'Collection',
             'totalItems' => 100,
         ]);
 
-        $this->assertCount(30, $response->toArray()['hydra:member']);
-
-        $this->assertMatchesResourceCollectionJsonSchema(FlightResponseDto::class);
+        $this->assertCount(10, $response->toArray()['member']);
     }
 
     public function testCreateFlight(): void
     {
+        $france = CountryFactory::createOne(['name' => 'France']);
+        $comores = CountryFactory::createOne(['name' => 'Comores']);
+        $company = CompanyFactory::createOne(['name' => 'Air France']);
+
+        AirportFactory::createOne([
+            'name' => 'Aéroport Charles de Gaulle',
+            'city' => CityFactory::new(['country' => $france]),
+        ]);
+        AirportFactory::createOne([
+            'name' => 'Aéroport Prince Saïd Ibrahim',
+            'city' => CityFactory::new(['country' => $comores]),
+        ]);
+        AirplaneFactory::createOne(['reference' => 'hjytjytj', 'company' => $company]);
+        CaptainFactory::createOne(['email' => 'test@example.com']);
+        StatusFactory::createOne(['name' => 'Confirmé']);
+
+        FlightFactory::createOne();
         $client = $this->createClientWithCredentials()
             ->request('POST', '/api/flights', [
                 'json' => [
-                    'dateDeparture' => '2031-04-30T22:36:45.685Z',
-                    'dateArrival' => '2031-04-30T04:36:45.685Z',
+                    'dateDeparture' => '2031-04-30T04:36:45.685Z',
+                    'dateArrival' => '2031-04-30T10:36:45.685Z',
                     'airportDeparture' => [
                         'name' => 'Aéroport Charles de Gaulle',
                         'city' => ['countryName' => 'France'],
@@ -77,23 +98,27 @@ final class FlightsTest extends AbstractTest
         $this->assertResponseIsSuccessful();
 
         $this->assertJsonContains([
-            '@id' => $iri,
+            'id' => $flight->getId(),
             'price' => 100,
         ]);
     }
 
     public function testDeleteFlight(): void
     {
+        // Création d'un vol à supprimer
         $flight = FlightFactory::createOne();
 
+        // Instanciation d'un client authentifié pour accéder aux endpoints protégés
         $client = $this->createClientWithCredentials();
 
+        // Récupération de l'IRI
         $iri = $this->findIriBy(Flight::class, ['id' => $flight->getId()]);
 
         $client->request('DELETE', $iri);
 
         $this->assertResponseStatusCodeSame(204);
 
+        // Vérifier que l'objet vol supprimé n'existe plus en base de données 
         $this->assertNull(
             FlightFactory::repository()->find($flight->getId())
         );

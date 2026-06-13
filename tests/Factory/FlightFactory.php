@@ -35,6 +35,9 @@ final class FlightFactory extends PersistentObjectFactory
     #[\Override]
     protected function defaults(): array|callable
     {
+        $dateDeparture = self::faker()->dateTimeBetween('+1 month', '+1 year');
+        $dateArrival = (clone $dateDeparture)->modify('+6 hours');
+
         return [
             'airplane' => AirplaneFactory::new(),
             'airportArrival' => AirportFactory::new(),
@@ -42,8 +45,8 @@ final class FlightFactory extends PersistentObjectFactory
             'captain' => CaptainFactory::new(), // TODO add App\\Entity\\Captain type manually
             'company' => CompanyFactory::new(),
             'createdAt' => \DateTimeImmutable::createFromMutable(self::faker()->dateTime()),
-            'dateArrival' => self::faker()->dateTime(),
-            'dateDeparture' => self::faker()->dateTime(),
+            'dateArrival' => $dateArrival,
+            'dateDeparture' => $dateDeparture,
             'isCanceled' => self::faker()->boolean(),
             'isDirect' => self::faker()->boolean(),
             'isLate' => self::faker()->boolean(),

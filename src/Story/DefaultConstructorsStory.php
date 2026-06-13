@@ -5,7 +5,7 @@ namespace App\Story;
 use App\Tests\Factory\ConstructorFactory;
 use Zenstruck\Foundry\Story;
 
-final class DefaultConstructorStory extends Story
+final class DefaultConstructorsStory extends Story
 {
     public function build(): void
     {

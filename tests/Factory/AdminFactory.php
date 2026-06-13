@@ -3,17 +3,15 @@
 namespace App\Tests\Factory;
 
 use App\Entity\Admin;
-use App\Repository\AdminRepository;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
-use Zenstruck\Foundry\Persistence\Proxy;
-use Zenstruck\Foundry\Persistence\ProxyRepositoryDecorator;
 
 /**
  * @extends PersistentObjectFactory<Admin>
  */
 final class AdminFactory extends PersistentObjectFactory
 {
-    public function __construct() {}
+    public function __construct(private UserPasswordHasherInterface $passwordHasher) {}
 
     #[\Override]
     public static function class(): string
@@ -29,7 +27,7 @@ final class AdminFactory extends PersistentObjectFactory
             'firstname' => self::faker()->firstName(),
             'lastname' => self::faker()->lastName(),
             'roles' => ['ROLE_ADMIN'],
-            'password' => self::faker()->password(4, 10), // hashed version of "$3cr3t"
+            'password' => 'password',
             'createdAt' => \DateTimeImmutable::createFromMutable(self::faker()->dateTime()),
         ];
     }
@@ -37,6 +35,12 @@ final class AdminFactory extends PersistentObjectFactory
     #[\Override]
     protected function initialize(): static
     {
-        return $this;
+        return $this
+            ->afterInstantiate(function(Admin $admin): void {
+                $admin->setPassword(
+                    $this->passwordHasher->hashPassword($admin, $admin->getPassword())
+                );
+            })
+        ;
     }
 }
