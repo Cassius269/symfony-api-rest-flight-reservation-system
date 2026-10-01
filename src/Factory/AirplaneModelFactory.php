@@ -1,18 +1,16 @@
 <?php
 
-namespace App\Tests\Factory;
+namespace App\Factory;
 
-use App\Entity\Continent;
-use App\Repository\ContinentRepository;
-use Doctrine\ORM\EntityRepository;
+use App\Entity\AirplaneModel;
+use App\Factory\ConstructorFactory;
 use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
-use Zenstruck\Foundry\Persistence\Proxy;
-use Zenstruck\Foundry\Persistence\ProxyRepositoryDecorator;
+
 
 /**
- * @extends PersistentObjectFactory<Continent>
+ * @extends PersistentObjectFactory<AirplaneModel>
  */
-final class ContinentFactory extends PersistentObjectFactory
+final class AirplaneModelFactory extends PersistentObjectFactory
 {
     /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#factories-as-services
@@ -24,7 +22,7 @@ final class ContinentFactory extends PersistentObjectFactory
     #[\Override]
     public static function class(): string
     {
-        return Continent::class;
+        return AirplaneModel::class;
     }
 
     /**
@@ -36,8 +34,10 @@ final class ContinentFactory extends PersistentObjectFactory
     protected function defaults(): array|callable
     {
         return [
+            'capacity' => self::faker()->randomNumber(),
+            'constructor' => ConstructorFactory::new(),
+            'model' => self::faker()->text(7),
             'createdAt' => \DateTimeImmutable::createFromMutable(self::faker()->dateTime()),
-            'name' => self::faker()->unique()->text(10),
         ];
     }
 
@@ -48,7 +48,7 @@ final class ContinentFactory extends PersistentObjectFactory
     protected function initialize(): static
     {
         return $this
-            // ->afterInstantiate(function(Continent $continent): void {})
+            // ->afterInstantiate(function(AirplaneModel $airplaneModel): void {})
         ;
     }
 }

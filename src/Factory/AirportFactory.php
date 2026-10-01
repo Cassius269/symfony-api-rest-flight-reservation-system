@@ -1,18 +1,15 @@
 <?php
 
-namespace App\Tests\Factory;
+namespace App\Factory;
 
-use App\Entity\Airplane;
-use App\Repository\AirplaneRepository;
-use Doctrine\ORM\EntityRepository;
+use App\Entity\Airport;
+use App\Factory\CityFactory;
 use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
-use Zenstruck\Foundry\Persistence\Proxy;
-use Zenstruck\Foundry\Persistence\ProxyRepositoryDecorator;
 
 /**
- * @extends PersistentObjectFactory<Airplane>
+ * @extends PersistentObjectFactory<Airport>
  */
-final class AirplaneFactory extends PersistentObjectFactory
+final class AirportFactory extends PersistentObjectFactory
 {
     /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#factories-as-services
@@ -24,7 +21,7 @@ final class AirplaneFactory extends PersistentObjectFactory
     #[\Override]
     public static function class(): string
     {
-        return Airplane::class;
+        return Airport::class;
     }
 
     /**
@@ -36,10 +33,10 @@ final class AirplaneFactory extends PersistentObjectFactory
     protected function defaults(): array|callable
     {
         return [
-            'airplaneModel' => AirplaneModelFactory::new(),
-            'company' => CompanyFactory::new(),
+            'city' => CityFactory::new(),
             'createdAt' => \DateTimeImmutable::createFromMutable(self::faker()->dateTime()),
-            'reference' => self::faker()->unique()->text(6),
+            'iataCode' => strtoupper(self::faker()->lexify('???')),
+            'name' => self::faker()->text(10),
         ];
     }
 
@@ -50,7 +47,7 @@ final class AirplaneFactory extends PersistentObjectFactory
     protected function initialize(): static
     {
         return $this
-            // ->afterInstantiate(function(Airplane $airplane): void {})
+            // ->afterInstantiate(function(Airport $airport): void {})
         ;
     }
 }

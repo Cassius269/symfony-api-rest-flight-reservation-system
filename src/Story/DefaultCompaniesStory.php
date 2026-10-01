@@ -2,7 +2,7 @@
 
 namespace App\Story;
 
-use App\Tests\Factory\CompanyFactory;
+use App\Factory\CompanyFactory;
 use Zenstruck\Foundry\Story;
 
 final class DefaultCompaniesStory extends Story

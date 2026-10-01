@@ -2,9 +2,8 @@
 
 namespace App\Story;
 
-use App\Story\DefaultCompaniesStory;
-use App\Story\DefaultFlightsStory;
-use App\Story\DefaultStatusStory;
+
+use App\Story\DefaultAirplanesStory;
 use Zenstruck\Foundry\Attribute\AsFixture;
 use Zenstruck\Foundry\Story;
 
@@ -17,6 +16,8 @@ final class AppStory extends Story
         DefaultConstructorsStory::load();
         DefaultCompaniesStory::load();
         DefaultStatusStory::load();
+        DefaultAirportsStory::load();
+        DefaultAirplanesStory::load();
         DefaultFlightsStory::load();
     }
 }

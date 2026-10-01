@@ -2,15 +2,15 @@
 
 namespace App\Tests;
 
-use App\Entity\Flight;
-use App\Tests\Factory\AirplaneFactory;
-use App\Tests\Factory\AirportFactory;
-use App\Tests\Factory\CaptainFactory;
-use App\Tests\Factory\CityFactory;
-use App\Tests\Factory\CompanyFactory;
-use App\Tests\Factory\CountryFactory;
-use App\Tests\Factory\FlightFactory;
-use App\Tests\Factory\StatusFactory;
+use App\Flight;
+use App\Factory\AirplaneFactory;
+use App\Factory\AirportFactory;
+use App\Factory\CaptainFactory;
+use App\Factory\CityFactory;
+use App\Factory\CompanyFactory;
+use App\Factory\CountryFactory;
+use App\Factory\FlightFactory;
+use App\Factory\StatusFactory;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
 

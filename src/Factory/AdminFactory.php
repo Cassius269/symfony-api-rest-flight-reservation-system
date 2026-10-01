@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Tests\Factory;
+namespace App\Factory;
 
 use App\Entity\Admin;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -27,7 +27,7 @@ final class AdminFactory extends PersistentObjectFactory
             'firstname' => self::faker()->firstName(),
             'lastname' => self::faker()->lastName(),
             'roles' => ['ROLE_ADMIN'],
-            'password' => 'password',
+            'password' => '123456789',
             'createdAt' => \DateTimeImmutable::createFromMutable(self::faker()->dateTime()),
         ];
     }
@@ -36,11 +36,10 @@ final class AdminFactory extends PersistentObjectFactory
     protected function initialize(): static
     {
         return $this
-            ->afterInstantiate(function(Admin $admin): void {
+            ->afterInstantiate(function (Admin $admin): void {
                 $admin->setPassword(
                     $this->passwordHasher->hashPassword($admin, $admin->getPassword())
                 );
-            })
-        ;
+            });
     }
 }

@@ -4,12 +4,11 @@ namespace App\Tests;
 
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase;
 use ApiPlatform\Symfony\Bundle\Test\Client;
-use App\Tests\Factory\AdminFactory;
+use App\Factory\AdminFactory;
 
 abstract class AbstractTest extends ApiTestCase
 {
     private ?string $token = null;
-
 
     protected function setUp(): void
     {

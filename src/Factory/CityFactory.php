@@ -1,14 +1,14 @@
 <?php
 
-namespace App\Tests\Factory;
+namespace App\Factory;
 
-use App\Entity\Airport;
+use App\Entity\City;
 use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 
 /**
- * @extends PersistentObjectFactory<Airport>
+ * @extends PersistentObjectFactory<City>
  */
-final class AirportFactory extends PersistentObjectFactory
+final class CityFactory extends PersistentObjectFactory
 {
     /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#factories-as-services
@@ -20,7 +20,7 @@ final class AirportFactory extends PersistentObjectFactory
     #[\Override]
     public static function class(): string
     {
-        return Airport::class;
+        return City::class;
     }
 
     /**
@@ -32,10 +32,9 @@ final class AirportFactory extends PersistentObjectFactory
     protected function defaults(): array|callable
     {
         return [
-            'city' => CityFactory::new(),
+            'country' => CountryFactory::randomOrCreate(), // lier une ville à un pays existant ou en créer au hasard
             'createdAt' => \DateTimeImmutable::createFromMutable(self::faker()->dateTime()),
-            'iataCode' => strtoupper(self::faker()->lexify('???')),
-            'name' => self::faker()->text(10),
+            'name' => self::faker()->unique()->city(),
         ];
     }
 
@@ -46,7 +45,7 @@ final class AirportFactory extends PersistentObjectFactory
     protected function initialize(): static
     {
         return $this
-            // ->afterInstantiate(function(Airport $airport): void {})
+            // ->afterInstantiate(function(City $city): void {})
         ;
     }
 }

@@ -2,7 +2,7 @@
 
 namespace App\Tests;
 
-use App\Tests\Factory\AdminFactory;
+use App\Factory\AdminFactory;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
 
@@ -22,6 +22,9 @@ final class UsersTest extends AbstractTest
             ->request('GET', '/api/me');
 
         $this->assertResponseIsSuccessful();
+        $this->assertJsonContains([
+            'role' => 'ROLE_ADMIN'
+        ]);
     }
 
     public function testLoginAsUser(): void

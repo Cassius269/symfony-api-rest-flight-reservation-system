@@ -1,18 +1,18 @@
 <?php
 
-namespace App\Tests\Factory;
+namespace App\Factory;
 
-use App\Entity\Captain;
-use App\Repository\CaptainRepository;
+use App\Entity\Continent;
+use App\Repository\ContinentRepository;
 use Doctrine\ORM\EntityRepository;
 use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 use Zenstruck\Foundry\Persistence\Proxy;
 use Zenstruck\Foundry\Persistence\ProxyRepositoryDecorator;
 
 /**
- * @extends PersistentObjectFactory<Captain>
+ * @extends PersistentObjectFactory<Continent>
  */
-final class CaptainFactory extends PersistentObjectFactory
+final class ContinentFactory extends PersistentObjectFactory
 {
     /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#factories-as-services
@@ -24,7 +24,7 @@ final class CaptainFactory extends PersistentObjectFactory
     #[\Override]
     public static function class(): string
     {
-        return Captain::class;
+        return Continent::class;
     }
 
     /**
@@ -37,11 +37,7 @@ final class CaptainFactory extends PersistentObjectFactory
     {
         return [
             'createdAt' => \DateTimeImmutable::createFromMutable(self::faker()->dateTime()),
-            'email' => self::faker()->unique()->email(),
-            'firstname' => self::faker()->firstName(),
-            'lastname' => self::faker()->lastName(),
-            'password' => self::faker()->password(5, 12),
-            'roles' => ['ROLE_CAPTAIN'],
+            'name' => self::faker()->unique()->text(10),
         ];
     }
 
@@ -52,7 +48,7 @@ final class CaptainFactory extends PersistentObjectFactory
     protected function initialize(): static
     {
         return $this
-            // ->afterInstantiate(function(Captain $captain): void {})
+            // ->afterInstantiate(function(Continent $continent): void {})
         ;
     }
 }

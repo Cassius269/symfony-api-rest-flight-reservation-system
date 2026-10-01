@@ -1,18 +1,18 @@
 <?php
 
-namespace App\Tests\Factory;
+namespace App\Factory;
 
-use App\Entity\AirplaneModel;
-use App\Repository\AirplaneModelRepository;
+use App\Entity\Country;
+use App\Repository\CountryRepository;
 use Doctrine\ORM\EntityRepository;
 use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
 use Zenstruck\Foundry\Persistence\Proxy;
 use Zenstruck\Foundry\Persistence\ProxyRepositoryDecorator;
 
 /**
- * @extends PersistentObjectFactory<AirplaneModel>
+ * @extends PersistentObjectFactory<Country>
  */
-final class AirplaneModelFactory extends PersistentObjectFactory
+final class CountryFactory extends PersistentObjectFactory
 {
     /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#factories-as-services
@@ -24,7 +24,7 @@ final class AirplaneModelFactory extends PersistentObjectFactory
     #[\Override]
     public static function class(): string
     {
-        return AirplaneModel::class;
+        return Country::class;
     }
 
     /**
@@ -36,11 +36,10 @@ final class AirplaneModelFactory extends PersistentObjectFactory
     protected function defaults(): array|callable
     {
         return [
-            'capacity' => self::faker()->randomNumber(),
-            'constructor' => ConstructorFactory::new(),
+            'continent' => ContinentFactory::new(),
             'createdAt' => \DateTimeImmutable::createFromMutable(self::faker()->dateTime()),
-            'model' => self::faker()->text(7),
-            'createdAt' => \DateTimeImmutable::createFromMutable(self::faker()->dateTime()),
+            'name' => self::faker()->unique()->text(10),
+            'timezone' => self::faker()->timezone(),
         ];
     }
 
@@ -51,7 +50,7 @@ final class AirplaneModelFactory extends PersistentObjectFactory
     protected function initialize(): static
     {
         return $this
-            // ->afterInstantiate(function(AirplaneModel $airplaneModel): void {})
+            // ->afterInstantiate(function(Country $country): void {})
         ;
     }
 }

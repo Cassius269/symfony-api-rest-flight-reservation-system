@@ -1,0 +1,8 @@
+doctrine:
+  dbal:
+    # On définit l'utilisation de SQLite
+    driver: pdo_sqlite
+    # On définit le chemin vers la base de données
+    path: "%kernel.cache_dir%/bdd_test_blog.db" # le nom personnalisé de la bdd est bdd_test_blog
+    # On déclare que le fichier n'est pas sur une URL distante
+    url: null

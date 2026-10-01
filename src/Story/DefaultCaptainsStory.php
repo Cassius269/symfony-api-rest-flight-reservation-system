@@ -2,7 +2,7 @@
 
 namespace App\Story;
 
-use App\Tests\Factory\CaptainFactory;
+use App\Factory\CaptainFactory;
 use Zenstruck\Foundry\Story;
 
 final class DefaultCaptainsStory extends Story

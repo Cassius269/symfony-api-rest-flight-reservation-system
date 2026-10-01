@@ -1,18 +1,15 @@
 <?php
 
-namespace App\Tests\Factory;
+namespace App\Factory;
 
-use App\Entity\City;
-use App\Repository\CityRepository;
-use Doctrine\ORM\EntityRepository;
+use App\Entity\Company;
 use Zenstruck\Foundry\Persistence\PersistentObjectFactory;
-use Zenstruck\Foundry\Persistence\Proxy;
-use Zenstruck\Foundry\Persistence\ProxyRepositoryDecorator;
+
 
 /**
- * @extends PersistentObjectFactory<City>
+ * @extends PersistentObjectFactory<Company>
  */
-final class CityFactory extends PersistentObjectFactory
+final class CompanyFactory extends PersistentObjectFactory
 {
     /**
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#factories-as-services
@@ -24,7 +21,7 @@ final class CityFactory extends PersistentObjectFactory
     #[\Override]
     public static function class(): string
     {
-        return City::class;
+        return Company::class;
     }
 
     /**
@@ -36,9 +33,9 @@ final class CityFactory extends PersistentObjectFactory
     protected function defaults(): array|callable
     {
         return [
-            'country' => CountryFactory::randomOrCreate(), // lier une ville à un pays existant ou en créer au hasard
             'createdAt' => \DateTimeImmutable::createFromMutable(self::faker()->dateTime()),
-            'name' => self::faker()->unique()->city(),
+            'iataCode' => self::faker()->unique()->regexify('[A-Z]{2}'),
+            'name' => self::faker()->text(10),
         ];
     }
 
@@ -49,7 +46,7 @@ final class CityFactory extends PersistentObjectFactory
     protected function initialize(): static
     {
         return $this
-            // ->afterInstantiate(function(City $city): void {})
+            // ->afterInstantiate(function(Company $company): void {})
         ;
     }
 }
