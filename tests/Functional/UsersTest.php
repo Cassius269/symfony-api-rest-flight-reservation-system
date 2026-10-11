@@ -1,15 +1,16 @@
 <?php
 
-namespace App\Tests;
+namespace App\Tests\Functional;
 
 use App\Factory\AdminFactory;
+use App\Tests\AbstractTest;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
 
 // UsersTest.php
 final class UsersTest extends AbstractTest
 {
-    use ResetDatabase, Factories;  // ← manquait
+    use ResetDatabase, Factories;
 
     public function testAdminResource(): void
     {

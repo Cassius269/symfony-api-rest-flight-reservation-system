@@ -206,6 +206,20 @@ class Flight
 
     public function addReservation(Reservation $reservation): static
     {
+        foreach ($this->reservations as $existingReservation) {
+            if ($existingReservation->getPassenger() === $reservation->getPassenger()) {
+                throw new \DomainException(
+                    'Ce passager possède déjà une réservation pour ce vol.'
+                );
+            }
+
+            if ($existingReservation->getNumberFlightSeat() === $reservation->getNumberFlightSeat()) {
+                throw new \DomainException(
+                    'Ce siège est déjà réservé pour ce vol.'
+                );
+            }
+        }
+
         if (!$this->reservations->contains($reservation)) {
             $this->reservations->add($reservation);
             $reservation->setFlight($this);

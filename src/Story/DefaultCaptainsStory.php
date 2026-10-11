@@ -9,7 +9,7 @@ final class DefaultCaptainsStory extends Story
 {
     public function build(): void
     {
-        // Créer 10 capitaines par défaut
+        // Créer 100 capitaines par défaut
         CaptainFactory::createMany(100);
         dump('Story CaptainsFactory exécutée');
     }

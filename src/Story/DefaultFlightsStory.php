@@ -7,6 +7,7 @@ use App\Factory\AirportFactory;
 use App\Factory\CaptainFactory;
 
 use App\Factory\FlightFactory;
+use App\Factory\StatusFactory;
 use Zenstruck\Foundry\Story;
 
 final class DefaultFlightsStory extends Story
@@ -18,7 +19,8 @@ final class DefaultFlightsStory extends Story
             'airportDeparture' => AirportFactory::random(),
             'airportArrival' => AirportFactory::random(),
             "airplane" => AirplaneFactory::random(),
-            'captain' => CaptainFactory::random()
+            'captain' => CaptainFactory::random(),
+            'status' => StatusFactory::random()
         ]);
 
         dump('Story FlightFactory exécutée');
