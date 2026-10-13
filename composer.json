@@ -85,11 +85,12 @@
             "@auto-scripts"
         ],
         "app-tests": [
-            "APP_ENV=test php bin/console doctrine:schema:drop --force --full-database",
-            "APP_ENV=test php bin/console doctrine:schema:create ",
-            "APP_ENV=test php bin/console foundry:load-fixtures --append",
-            "bin/console cache:clear --env=test",
-            "bin/phpunit"
+            "APP_ENV=test php bin/console doctrine:database:create --if-not-exists --no-interaction",
+            "APP_ENV=test php bin/console doctrine:schema:drop --force --full-database --no-interaction",
+            "APP_ENV=test php bin/console doctrine:schema:create --no-interaction",
+            "APP_ENV=test php bin/console foundry:load-fixtures --append --no-interaction",
+            "APP_ENV=test php bin/console cache:clear",
+            "APP_ENV=test php bin/phpunit"
         ]
     },
     "conflict": {

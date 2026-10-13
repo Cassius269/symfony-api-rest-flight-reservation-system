@@ -8,12 +8,10 @@ jobs:
       database:
         image: mariadb:10.7.3
         env:
-          MARIADB_USER: root
           MARIADB_ROOT_PASSWORD: root
           MARIADB_DATABASE: app
-          MARIADB_ALLOW_EMPTY_ROOT_PASSWORD: "no"
         ports:
-          - "3306: 3306"
+          - "3306:3306"
         options: >-
           --health-cmd="mysqladmin ping -h 127.0.0.1 -uroot -proot --silent"
           --health-interval=10s
@@ -51,4 +49,4 @@ jobs:
         run: composer app-tests
         env:
           APP_ENV: test
-          DATABASE_URL: mysql://root:root@127.0.0.1:${{ job.services.database.ports['3306']}}/app_test
+          DATABASE_URL: mysql://root:root@127.0.0.1:${{ job.services.database.ports['3306']}}/app
