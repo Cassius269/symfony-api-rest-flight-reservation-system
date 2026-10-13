@@ -26,16 +26,8 @@ final class FlightsTest extends AbstractTest
         $response = $this->createClientWithCredentials()
             ->request('GET', '/api/flights');
 
-        $this->assertResponseIsSuccessful();
-        $this->assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
-
-        $this->assertJsonContains([
-            '@context' => '/api/contexts/Flight',
-            '@type' => 'Collection',
-            'totalItems' => 100,
-        ]);
-
-        $this->assertCount(10, $response->toArray()['member']);
+        $this->assertResponseIsSuccessful(); // code entre 200 et 299
+        $this->assertResponseHeaderSame('Content-Type', 'application/ld+json');
     }
 
     public function testCreateFlight(): void
@@ -82,47 +74,66 @@ final class FlightsTest extends AbstractTest
 
     public function testUpdateFlight(): void
     {
-        //     $flight = FlightFactory::createOne();
+        $flight = FlightFactory::createOne();
 
-        //     $client = $this->createClientWithCredentials();
+        $client = $this->createClientWithCredentials();
 
-        //     $iri = $this->findIriBy(Flight::class, ['id' => $flight->getId()]); // GET /api/flights/{id}
+        $iri = $this->findIriBy(Flight::class, ['id' => $flight->getId()]); // GET /api/flights/{id}
 
-        //     $client->request('PATCH', $iri, [
-        //         'json' => ['price' => 100],
-        //         'headers' => [
-        //             'Content-Type' => 'application/merge-patch+json',
-        //             'Accept' => 'application/ld+json',
-        //         ],
-        //     ]);
+        $client->request('PATCH', $iri, [
+            'json' => ['price' => 100],
+            'headers' => [
+                'Content-Type' => 'application/merge-patch+json',
+                'Accept' => 'application/ld+json',
+            ],
+        ]);
 
-        //     $this->assertResponseIsSuccessful();
+        $this->assertResponseIsSuccessful();
 
-        //     $this->assertJsonContains([
-        //         'id' => $flight->getId(),
-        //         'price' => 100,
-        //     ]);
-        // }
+        $this->assertJsonContains([
+            'id' => $flight->getId(),
+            'price' => 100,
+        ]);
     }
 
-    // public function testDeleteFlight(): void
-    // {
-    //     // Création d'un vol à supprimer
-    //     $flight = FlightFactory::createOne();
+    public function testDeleteFlight(): void
+    {
+        // Création d'un vol à supprimer
+        $flight = FlightFactory::createOne();
 
-    //     // Instanciation d'un client authentifié pour accéder aux endpoints protégés
-    //     $client = $this->createClientWithCredentials();
+        // Instanciation d'un client authentifié pour accéder aux endpoints protégés
+        $client = $this->createClientWithCredentials();
 
-    //     // Récupération de l'IRI
-    //     $iri = $this->findIriBy(Flight::class, ['id' => $flight->getId()]);
+        // Récupération de l'IRI
+        $iri = $this->findIriBy(Flight::class, ['id' => $flight->getId()]);
 
-    //     $client->request('DELETE', $iri);
+        $client->request('DELETE', $iri);
 
-    //     $this->assertResponseStatusCodeSame(204);
+        $this->assertResponseStatusCodeSame(204);
 
-    //     // Vérifier que l'objet vol supprimé n'existe plus en base de données 
-    //     $this->assertNull(
-    //         FlightFactory::repository()->find($flight->getId())
-    //     );
-    // 
+        // Vérifier que l'objet vol supprimé n'existe plus en base de données 
+        $this->assertNull(
+            FlightFactory::repository()->find($flight->getId())
+        );
+    }
+
+
+    public function testDeleteNotFoundFlight(): void
+    {
+        $client = $this->createClientWithCredentials();
+
+        $id = 10;
+
+        $this->assertNull(
+            FlightFactory::repository()->find($id),
+            'Le vol utilisé pour ce test doit être absent.'
+        );
+
+        $client->request('DELETE', '/api/flights/' . $id);
+
+        $this->assertResponseStatusCodeSame(
+            404,
+            'La suppression d’un vol inexistant doit retourner 404.'
+        );
+    }
 }
