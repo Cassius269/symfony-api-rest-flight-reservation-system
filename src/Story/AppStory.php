@@ -16,6 +16,7 @@ final class AppStory extends Story
         DefaultConstructorsStory::load();
         DefaultCompaniesStory::load();
         DefaultCaptainsStory::load();
+        DefaultAirplaneModelsStory::load();
         DefaultAirplanesStory::load();
         DefaultCompaniesCaptainsStory::load();
         DefaultStatusStory::load();
