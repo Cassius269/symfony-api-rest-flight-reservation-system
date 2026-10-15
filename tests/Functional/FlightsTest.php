@@ -21,6 +21,7 @@ final class FlightsTest extends AbstractTest
 
     public function testGetCollection(): void
     {
+        $this->prepareFlightDependencies();
         FlightFactory::createMany(100);
 
         $response = $this->createClientWithCredentials()
@@ -32,6 +33,7 @@ final class FlightsTest extends AbstractTest
 
     public function testCreateFlight(): void
     {
+        $this->prepareFlightDependencies();
         $france = CountryFactory::createOne(['name' => 'France']);
         $comores = CountryFactory::createOne(['name' => 'Comores']);
         $company = CompanyFactory::createOne(['name' => 'Air France']);
@@ -74,6 +76,7 @@ final class FlightsTest extends AbstractTest
 
     public function testUpdateFlight(): void
     {
+        $this->prepareFlightDependencies();
         $flight = FlightFactory::createOne();
 
         $client = $this->createClientWithCredentials();
@@ -98,6 +101,7 @@ final class FlightsTest extends AbstractTest
 
     public function testDeleteFlight(): void
     {
+        $this->prepareFlightDependencies();
         // Création d'un vol à supprimer
         $flight = FlightFactory::createOne();
 
@@ -120,6 +124,7 @@ final class FlightsTest extends AbstractTest
 
     public function testDeleteNotFoundFlight(): void
     {
+        $this->prepareFlightDependencies();
         $client = $this->createClientWithCredentials();
 
         $id = 10;
@@ -135,5 +140,18 @@ final class FlightsTest extends AbstractTest
             404,
             'La suppression d’un vol inexistant doit retourner 404.'
         );
+    }
+
+
+    private function prepareFlightDependencies(): void
+    {
+        $company = CompanyFactory::createOne();
+
+        AirplaneFactory::createOne([
+            'company' => $company,
+        ]);
+
+        CaptainFactory::createOne();
+        StatusFactory::createOne();
     }
 }
