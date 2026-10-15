@@ -49,6 +49,9 @@ jobs:
       - name: install deps
         run: composer install --prefer-dist --no-interaction --no-progress --optimize-autoloader --ansi
 
+      - name: Generate JWT test keys
+        run: php bin/console lexik:jwt:generate-keypair --skip-if-exists
+
       - name: Tests
         run: composer app-tests
         env:
