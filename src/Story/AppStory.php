@@ -13,12 +13,13 @@ final class AppStory extends Story
     public function build(): void
     {
         DefaultAdminsStory::load();
-        DefaultCaptainsStory::load();
         DefaultConstructorsStory::load();
         DefaultCompaniesStory::load();
+        DefaultCaptainsStory::load();
+        DefaultAirplanesStory::load();
+        DefaultCompaniesCaptainsStory::load();
         DefaultStatusStory::load();
         DefaultAirportsStory::load();
-        DefaultAirplanesStory::load();
         DefaultFlightsStory::load();
     }
 }

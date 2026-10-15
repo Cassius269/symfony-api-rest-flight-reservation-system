@@ -35,11 +35,11 @@ final class FlightFactory extends PersistentObjectFactory
         $dateArrival = (clone $dateDeparture)->modify('+6 hours');
 
         return [
-            'airplane' => AirplaneFactory::new(),
+            'airplane' => AirplaneFactory::random(),
             'airportArrival' => AirportFactory::new(),
             'airportDeparture' => AirportFactory::new(),
-            'captain' => CaptainFactory::new(), // TODO add App\\Entity\\Captain type manually
-            'company' => CompanyFactory::new(),
+            'captain' => CaptainFactory::random(),
+            'company' => CompanyFactory::random(),
             'createdAt' => \DateTimeImmutable::createFromMutable(self::faker()->dateTime()),
             'dateArrival' => $dateArrival,
             'dateDeparture' => $dateDeparture,
@@ -47,7 +47,7 @@ final class FlightFactory extends PersistentObjectFactory
             'isDirect' => self::faker()->boolean(),
             'isLate' => self::faker()->boolean(),
             'price' => self::faker()->randomFloat(2, 100, 1000), // génère un prix décimal aléatoire entre 100 et 1000euros
-            'status' => StatusFactory::new(),
+            'status' => StatusFactory::random(),
         ];
     }
 

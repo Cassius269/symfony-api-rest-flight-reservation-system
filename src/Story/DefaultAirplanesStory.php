@@ -9,6 +9,6 @@ final class DefaultAirplanesStory extends Story
 {
     public function build(): void
     {
-        AirplaneFactory::createMany(10);
+        AirplaneFactory::createMany(50);
     }
 }
