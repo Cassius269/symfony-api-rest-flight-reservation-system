@@ -15,13 +15,13 @@ jobs:
                   tools: composer:v2
 
             - name: Setup Cache
-              run: echo "COMPOSER_CACHE_DIR:${composer config cache-dir}"
+              run: echo "COMPOSER_CACHE_DIR=${composer config cache-dir}" >>GITHUB_ENV
 
             - name: Caching deps
               uses: actions/cache@v4
               with:
                   path: ${{ env.COMPOSER_CACHE_DIR }}
-                  key: php8.3-composer-${{ hashFiles('**/composer.json') }} >>GITHUB_ENV
+                  key: php8.3-composer-${{ hashFiles('**/composer.json') }}
                   restore-keys: |
                       php8.3-composer-latest-
             - name: Update composer
@@ -33,7 +33,7 @@ jobs:
             - name: security audit
               run: |
                   composer audit \
-                    --nodev \
+                    --no-dev \
                     --abandoned="report" \
                     --ignore-severity="low" \
                     --ignore-severity="medium" \
