@@ -1,8 +1,9 @@
 name: Security Audit
 on: [push, pull_request]
 jobs:
-    name: Security Audit
-    runs-on: ubuntu-latest
+    audit:
+        name: Security Audit
+        runs-on: ubuntu-latest
     steps:
         - name: Checkout
           uses: actions/checkout@v4
@@ -39,3 +40,10 @@ jobs:
                 --format="json" \
                 --no-ansi \
                 >> /tmp/security-audit.json
+
+        - name: upload security audit report
+          uses: actions/upload-artifact
+          if: always()
+          with:
+              name: security-audit
+              path: /tmp/security-audit.json
