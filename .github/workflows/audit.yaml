@@ -4,46 +4,46 @@ jobs:
     audit:
         name: Security Audit
         runs-on: ubuntu-latest
-    steps:
-        - name: Checkout
-          uses: actions/checkout@v4
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
 
-        - name: Setup PHP
-          uses: shivammathur/setup-php@v2
-          with:
-              php-version: 8.3
-              tools: composer:v2
+            - name: Setup PHP
+              uses: shivammathur/setup-php@v2
+              with:
+                  php-version: 8.3
+                  tools: composer:v2
 
-        - name: Setup Cache
-          run: echo "COMPOSER_CACHE_DIR:${composer config cache-dir}"
+            - name: Setup Cache
+              run: echo "COMPOSER_CACHE_DIR:${composer config cache-dir}"
 
-        - name: Caching deps
-          uses: actions/cache@v4
-          with:
-              path: ${{ env.COMPOSER_CACHE_DIR }}
-              key: php8.3-composer-${{ hashFiles('**/composer.json') }} >>GITHUB_ENV
-              restore-keys: |
-                  php8.3-composer-latest-
-        - name: Update composer
-          run: composer self-Update
+            - name: Caching deps
+              uses: actions/cache@v4
+              with:
+                  path: ${{ env.COMPOSER_CACHE_DIR }}
+                  key: php8.3-composer-${{ hashFiles('**/composer.json') }} >>GITHUB_ENV
+                  restore-keys: |
+                      php8.3-composer-latest-
+            - name: Update composer
+              run: composer self-Update
 
-        - name: isntall deps
-          run: composer install --prefer-dist --no-insteraction --no-progress --optimize-autoloader
+            - name: isntall deps
+              run: composer install --prefer-dist --no-insteraction --no-progress --optimize-autoloader
 
-        - name: security audit
-          run: |
-              composer audit \
-                --nodev \
-                --abandoned="report" \
-                --ignore-severity="low" \
-                --ignore-severity="medium" \
-                --format="json" \
-                --no-ansi \
-                >> /tmp/security-audit.json
+            - name: security audit
+              run: |
+                  composer audit \
+                    --nodev \
+                    --abandoned="report" \
+                    --ignore-severity="low" \
+                    --ignore-severity="medium" \
+                    --format="json" \
+                    --no-ansi \
+                    >> /tmp/security-audit.json
 
-        - name: upload security audit report
-          uses: actions/upload-artifact
-          if: always()
-          with:
-              name: security-audit
-              path: /tmp/security-audit.json
+            - name: upload security audit report
+              uses: actions/upload-artifact
+              if: always()
+              with:
+                  name: security-audit
+                  path: /tmp/security-audit.json
