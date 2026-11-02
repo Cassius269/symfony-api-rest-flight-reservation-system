@@ -25,9 +25,9 @@ jobs:
                   restore-keys: |
                       php8.3-composer-latest-
             - name: Update composer
-              run: composer self-Update
+              run: composer self-update
 
-            - name: isntall deps
+            - name: install deps
               run: composer install --prefer-dist --no-interaction --no-progress --optimize-autoloader
 
             - name: security audit
