@@ -1,6 +1,12 @@
 name: Security Audit
-on: [push, pull_request]
-jobs:
+on:
+    workflows_call:
+    push:
+        branches-ignore:
+            - main
+    pull_request:
+        branches-ignore:
+            - mainjobs:
     audit:
         name: Security Audit
         runs-on: ubuntu-latest
