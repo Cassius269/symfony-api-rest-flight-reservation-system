@@ -7,11 +7,11 @@ jobs:
     audit:
         uses: "./.github/workflows/audit.yaml"
     # quality:
-    #     uses: "./.github/workflows/quality.yaml"
+    #    uses: "./.github/workflows/quality.yaml"
     tests:
         # needs: [audit, quality]
         needs: [audit]
-        uses: "./github/workflows/test.yaml"
+        uses: "./.github/workflows/test.yaml"
     deploy:
         name: deploy
         needs: [tests]
